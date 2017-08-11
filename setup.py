@@ -16,7 +16,7 @@ INSTALL_REQUIRES = [
 ]
 ENTRY_POINTS = {
     'console_scripts': [
-        'bio2bel_bkms = bio2bel_bkms.cli:main',
+        'bio2bel_ec = bio2bel_ec.cli:main',
     ]
 }
 
