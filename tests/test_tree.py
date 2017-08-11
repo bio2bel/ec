@@ -8,6 +8,8 @@ test_path = tree.ENZCLASS_FILE
 
 class TestTree(unittest.TestCase):
     def setUp(self):
+        if not os.path.isfile(tree.ENZCLASS_FILE):
+            tree.urlretrieve(tree.ENZCLASS_URL, tree.ENZCLASS_FILE)
         with open(test_path) as f:
             self.graph = tree.populate_tree(None, f)
 
