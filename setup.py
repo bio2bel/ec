@@ -7,7 +7,7 @@ import re
 import setuptools
 
 PACKAGES = setuptools.find_packages(where='src')
-META_PATH = os.path.join('src', 'bio2bel_bkms', '__init__.py')
+META_PATH = os.path.join('src', '__init__.py')
 INSTALL_REQUIRES = [
     'requests',
     'click',
