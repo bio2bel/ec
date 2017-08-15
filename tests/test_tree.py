@@ -11,7 +11,7 @@ class TestTree(unittest.TestCase):
         if not os.path.isfile(tree.ENZCLASS_FILE):
             tree.urlretrieve(tree.ENZCLASS_URL, tree.ENZCLASS_FILE)
         with open(test_path) as f:
-            self.graph = tree.populate_tree(None, f)
+            self.graph = tree.populate_tree()
 
     def TestLenght(self):
         self.assertEqual(33, self.graph.number_of_nodes())
