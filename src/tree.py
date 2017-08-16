@@ -5,6 +5,9 @@ from urllib.request import urlretrieve
 
 import networkx as nx
 from pybel.constants import PYBEL_DATA_DIR
+from pybel.utils import ensure_quotes
+from pybel_tools.document_utils import write_boilerplate
+from pybel_tools.resources import CONFIDENCE
 
 ENZCLASS_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 
@@ -65,7 +68,56 @@ def populate_tree(fileName=ENZCLASS_FILE):
     return graph
 
 
-if __name__ == '__main__':
-    g = populate_tree()
-    print(g.edges())
-    pass
+def write_expasy_tree_boilerplate(file=None):
+    """Writes the BEL document header to the file
+
+    :param file file: A writeable file or file like. Defaults to stdout
+    """
+    write_boilerplate(
+        document_name='InterPro Tree',
+        authors='Aram Grigoryan and Charles Tapley Hoyt',
+        contact='aram.grigoryan@scai.fraunhofer.de',
+        licenses='Creative Commons by 4.0',
+        copyright='Copyright (c) 2017 Aram Grigoryan. All Rights Reserved.',
+        description="""This BEL document represents relations from EXPASY ENZYME nomenclature database""",
+        namespace_dict={
+            'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
+        },
+        namespace_patterns={},
+        annotations_dict={'Confidence': CONFIDENCE},
+        annotations_patterns={},
+        file=file
+    )
+
+
+def write_expasy_tree_body(graph, file):
+    """Creates the lines of BEL document that represents the InterPro tree
+
+    :param networkx.DiGraph graph: A graph representing the InterPro tree from :func:`main`
+    :param file file: A writeable file or file-like. Defaults to stdout.
+    """
+    print('SET Citation = {"PubMed","InterPro","27899635"}', file=file)
+    print('SET Evidence = "InterPro Definitions"', file=file)
+    print('SET Confidence = "Axiomatic"', file=file)
+
+    for parent, child in graph.edges_iter():
+        print(
+            'p(EC:{}) isA p(EC:{})'.format(
+                ensure_quotes(child),
+                ensure_quotes(parent),
+            ),
+            file=file
+        )
+
+    print('UNSET ALL', file=file)
+
+
+def write_expasy_tree(file=None):
+    """Creates the entire BEL document representing the InterPro tree
+
+    :param file file: A writeable file or file-like. Defaults to stdout.
+    :param bool force_download: Should the data be re-downloaded?
+    """
+    graph = populate_tree()
+    write_expasy_tree_boilerplate(file)
+    write_expasy_tree_body(graph, file)
