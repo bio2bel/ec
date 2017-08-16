@@ -1,4 +1,4 @@
-#from . import tree
+from . import tree
 from .tree import *
 
 __version__ = '0.1.1-dev'
