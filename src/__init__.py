@@ -1,4 +1,5 @@
-from . import tree
+from src.bio2bel_ec import tree
+
 #from .tree import *
 
 __version__ = '0.1.1-dev'

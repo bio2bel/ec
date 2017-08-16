@@ -1,9 +1,8 @@
 import os
 import unittest
 
+from src import tree
 
-
-from ..src import tree
 test_path = tree.ENZCLASS_FILE
 
 class TestTree(unittest.TestCase):
