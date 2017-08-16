@@ -74,7 +74,7 @@ def write_expasy_tree_boilerplate(file=None):
     :param file file: A writeable file or file like. Defaults to stdout
     """
     write_boilerplate(
-        document_name='InterPro Tree',
+        document_name='Expasy Enzyme Tree',
         authors='Aram Grigoryan and Charles Tapley Hoyt',
         contact='aram.grigoryan@scai.fraunhofer.de',
         licenses='Creative Commons by 4.0',
@@ -91,13 +91,13 @@ def write_expasy_tree_boilerplate(file=None):
 
 
 def write_expasy_tree_body(graph, file):
-    """Creates the lines of BEL document that represents the InterPro tree
+    """Creates the lines of BEL document that represents the Expasy Enzyme tree
 
-    :param networkx.DiGraph graph: A graph representing the InterPro tree from :func:`main`
+    :param networkx.DiGraph graph: A graph representing the Expasy tree from :func:`main`
     :param file file: A writeable file or file-like. Defaults to stdout.
     """
-    print('SET Citation = {"PubMed","InterPro","27899635"}', file=file)
-    print('SET Evidence = "InterPro Definitions"', file=file)
+    print('SET Citation = {"PubMed","Expasy","12824418"}', file=file)
+    print('SET Evidence = "Expasy Definitions"', file=file)
     print('SET Confidence = "Axiomatic"', file=file)
 
     for parent, child in graph.edges_iter():
@@ -113,10 +113,9 @@ def write_expasy_tree_body(graph, file):
 
 
 def write_expasy_tree(file=None):
-    """Creates the entire BEL document representing the InterPro tree
+    """Creates the entire BEL document representing the Expasy tree
 
     :param file file: A writeable file or file-like. Defaults to stdout.
-    :param bool force_download: Should the data be re-downloaded?
     """
     graph = populate_tree()
     write_expasy_tree_boilerplate(file)
