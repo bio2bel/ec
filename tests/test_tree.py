@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from src import tree
+from bio2bel_ec import tree
 
 test_path = tree.ENZCLASS_FILE
 

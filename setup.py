@@ -7,7 +7,7 @@ import re
 import setuptools
 
 PACKAGES = setuptools.find_packages(where='src')
-META_PATH = os.path.join('src', '__init__.py')
+META_PATH = os.path.join('src', 'bio2bel_ec', '__init__.py')
 INSTALL_REQUIRES = [
     'requests',
     'click',
@@ -45,7 +45,7 @@ def find_meta(meta):
 
 def get_long_description():
     """Get the long_description from the README.rst file. Assume UTF-8 encoding."""
-    with codecs.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
+    with codecs.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
         long_description = f.read()
     return long_description
 
