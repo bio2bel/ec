@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
 
 from pybel import BELGraph
@@ -14,6 +15,7 @@ cyclooxygenase_ec_pp = PROTEIN, 'EC', '1.14.-.-'
 cyclooxygenase_ec_ppp = PROTEIN, 'EC', '1.-.-.-'
 
 
+@unittest.skipIf('CI' in os.environ, "Don't have PyUniProt data on Travis")
 class TestEnrich(unittest.TestCase):
     def test_enrich(self):
         """Tests that the connection from the protein to the actual enzyme class is made and also
