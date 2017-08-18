@@ -7,6 +7,7 @@ from pybel.constants import IS_A
 from pybel.constants import PYBEL_DATA_DIR
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import get_latest_arty_namespace
+from pybel.utils import ensure_quotes
 
 EC_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'bio2bel', 'ec')
 if not os.path.exists(EC_DATA_DIR):
@@ -40,7 +41,7 @@ def print_human(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(HGNC:{}) {} p(EC:{})'.format(e.gene_name, IS_A, ec), file=file)#TODO ensure quotes!
+                print('p(HGNC:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
 
 
 def print_musmusculus(file):
@@ -54,7 +55,7 @@ def print_musmusculus(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(HGNC:{}) {} p(EC:{})'.format(e.gene_name, IS_A, ec), file=file)  # TODO replace hgnc for mice
+                print('p(MGI:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
 
 
 def print_rattusnorvegicus(file):
@@ -68,7 +69,7 @@ def print_rattusnorvegicus(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(HGNC:{}) {} p(EC:{})'.format(e.gene_name, IS_A, ec), file=file)  # TODO replace hgnc for rats
+                print('p(RGD:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
 
 
 def write_gene_ec_mapping(file):
@@ -98,9 +99,9 @@ def write_gene_ec_mapping(file):
     print('SET Citation = {{"URL","{}"}}'.format('http://www.uniprot.org/downloads'), file=file)
     print('SET Evidence = "HGNC to EC mapping"', file=file)
 
-    print_human(file)
-    # TODO add print_musmuculus and print_rattusnorvegicus when their todo's are done
-
+    print_human(file=file)
+    print_musmusculus(file=file)
+    print_rattusnorvegicus(file=file)
 
 if __name__ == '__main__':
     filename = os.path.join(EC_DATA_DIR, 'hgnc_to_ec.bel')
