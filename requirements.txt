@@ -3,3 +3,4 @@ click
 pandas
 pybel_tools
 pyuniprot
+networkx

@@ -13,6 +13,7 @@ INSTALL_REQUIRES = [
     'click',
     'pandas',
     'pybel_tools',
+    'networkx',
 ]
 ENTRY_POINTS = {
     'console_scripts': [
