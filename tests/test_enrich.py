@@ -8,6 +8,7 @@ from pybel.constants import PROTEIN
 
 from bio2bel_ec.enrich import enrich_enzyme_classes
 
+
 @unittest.skipIf('CI' in os.environ, "Don't have PyUniProt data on Travis")
 class TestEnrich(unittest.TestCase):
     def setUp(self):
