@@ -1,29 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import os
 from urllib.request import urlretrieve
 
 import networkx as nx
-from pybel.constants import PYBEL_DATA_DIR
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import CONFIDENCE
 
-ENZCLASS_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
+from .constants import ENZCLASS_URL, ENZCLASS_FILE
 
-ENZCLASS_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'expasy')
-if not os.path.exists(ENZCLASS_DATA_DIR):
-    os.makedirs(ENZCLASS_DATA_DIR)
 
-ENZCLASS_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzclass.txt')
 
 
 def download_res():
     urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
 
-if not os.path.isfile(ENZCLASS_FILE):
-    download_res()
 
 
 def populate_tree(fileName=ENZCLASS_FILE):

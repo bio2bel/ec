@@ -2,13 +2,15 @@ import os
 import unittest
 
 from bio2bel_ec import tree
+from bio2bel_ec.constants import ENZCLASS_FILE, ENZCLASS_URL
 
-test_path = tree.ENZCLASS_FILE
+test_path = ENZCLASS_FILE
+
 
 class TestTree(unittest.TestCase):
     def setUp(self):
-        if not os.path.isfile(tree.ENZCLASS_FILE):
-            tree.urlretrieve(tree.ENZCLASS_URL, tree.ENZCLASS_FILE)
+        if not os.path.isfile(ENZCLASS_FILE):
+            tree.urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
         with open(test_path) as f:
             self.graph = tree.populate_tree()
 

@@ -4,14 +4,11 @@ import os
 
 import pyuniprot
 from pybel.constants import IS_A
-from pybel.constants import PYBEL_DATA_DIR
+from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import get_latest_arty_namespace
-from pybel.utils import ensure_quotes
 
-EC_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'bio2bel', 'ec')
-if not os.path.exists(EC_DATA_DIR):
-    os.makedirs(EC_DATA_DIR)
+from .constants import EC_DATA_DIR
 
 
 def get_data(taxid=9606, force=False):
@@ -102,6 +99,7 @@ def write_gene_ec_mapping(file):
     print_human(file=file)
     print_musmusculus(file=file)
     print_rattusnorvegicus(file=file)
+
 
 if __name__ == '__main__':
     filename = os.path.join(EC_DATA_DIR, 'hgnc_to_ec.bel')
