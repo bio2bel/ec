@@ -2,6 +2,10 @@
 
 from pybel_tools import pipeline
 
+__all__ = [
+    'enrich_enzyme_classes',
+]
+
 
 @pipeline.mutator
 def enrich_enzyme_classes(graph):

@@ -9,6 +9,10 @@ from pybel_tools.resources import CONFIDENCE
 
 from .constants import ENZCLASS_URL, ENZCLASS_FILE
 
+__all__ = [
+    'populate_tree',
+    'write_expasy_tree',
+]
 
 
 

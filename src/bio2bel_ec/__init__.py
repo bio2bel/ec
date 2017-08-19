@@ -1,6 +1,14 @@
-from bio2bel_ec import tree
+# -*- coding: utf-8 -*-
 
-#from .tree import *
+from . import enrich
+from . import tree
+from .enrich import *
+from .tree import *
+
+__all__ = (
+    tree.__all__ +
+    enrich.__all__
+)
 
 __version__ = '0.1.1-dev'
 
