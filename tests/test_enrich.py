@@ -35,7 +35,38 @@ class TestParent(unittest.TestCase):
 
 @unittest.skipIf('CI' in os.environ, "Don't have PyUniProt data on Travis")
 class TestEnrich(unittest.TestCase):
-    def test_enrich(self):
+    def test_enrich_class(self):
+        """Tests that the connection from the subclass to the enzyme class is inferred"""
+        graph = BELGraph()
+        graph.add_simple_node(*cyclooxygenase_ec_pp)
+
+        self.assertEqual(1, graph.number_of_nodes())
+
+        enrich_enzyme_classes(graph)
+
+        self.assertIn(cyclooxygenase_ec_pp, graph)
+        self.assertIn(cyclooxygenase_ec_ppp, graph)
+
+        self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
+
+    def test_enrich_subclass(self):
+        """Tests that the connection from the enzyme subsubclass to subclass and class is made and also
+        the entire class hierarchy is ensured"""
+        graph = BELGraph()
+        graph.add_simple_node(*cyclooxygenase_ec_p)
+
+        self.assertEqual(1, graph.number_of_nodes())
+
+        enrich_enzyme_classes(graph)
+
+        self.assertIn(cyclooxygenase_ec_p, graph)
+        self.assertIn(cyclooxygenase_ec_pp, graph)
+        self.assertIn(cyclooxygenase_ec_ppp, graph)
+
+        self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
+        self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
+
+    def test_enrich_instance(self):
         """Tests that the connection from the protein to the actual enzyme class is made and also
         the entire class hierarchy is ensured"""
         graph = BELGraph()
