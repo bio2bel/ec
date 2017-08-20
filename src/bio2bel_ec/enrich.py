@@ -18,4 +18,4 @@ def enrich_enzyme_classes(graph):
 
     :param pybel.BELGraph graph: A BEL graph
     """
-    raise NotImplemented
+    raise NotImplementedError
