@@ -6,7 +6,8 @@ import unittest
 from pybel import BELGraph
 from pybel.constants import PROTEIN
 
-from bio2bel_ec.enrich import enrich_enzyme_classes
+from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent
+
 ec = '1.14.99.1'
 ec_p = '1.14.99.-'
 ec_pp = '1.14. -.-'
@@ -18,6 +19,18 @@ cyclooxygenase_ec_p = PROTEIN, 'EC', ec_p
 cyclooxygenase_ec_pp = PROTEIN, 'EC', ec_pp
 cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 
+
+class TestParent(unittest.TestCase):
+    """Tests that the function for getting the parent given an enzyme string works"""
+
+    def test_instance(self):
+        self.assertEqual(ec_p, get_parent(ec))
+
+    def test_subclass(self):
+        self.assertEqual(ec_pp, get_parent(ec_p))
+
+    def test_class(self):
+        self.assertEqual(ec_ppp, get_parent(ec_pp))
 
 
 @unittest.skipIf('CI' in os.environ, "Don't have PyUniProt data on Travis")

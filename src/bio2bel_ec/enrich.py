@@ -7,6 +7,15 @@ __all__ = [
 ]
 
 
+def get_parent(ec_str):
+    """Get the parent enzyme string
+
+    :param str ec_str: Gets the parent enzyme string
+    :rtype: str
+    """
+    return NotImplementedError
+
+
 @pipeline.mutator
 def enrich_enzyme_classes(graph):
     """Enriches Enzyme Classes for proteins in the graph
