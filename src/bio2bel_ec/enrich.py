@@ -10,7 +10,7 @@ __all__ = [
 def get_parent(ec_str):
     """Get the parent enzyme string
 
-    :param str ec_str: Gets the parent enzyme string
+    :param str ec_str: The child enzyme string
     :rtype: str
     """
     return NotImplementedError
@@ -22,7 +22,7 @@ def enrich_enzyme_classes(graph):
 
     1. Gets a list of proteins
     2. looks up their entries with PyUniProt
-    3. Annotates isA relations for all enzyme classes it finds
+    3. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
     4. Ensures all parent enzyme classes for those enzyme classes
 
     :param pybel.BELGraph graph: A BEL graph
