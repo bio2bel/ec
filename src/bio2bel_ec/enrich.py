@@ -13,7 +13,7 @@ def get_parent(ec_str):
     :param str ec_str: The child enzyme string
     :rtype: str
     """
-    return NotImplementedError
+    raise NotImplementedError
 
 
 @pipeline.mutator
