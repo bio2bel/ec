@@ -38,7 +38,8 @@ def print_human(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(HGNC:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
+                print('p(HGNC:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))),
+                      file=file)
 
 
 def print_musmusculus(file):
@@ -52,7 +53,8 @@ def print_musmusculus(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(MGI:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
+                print('p(MGI:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))),
+                      file=file)
 
 
 def print_rattusnorvegicus(file):
@@ -66,7 +68,8 @@ def print_rattusnorvegicus(file):
     for e in entries:
         if e.ec_numbers:
             for ec in e.ec_numbers:
-                print('p(RGD:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))), file=file)
+                print('p(RGD:{}) {} p(EC:{})'.format(ensure_quotes(str(e.gene_name)), IS_A, ensure_quotes(str(ec))),
+                      file=file)
 
 
 def write_gene_ec_mapping(file):

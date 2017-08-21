@@ -15,11 +15,8 @@ __all__ = [
 ]
 
 
-
 def download_res():
     urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
-
-
 
 
 def populate_tree(fileName=ENZCLASS_FILE):
@@ -48,8 +45,6 @@ def populate_tree(fileName=ENZCLASS_FILE):
         elif len(nums) == 4:
             return ("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2]),
                     "{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3]))
-
-        return nums
 
     with open(str(fileName), 'r') as file:
         for line in file:
