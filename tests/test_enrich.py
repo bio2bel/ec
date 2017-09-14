@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os
 import unittest
 
+import os
 from pybel import BELGraph
 from pybel.constants import PROTEIN
 
-from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent
+from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent, annotate_parents
 
 ec = '1.14.99.1'
 ec_p = '1.14.99.-'
@@ -20,7 +20,20 @@ cyclooxygenase_ec_pp = PROTEIN, 'EC', ec_pp
 cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 
 
-class TestParent(unittest.TestCase):
+class TestAnnotateParent(unittest.TestCase):
+    def test_single(self):
+        graph = BELGraph()
+        graph.add_simple_node(*cyclooxygenase)
+
+        self.assertEqual(1, graph.number_of_nodes())
+
+        annotate_parents(graph, cyclooxygenase)
+
+        self.assertEqual(2, graph.number_of_nodes())
+        self.assertIn(cyclooxygenase_ec_p, graph)
+
+
+class TestTree(unittest.TestCase):
     """Tests that the function for getting the parent given an enzyme string works"""
 
     def test_instance(self):

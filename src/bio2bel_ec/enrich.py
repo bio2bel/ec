@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from pybel.constants import PROTEIN, FUNCTION
+from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
+
 from bio2bel_ec.tree import populate_tree, download_res
 
 __all__ = [
@@ -17,7 +20,31 @@ def get_parent(ec_str):
     graph = populate_tree()
 
     return graph.predecessors(ec_str)[-1]
-    #raise NotImplementedError
+    # raise NotImplementedError
+
+
+def node_is_protein(graph, node):
+    return PROTEIN == graph.node[node][FUNCTION]
+
+
+def annotate_parents(graph, node):
+    """Annotates the set of possibly multiple Enyzme Class parents to the node in the graph
+
+    :param BELGraph graph: A BEL graph
+    :param tuple node: A PyBEL node tuple
+    """
+    raise NotImplementedError
+
+
+def annotate_all_parents(graph):
+    """Adds the set of possibly multiple Enzyme Class memberships for all nodes in a graph
+
+    :param BELGraph graph: A BEL graph
+    """
+    nodes = list(filter_nodes(graph, node_is_protein))
+
+    for node in nodes:
+        annotate_parents(graph, node)
 
 
 @pipeline.mutator
@@ -33,6 +60,7 @@ def enrich_enzyme_classes(graph):
     """
 
     raise NotImplementedError
+
 
 if __name__ == '__main__':
     download_res()
