@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pybel_tools import pipeline
+from bio2bel_ec.tree import populate_tree, download_res
 
 __all__ = [
     'enrich_enzyme_classes',
@@ -13,7 +14,10 @@ def get_parent(ec_str):
     :param str ec_str: The child enzyme string
     :rtype: str
     """
-    raise NotImplementedError
+    graph = populate_tree()
+
+    return graph.predecessors(ec_str)[-1]
+    #raise NotImplementedError
 
 
 @pipeline.mutator
@@ -27,4 +31,10 @@ def enrich_enzyme_classes(graph):
 
     :param pybel.BELGraph graph: A BEL graph
     """
+
     raise NotImplementedError
+
+if __name__ == '__main__':
+    download_res()
+    ec_name = get_parent('1.14.99.-')
+    print(ec_name)
