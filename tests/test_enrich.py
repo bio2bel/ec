@@ -8,13 +8,13 @@ from pybel.constants import PROTEIN
 
 from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent
 
-#ec = '1.14.99.1'
+ec = '1.14.99.1'
 ec_p = '1.14.99.-'
 ec_pp = '1.14. -.-'
 ec_ppp = '1. -. -.-'
 
 cyclooxygenase = PROTEIN, 'HGNC', 'PTGS2'
-#cyclooxygenase_ec = PROTEIN, 'EC', ec
+cyclooxygenase_ec = PROTEIN, 'EC', ec
 cyclooxygenase_ec_p = PROTEIN, 'EC', ec_p
 cyclooxygenase_ec_pp = PROTEIN, 'EC', ec_pp
 cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
@@ -23,8 +23,8 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 class TestParent(unittest.TestCase):
     """Tests that the function for getting the parent given an enzyme string works"""
 
-    #def test_instance(self):
-        #self.assertEqual(ec_p, get_parent(ec))
+    def test_instance(self):
+        self.assertEqual(ec_p, get_parent(ec))
 
     def test_subclass(self):
         self.assertEqual(ec_pp, get_parent(ec_p))
@@ -76,12 +76,12 @@ class TestEnrich(unittest.TestCase):
 
         enrich_enzyme_classes(graph)
 
-        #self.assertIn(cyclooxygenase_ec, graph)
+        self.assertIn(cyclooxygenase_ec, graph)
         self.assertIn(cyclooxygenase_ec_p, graph)
         self.assertIn(cyclooxygenase_ec_pp, graph)
         self.assertIn(cyclooxygenase_ec_ppp, graph)
 
-        #self.assertIn(cyclooxygenase_ec, graph.edge[cyclooxygenase])
+        self.assertIn(cyclooxygenase_ec, graph.edge[cyclooxygenase])
         self.assertIn(cyclooxygenase_ec_p, graph.edge[cyclooxygenase_ec])
         self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
         self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
