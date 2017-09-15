@@ -3,6 +3,7 @@
 from urllib.request import urlretrieve
 
 import networkx as nx
+import os
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import CONFIDENCE
@@ -16,8 +17,14 @@ __all__ = [
 ]
 
 
-def download_res():
-    urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
+def download_res(force=False):
+    """
+
+    :param force: bool to force download
+    :return: None
+    """
+    if not os.path.exist(ENZCLASS_FILE) or force:
+        urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
 
 def populate_tree(fileName=ENZCLASS_FILE):
