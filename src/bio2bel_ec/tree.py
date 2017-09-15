@@ -22,7 +22,7 @@ def download_res(force=False):
     :param force: bool to force download
     :return: None
     """
-    if not os.path.exist(ENZCLASS_FILE) or force:
+    if not os.path.exists(ENZCLASS_FILE) or force:
         urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
 
