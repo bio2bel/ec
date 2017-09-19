@@ -13,6 +13,7 @@ from .constants import ENZCLASS_URL, ENZCLASS_FILE
 __all__ = [
     'populate_tree',
     'write_expasy_tree',
+    'standard_ec_id',
 ]
 
 
@@ -24,6 +25,15 @@ def download_res(force=False):
     """
     if not os.path.exists(ENZCLASS_FILE) or force:
         urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
+
+
+def standard_ec_id(non_standard_ec_id):
+    """
+    Rerturns standardized ec id string
+    :param str non_standard_ec_id: str
+    :return str:
+    """
+    return non_standard_ec_id.replace(" ", "")
 
 
 def populate_tree(fileName=ENZCLASS_FILE):
@@ -48,12 +58,14 @@ def populate_tree(fileName=ENZCLASS_FILE):
         if len(nums) == 1:
             return None
         elif len(nums) == 2:
-            return ("{}. -. -.-".format(nums[0]), "{}.{:>2}. -.-".format(nums[0], nums[1]))
+            return (standard_ec_id("{}. -. -.-".format(nums[0])),
+                    standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
         elif len(nums) == 3:
-            return ("{}.{:>2}. -.-".format(nums[0], nums[1]), "{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2]))
+            return (standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
+                    standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
         elif len(nums) == 4:
-            return ("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2]),
-                    "{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3]))
+            return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
+                    standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
 
     with open(str(fileName), 'r') as file:
         for line in file:

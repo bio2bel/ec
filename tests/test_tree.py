@@ -21,10 +21,10 @@ class TestTree(unittest.TestCase):
 
     def test_1(self):
         """checks some nodes"""
-        self.assertIn('5. 4. 2.-', self.graph.edge['5. 4. -.-'])
+        self.assertIn(tree.standard_ec_id('5. 4. 2.-'), self.graph.edge[tree.standard_ec_id('5. 4. -.-')])
 
-        self.assertIn('6. 6. 1.-', self.graph.edge['6. 6. -.-'])
-        self.assertIn('6. 6. -.-', self.graph.edge['6. -. -.-'])
+        self.assertIn(tree.standard_ec_id('6. 6. 1.-'), self.graph.edge[tree.standard_ec_id('6. 6. -.-')])
+        self.assertIn(tree.standard_ec_id('6. 6. -.-'), self.graph.edge[tree.standard_ec_id('6. -. -.-')])
 
 
 if __name__ == '__main__':
