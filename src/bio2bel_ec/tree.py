@@ -8,7 +8,7 @@ from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import CONFIDENCE
 
-from .constants import ENZCLASS_URL, ENZCLASS_FILE
+from bio2bel_ec.constants import ENZCLASS_URL, ENZCLASS_FILE
 
 __all__ = [
     'populate_tree',
