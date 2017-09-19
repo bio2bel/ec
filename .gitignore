@@ -104,5 +104,9 @@ ENV/
 .idea
 .idea/*
 
+# scratch dir
+.src/scratch
+.src/scratch/*
+
 # Dolphin on linux
 .directory

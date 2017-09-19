@@ -7,11 +7,12 @@ from pybel import BELGraph
 from pybel.constants import PROTEIN
 
 from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent, annotate_parents
+from bio2bel_ec.tree import standard_ec_id
 
-ec = '1.14.99.1'
-ec_p = '1.14.99.-'
-ec_pp = '1.14. -.-'
-ec_ppp = '1. -. -.-'
+ec = standard_ec_id('1.14.99.1')
+ec_p = standard_ec_id('1.14.99.-')
+ec_pp = standard_ec_id('1.14. -.-')
+ec_ppp = standard_ec_id('1. -. -.-')
 
 cyclooxygenase = PROTEIN, 'HGNC', 'PTGS2'
 cyclooxygenase_ec = PROTEIN, 'EC', ec
