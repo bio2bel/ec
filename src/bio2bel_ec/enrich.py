@@ -70,12 +70,14 @@ def node_is_protein(graph, node):
 
 
 def annotate_parents(graph, node):
-    """Annotates the set of possibly multiple Enyzme Class parents to the node in the graph
+    """Annotates the set of possibly multiple Enzyme Class parents to the node in the graph
 
     :param BELGraph graph: A BEL graph
     :param tuple node: A PyBEL node tuple
     """
-    raise NotImplementedError
+    parent_node = (node[0], node[1], get_parent(node[2]))
+    graph.add_edge(parent_node, node)
+    return graph
 
 
 def annotate_all_parents(graph):
@@ -84,6 +86,7 @@ def annotate_all_parents(graph):
     :param BELGraph graph: A BEL graph
     """
     nodes = list(filter_nodes(graph, node_is_protein))
+    print(len(nodes))
 
     for node in nodes:
         annotate_parents(graph, node)
@@ -100,5 +103,8 @@ def enrich_enzyme_classes(graph):
 
     :param pybel.BELGraph graph: A BEL graph
     """
-
-    raise NotImplementedError
+    annotate_all_parents(graph)
+    for edge in graph.edges():
+        print(edge)
+    return graph
+    #raise NotImplementedError

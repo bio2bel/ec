@@ -24,11 +24,11 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 class TestAnnotateParent(unittest.TestCase):
     def test_single(self):
         graph = BELGraph()
-        graph.add_simple_node(*cyclooxygenase)
+        graph.add_simple_node(*cyclooxygenase_ec)
 
         self.assertEqual(1, graph.number_of_nodes())
 
-        annotate_parents(graph, cyclooxygenase)
+        annotate_parents(graph, cyclooxygenase_ec)
 
         self.assertEqual(2, graph.number_of_nodes())
         self.assertIn(cyclooxygenase_ec_p, graph)
@@ -84,7 +84,7 @@ class TestEnrich(unittest.TestCase):
         """Tests that the connection from the protein to the actual enzyme class is made and also
         the entire class hierarchy is ensured"""
         graph = BELGraph()
-        graph.add_simple_node(*cyclooxygenase)
+        graph.add_simple_node(*cyclooxygenase_ec_ppp)
 
         self.assertEqual(1, graph.number_of_nodes())
 
