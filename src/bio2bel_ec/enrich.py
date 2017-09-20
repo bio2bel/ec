@@ -3,27 +3,43 @@
 import os
 import re
 from urllib.request import urlretrieve
+import pyuniprot
 
 from pybel.constants import PROTEIN, FUNCTION
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
 from bio2bel_ec.tree import populate_tree
-from bio2bel_ec.constants import ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE, EC_DATA_FILE_REGEX
+from bio2bel_ec.constants import ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE, EC_DATA_FILE_REGEX, SQL_DEFAULTS, SQLITE_DB_PATH
 
 __all__ = [
     'enrich_enzyme_classes',
 ]
 
 
-def download_ec_data(force_download=False):
+
+def mysql_connect(connection=SQL_DEFAULTS):
     """
-    Downloads the file
+    Sets a connection using MySQL
+    :param str connection:
     :return None:
     """
-    if not os.path.exists(ENZCLASS_DATA_FILE) or force_download:
-        urlretrieve(ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE)
+    pyuniprot.set_mysql_connection(connection)
 
+def sqlite_connect(db_path=SQLITE_DB_PATH):
+    """
+    Sets SQLite connection
+    :param db_path: str
+    :return: None
+    """
+    sqlite_db = os.path.join('sqlite:///', db_path)
+    pyuniprot.set_connection(sqlite_db)
+
+def connect(con_str=None, mysql=True):
+    if mysql:
+        mysql_connect() if con_str is None else mysql_connect(con_str)
+    else:
+        sqlite_connect() if con_str is None else sqlite_connect(con_str)
 
 def get_parent(ec_str):
     """Get the parent enzyme string
@@ -31,36 +47,9 @@ def get_parent(ec_str):
     :param str ec_str: The child enzyme string
     :rtype str: str
     """
-
-    def get_full_list_of_ec_ids(force_download=False):
-        """
-        Apparantly Returns the full list of EC entries
-        :return lst: lst
-        """
-        download_ec_data()
-        with open(ENZCLASS_DATA_FILE, 'r') as ec_file:
-            e_read = ec_file.read()
-
-            matches = re.finditer(EC_DATA_FILE_REGEX, e_read)
-            new_list = []
-
-            for regex_obj in matches:
-                new_list.append(regex_obj.group().split('   ')[1])
-
-            return new_list
-
-    id_list = get_full_list_of_ec_ids()
-
     graph = populate_tree()
-    if ec_str in id_list:
-        ec_str = ec_str.split('.')
-        ec_str[-1] = '-'
-        ec_str = '.'.join(_ for _ in ec_str)
-        return ec_str
-
     return graph.predecessors(ec_str)[-1]
-
-
+    connect()
 
     # raise NotImplementedError
 

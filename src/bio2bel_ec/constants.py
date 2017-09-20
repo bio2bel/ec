@@ -20,3 +20,5 @@ if not os.path.exists(EC_DATA_DIR):
     os.makedirs(EC_DATA_DIR)
 
 EC_DATA_FILE_REGEX = '(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
+SQL_DEFAULTS = "host='localhost', user='pyuniprot_user', passwd='pyuniprot_passwd', db='pyuniprot'"
+SQLITE_DB_PATH = os.path.join('~/.pyuniprot/data/', 'pyuniprot.db')

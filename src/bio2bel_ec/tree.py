@@ -4,11 +4,13 @@ from urllib.request import urlretrieve
 
 import networkx as nx
 import os
+import re
+
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
 from pybel_tools.resources import CONFIDENCE, get_latest_arty_namespace
 
-from bio2bel_ec.constants import ENZCLASS_URL, ENZCLASS_FILE
+from bio2bel_ec.constants import ENZCLASS_URL, ENZCLASS_FILE, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, EC_DATA_FILE_REGEX
 
 __all__ = [
     'populate_tree',
@@ -26,6 +28,13 @@ def download_res(force=False):
     if not os.path.exists(ENZCLASS_FILE) or force:
         urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
+def download_ec_data(force_download=False):
+    """
+    Downloads the file
+    :return None:
+    """
+    if not os.path.exists(ENZCLASS_DATA_FILE) or force_download:
+        urlretrieve(ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE)
 
 def standard_ec_id(non_standard_ec_id):
     """
@@ -77,6 +86,28 @@ def populate_tree(fileName=ENZCLASS_FILE):
             if e is not None:
                 graph.add_edge(*e)
 
+    def get_full_list_of_ec_ids(force_download=False):
+        """
+        Apparantly Returns the full list of EC entries
+        :return lst: lst
+        """
+        download_ec_data()
+        with open(ENZCLASS_DATA_FILE, 'r') as ec_file:
+            e_read = ec_file.read()
+
+            matches = re.finditer(EC_DATA_FILE_REGEX, e_read)
+            new_list = []
+
+            for regex_obj in matches:
+                new_list.append(regex_obj.group().split('   ')[1])
+
+            return new_list
+
+    id_list = get_full_list_of_ec_ids()
+    for node in id_list:
+        e = give_edge(node)
+        if e is not None:
+            graph.add_edge(*e)
     return graph
 
 
