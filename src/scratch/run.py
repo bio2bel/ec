@@ -21,10 +21,11 @@ bgraph = pybel.BELGraph()
 #bgraph = pybel.from_path('/home/agrigoryan/belscript.bel', no_identifier_validation=True)
 f = open('/home/agrigoryan/dd.txt', 'w+')
 
-#bgraph.add_simple_node(*cyclooxygenase_ec)
+bgraph.add_simple_node(*cyclooxygenase_ec)
 #bgraph.add_simple_node(PROTEIN, 'EC',get_parent(cyclooxygenase_ec[-1]))
 bgraph.add_edge(cyclooxygenase_ec, cyclooxygenase_ec_p)
 for edge in bgraph.edges():
     print(edge)
+print(bgraph.node[cyclooxygenase_ec]['function'])
 #pybel.to_csv(bgraph, file=f)
 print(bgraph)

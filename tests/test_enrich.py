@@ -24,11 +24,11 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 class TestAnnotateParent(unittest.TestCase):
     def test_single(self):
         graph = BELGraph()
-        graph.add_simple_node(*cyclooxygenase_ec)
+        graph.add_simple_node(*cyclooxygenase)
 
         self.assertEqual(1, graph.number_of_nodes())
 
-        annotate_parents(graph, cyclooxygenase_ec)
+        annotate_parents(graph, cyclooxygenase)
 
         self.assertEqual(2, graph.number_of_nodes())
         self.assertIn(cyclooxygenase_ec_p, graph)

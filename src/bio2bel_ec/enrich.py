@@ -77,7 +77,6 @@ def annotate_parents(graph, node):
     """
     parent_node = (node[0], node[1], get_parent(node[2]))
     graph.add_edge(parent_node, node)
-    return graph
 
 
 def annotate_all_parents(graph):
