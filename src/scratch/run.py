@@ -3,6 +3,9 @@ from bio2bel_ec.enrich import get_parent
 import pybel
 from pybel.constants import PROTEIN
 
+import pyuniprot
+pyuniprot.set_mysql_connection()
+
 #with open('/home/agrigoryan/expasy_enzyme.bel', 'w+') as f:
 #    write_expasy_tree(f)
 
@@ -19,7 +22,7 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 
 bgraph = pybel.BELGraph()
 #bgraph = pybel.from_path('/home/agrigoryan/belscript.bel', no_identifier_validation=True)
-f = open('/home/agrigoryan/dd.txt', 'w+')
+#f = open('/home/agrigoryan/dd.txt', 'w+')
 
 bgraph.add_simple_node(*cyclooxygenase_ec)
 #bgraph.add_simple_node(PROTEIN, 'EC',get_parent(cyclooxygenase_ec[-1]))
@@ -29,3 +32,8 @@ for edge in bgraph.edges():
 print(bgraph.node[cyclooxygenase_ec]['function'])
 #pybel.to_csv(bgraph, file=f)
 print(bgraph)
+
+###
+
+query = pyuniprot.query()
+print(query.entry(as_df=True))

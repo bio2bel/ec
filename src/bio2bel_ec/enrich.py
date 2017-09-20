@@ -10,7 +10,7 @@ from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
 from bio2bel_ec.tree import populate_tree
-from bio2bel_ec.constants import ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE, EC_DATA_FILE_REGEX, SQL_DEFAULTS, SQLITE_DB_PATH
+from bio2bel_ec.constants import SQL_DEFAULTS, SQLITE_DB_PATH
 
 __all__ = [
     'enrich_enzyme_classes',
