@@ -6,7 +6,7 @@ import networkx as nx
 import os
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
-from pybel_tools.resources import CONFIDENCE
+from pybel_tools.resources import CONFIDENCE, get_latest_arty_namespace
 
 from bio2bel_ec.constants import ENZCLASS_URL, ENZCLASS_FILE
 
@@ -92,12 +92,11 @@ def write_expasy_tree_boilerplate(file=None):
         licenses='Creative Commons by 4.0',
         copyright='Copyright (c) 2017 Aram Grigoryan. All Rights Reserved.',
         description="""This BEL document represents relations from EXPASY ENZYME nomenclature database""",
-        namespace_dict={
-            'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
+        namespace_dict={'EC': get_latest_arty_namespace('enzyme-class')},
+        namespace_patterns={
+            #'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
         },
-        namespace_patterns={},
         annotations_dict={'Confidence': CONFIDENCE},
-        annotations_patterns={},
         file=file
     )
 
