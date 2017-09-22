@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import re
-from urllib.request import urlretrieve
 import pyuniprot
 
 from pybel.constants import PROTEIN, FUNCTION
@@ -49,12 +47,14 @@ def get_parent(ec_str):
     """
     graph = populate_tree()
     return graph.predecessors(ec_str)[-1]
-    connect()
-
-    # raise NotImplementedError
-
 
 def node_is_protein(graph, node):
+    """
+    True if node is protein, False if else.
+    :param graph: BELGraph
+    :param node: tuple node
+    :return: bool
+    """
     return PROTEIN == graph.node[node][FUNCTION]
 
 
