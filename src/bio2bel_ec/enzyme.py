@@ -59,8 +59,10 @@ def expasy_parser():
                 ec_data_entry['DE'] = line.split()[1].strip()
                 if re.search(EC_DELETED_REGEX, line) is not None:
                     ec_data_entry['DELETED'] = True
-                if re.search(EC_TRANSFERRED_REGEX, line.split()[1].strip()) is not None:
-                    ec_data_entry['TRANSFERRED'] = re.search(EC_TRANSFERRED_REGEX, line.split()[1].strip()).group()
+                if re.search(EC_TRANSFERRED_REGEX, line) is not None:
+                    matches = re.finditer(EC_PATTERN_REGEX, line)
+                    for ec_ in matches:
+                        ec_data_entry['TRANSFERRED'].append(ec_.group())
             elif descriptor == 'AN':
                 ec_data_entry['AN'].append(line[5:-2])
             elif descriptor == 'CA':

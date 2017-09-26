@@ -40,7 +40,11 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 
 from bio2bel_ec.enzyme import expasy_parser
 db = expasy_parser()
+#for entry in db:
+#    if entry['DELETED'] == True:
+#        print(entry['ID'])
+
 for entry in db:
-    if entry['DELETED'] == True:
-        print(entry['ID'])
+    if len(entry['TRANSFERRED']) !=0:
+        print(entry['TRANSFERRED'])
 
