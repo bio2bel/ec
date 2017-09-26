@@ -39,4 +39,8 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 #print(query.entry(as_df=True))
 
 from bio2bel_ec.enzyme import expasy_parser
-expasy_parser()
+db = expasy_parser()
+for entry in db:
+    if entry['DELETED'] == True:
+        print(entry['ID'])
+

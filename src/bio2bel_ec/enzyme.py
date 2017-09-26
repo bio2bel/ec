@@ -31,7 +31,7 @@ def expasy_parser():
             if descriptor == "//":
                 if ec_data_entry['ID'] != '':
                     expasy_db.append(ec_data_entry)
-                    log.info(" EC_ENTRY: {}".format(ec_data_entry))
+                    #log.info(" EC_ENTRY: {}".format(ec_data_entry))
                 ec_data_entry = {
                     'ID': '',
                     'DE': '',
@@ -55,7 +55,7 @@ def expasy_parser():
                 continue
             elif descriptor == 'DE':
                 ec_data_entry['DE'] = line.split()[1].strip()
-                if re.search(EC_DELETED_REGEX, line.split()[1].strip()) is not None:
+                if re.search(EC_DELETED_REGEX, line) is not None:
                     ec_data_entry['DELETED'] = True
                 if re.search(EC_TRANSFERRED_REGEX, line.split()[1].strip()) is not None:
                     ec_data_entry['TRANSFERRED'] = re.search(EC_TRANSFERRED_REGEX, line.split()[1].strip()).group()
