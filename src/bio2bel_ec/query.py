@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This method has been eclipsed by direct database download"""
+
 import os
 
 import pyuniprot

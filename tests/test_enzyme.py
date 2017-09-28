@@ -4,7 +4,7 @@ import unittest
 
 from bio2bel_ec.enzyme import expasy_parser
 
-from bio2bel_ec.constants import ENZCLASS_DATA_TEST_FILE
+from tests.constants import ENZCLASS_DATA_TEST_FILE
 
 
 class TestEnzyme(unittest.TestCase):
@@ -33,7 +33,9 @@ class TestEnzyme(unittest.TestCase):
         self.assertEqual('ADH3_ENTHI', db[0]['DR'][2]['Entry_name'])
         self.assertEqual('Q04894', db[0]['DR'][3]['AC_Nb'])
         self.assertEqual('ADH6_YEAST', db[0]['DR'][3]['Entry_name'])
-        self.assertEqual('-!- Some members of this group oxidize only primary alcohols; others act also on secondary alcohols.-!- May be identical with EC 1.1.1.19, EC 1.1.1.33 and EC 1.1.1.55.-!- Re-specific with respect to NADPH.',db[0]['CC'])
+        self.assertEqual(
+            '-!- Some members of this group oxidize only primary alcohols; others act also on secondary alcohols.-!- May be identical with EC 1.1.1.19, EC 1.1.1.33 and EC 1.1.1.55.-!- Re-specific with respect to NADPH.',
+            db[0]['CC'])
         #
         self.assertEqual('1.1.1.5', db[1]['ID'])
         self.assertEqual(False, db[1]['DELETED'])
@@ -43,7 +45,6 @@ class TestEnzyme(unittest.TestCase):
         #
         self.assertEqual('1.1.1.74', db[2]['ID'])
         self.assertEqual(True, db[2]['DELETED'])
-
 
 
 if __name__ == '__main__':
