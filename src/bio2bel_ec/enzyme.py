@@ -28,6 +28,11 @@ def expasy_parser(path=None):
 
     path = ENZCLASS_DATA_FILE if path is None else path
 
+    ec_pattern = re.compile(EC_PATTERN_REGEX)
+    deleted_pattern = re.compile(EC_DELETED_REGEX)
+    transferred_pattern = re.compile(EC_TRANSFERRED_REGEX)
+    prosite_pattern = re.compile(EC_PROSITE_REGEX)
+
     with open(path, 'r') as enzclass_file:
         ec_data_entry = {'ID': ''}
         for line in enzclass_file:
@@ -57,14 +62,14 @@ def expasy_parser(path=None):
 
             # parsing
             if descriptor == 'ID':
-                ec_data_entry['ID'] = re.search(EC_PATTERN_REGEX, line).group()
+                ec_data_entry['ID'] = ec_pattern.search(line).group()
                 continue
             elif descriptor == 'DE':
                 ec_data_entry['DE'] = line.split('   ')[1].strip()
-                if re.search(EC_DELETED_REGEX, line) is not None:
+                if deleted_pattern.search(line) is not None:
                     ec_data_entry['DELETED'] = True
-                if re.search(EC_TRANSFERRED_REGEX, line) is not None:
-                    matches = re.finditer(EC_PATTERN_REGEX, line)
+                if transferred_pattern.search(line) is not None:
+                    matches = ec_pattern.finditer(line)
                     for ec_ in matches:
                         ec_data_entry['TRANSFERRED'].append(ec_.group())
             elif descriptor == 'AN':
@@ -77,7 +82,7 @@ def expasy_parser(path=None):
             elif descriptor == 'CC':
                 ec_data_entry['CC'] += line[5:-1]
             elif descriptor == 'PR':
-                ec_data_entry['PR'].append(re.search(EC_PROSITE_REGEX, line).group())
+                ec_data_entry['PR'].append(prosite_pattern.search(line).group())
             elif descriptor == 'DR':
                 for dr_tuple in line[5:-2].split(';'):
                     dr_tuple = dr_tuple.strip()
