@@ -32,6 +32,8 @@ def expasy_parser():
             descriptor = line[:2]
             if descriptor == "//":
                 if ec_data_entry['ID'] != '':
+                    ec_data_entry['CC'] = " ".join(ec_data_entry['CC'].split())
+                    ec_data_entry['CA'] = " ".join(ec_data_entry['CA'].split())
                     expasy_db.append(ec_data_entry)
                     # log.info(" EC_ENTRY: {}".format(ec_data_entry))
                 ec_data_entry = {
