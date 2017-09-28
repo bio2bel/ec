@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-def expasy_parser():
+def expasy_parser(path=None):
     """
     Parses the ExPASy database file. Returns a list of enzyme entry dictionaries
     :return: list
@@ -26,7 +26,9 @@ def expasy_parser():
 
     expasy_db = []
 
-    with open(ENZCLASS_DATA_FILE, 'r') as enzclass_file:
+    path = ENZCLASS_DATA_FILE if path is None else path
+
+    with open(path, 'r') as enzclass_file:
         ec_data_entry = {'ID': ''}
         for line in enzclass_file:
             descriptor = line[:2]
@@ -58,7 +60,7 @@ def expasy_parser():
                 ec_data_entry['ID'] = re.search(EC_PATTERN_REGEX, line).group()
                 continue
             elif descriptor == 'DE':
-                ec_data_entry['DE'] = line.split()[1].strip()
+                ec_data_entry['DE'] = line.split('   ')[1].strip()
                 if re.search(EC_DELETED_REGEX, line) is not None:
                     ec_data_entry['DELETED'] = True
                 if re.search(EC_TRANSFERRED_REGEX, line) is not None:
@@ -77,7 +79,8 @@ def expasy_parser():
             elif descriptor == 'PR':
                 ec_data_entry['PR'].append(re.search(EC_PROSITE_REGEX, line).group())
             elif descriptor == 'DR':
-                for dr_tuple in line[5:-2].split(' ;  '):
+                for dr_tuple in line[5:-2].split(';'):
+                    dr_tuple = dr_tuple.strip()
                     ec_data_entry['DR'].append(
                         {'AC_Nb': dr_tuple.split(', ')[0], 'Entry_name': dr_tuple.split(', ')[1]})
             else:

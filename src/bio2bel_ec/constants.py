@@ -14,6 +14,7 @@ if not os.path.exists(ENZCLASS_DATA_DIR):
 
 ENZCLASS_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzclass.txt')
 ENZCLASS_DATA_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzyme.dat')
+ENZCLASS_DATA_TEST_FILE = os.path.join('../tests/', 'enzyme_test.dat')
 
 EC_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'bio2bel', 'ec')
 if not os.path.exists(EC_DATA_DIR):

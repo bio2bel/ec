@@ -105,8 +105,8 @@ ENV/
 .idea/*
 
 # scratch dir
-.src/scratch
-.src/scratch/*
+.src/bio2bel_ec/scratch
+.src/bio2bel_ec/scratch/*
 
 # Dolphin on linux
 .directory
