@@ -4,13 +4,13 @@ import unittest
 
 from bio2bel_ec.enzyme import expasy_parser
 
-from tests.constants import ENZCLASS_DATA_TEST_FILE
+from constants import ENZCLASS_DATA_TEST_FILE
 
 
 class TestEnzyme(unittest.TestCase):
     def test_all(self):
-        """
-        Tests everything for the ENZCLASS_DATA_TEST_FILE
+        """Tests everything for the ENZCLASS_DATA_TEST_FILE
+
         :return: None
         """
         db = expasy_parser(ENZCLASS_DATA_TEST_FILE)
