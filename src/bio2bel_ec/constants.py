@@ -16,6 +16,9 @@ ENZCLASS_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzclass.txt')
 ENZCLASS_DATA_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzyme.dat')
 ENZCLASS_DATA_TEST_FILE = os.path.join('../tests/', 'enzyme_test.dat')
 
+ENZCLASS_DATABASE_NAME = 'enzyme_dat.sqlite'
+ENZCLASS_SQLITE_PATH = 'sqlite:///' + os.path.join(ENZCLASS_DATA_DIR, ENZCLASS_DATABASE_NAME)
+
 EC_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'bio2bel', 'ec')
 if not os.path.exists(EC_DATA_DIR):
     os.makedirs(EC_DATA_DIR)
