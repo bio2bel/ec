@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from .enzyme import expasy_parser
-from .models import Base, EC_Entry, PR_Entry, Prosite_Entry
+from .models import Base, EC_Entry, PR_Entry, DR_Entry
 
 class Manager(object):
     """Creates a connection to database and a persistient session using SQLAlchemy"""
