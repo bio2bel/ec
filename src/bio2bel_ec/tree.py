@@ -45,7 +45,7 @@ def standard_ec_id(non_standard_ec_id):
     return non_standard_ec_id.replace(" ", "")
 
 
-def populate_tree(fileName=ENZCLASS_FILE):
+def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
     """Populates graph from a given specific file.
 
     :param fileName str
@@ -103,7 +103,7 @@ def populate_tree(fileName=ENZCLASS_FILE):
 
             return new_list
 
-    id_list = get_full_list_of_ec_ids()
+    id_list = get_full_list_of_ec_ids(force_download)
     for node in id_list:
         e = give_edge(node)
         if e is not None:

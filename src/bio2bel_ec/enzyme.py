@@ -38,8 +38,8 @@ transferred_pattern = re.compile(EC_TRANSFERRED_REGEX)
 prosite_pattern = re.compile(EC_PROSITE_REGEX)
 
 
-def expasy_parser(path=None):
-    download_ec_data()
+def expasy_parser(path=None, force_download=False):
+    download_ec_data(force_download)
 
     path = ENZCLASS_DATA_FILE if path is None else path
 

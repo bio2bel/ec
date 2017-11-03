@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ExPASy database model"""
 
-from sqlalchemy import Column, String, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, Table, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -65,7 +65,7 @@ class Protein_Entry(Base):
     enzyme_id = Column(String(255), foreignkey=True)
     AC_Nb = Column(String(255))
     Entry_name = Column(String(255))
-    comment = Column(String(255)) #used to indicate UniProt or SWISSProt
+    is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
     ec = relationship(
         Enzyme_Entry,

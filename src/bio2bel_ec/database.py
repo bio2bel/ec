@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from .enzyme import expasy_parser
+from .tree import populate_tree
 from .models import Base, Enzyme_Entry, Prosite_Entry, Protein_Entry
 from .constants import ENZCLASS_CONFIG_FILE_PATH, ENZCLASS_SQLITE_PATH
 
@@ -69,3 +70,21 @@ class Manager(object):
 
         return ENZCLASS_SQLITE_PATH
 
+    def populate(self, force_download=False):
+        """Populates the database
+
+        :param bool force_download: Should the data be downloaded again, or cache used if exists?
+        """
+        tree_graph = populate_tree(force_download)
+        data_dict = expasy_parser(force_download)
+
+        id_model = {}
+
+        for data_cell in data_dict:
+            if not (data_cell['DELETED'] or data_cell['TRANSFERRED']): #if both are false then proceed
+                #TODO 0 first create an enzyme entry and add to enzyme_entry class
+                #TODO 1 second create the prosite entry IF EXIST
+                #TODO 2 third create protein entry if EXIST
+                pass #TODO finish 0, 1, and 2
+        #TODO 3 add hierarchy data from tree_graph
+            pass #TODO finish 3
