@@ -16,6 +16,8 @@ ENZCLASS_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzclass.txt')
 ENZCLASS_DATA_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzyme.dat')
 ENZCLASS_DATA_TEST_FILE = os.path.join('../tests/', 'enzyme_test.dat')
 
+ENZCLASS_CONFIG_FILE_PATH = os.path.join(ENZCLASS_DATA_DIR, 'config.ini')
+
 ENZCLASS_DATABASE_NAME = 'enzyme_dat.sqlite'
 ENZCLASS_SQLITE_PATH = 'sqlite:///' + os.path.join(ENZCLASS_DATA_DIR, ENZCLASS_DATABASE_NAME)
 
