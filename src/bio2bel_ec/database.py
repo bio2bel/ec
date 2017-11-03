@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+import configparser
 import logging
 log = logging.getLogger(__name__)
 log.setLevel(20)
@@ -10,6 +12,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from .enzyme import expasy_parser
 from .models import Base, Enzyme_Entry, Prosite_Entry, Protein_Entry
+from .constants import ENZCLASS_CONFIG_FILE_PATH, ENZCLASS_SQLITE_PATH
 
 class Manager(object):
     """Creates a connection to database and a persistient session using SQLAlchemy"""
@@ -37,3 +40,32 @@ class Manager(object):
         """drops all tables in the database"""
         log.info('drop tables in {}'.format(self.engine.url))
         Base.metadata.drop_all(self.engine)
+
+    @staticmethod
+    def get_connection_string(connection=None):
+        """Return the SQLAlchemy connection string if it is set
+
+        :param connection: get the SQLAlchemy connection string
+        :rtype: str
+        """
+        if connection:
+            return connection
+
+        config = configparser.ConfigParser()
+
+        cfp = ENZCLASS_CONFIG_FILE_PATH
+
+        if os.path.exists(cfp):
+            log.info('fetch database configuration from {}'.format(cfp))
+            config.read(cfp)
+            connection = config['database']['sqlalchemy_connection_string']
+            log.info('load connection string from {}: {}'.format(cfp, connection))
+            return connection
+
+        with open(cfp, 'w') as config_file:
+            config['database'] = {'sqlalchemy_connection_string': ENZCLASS_SQLITE_PATH}
+            config.write(config_file)
+            log.info('create configuration file {}'.format(cfp))
+
+        return ENZCLASS_SQLITE_PATH
+
