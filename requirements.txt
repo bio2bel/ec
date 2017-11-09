@@ -1,8 +1,8 @@
-pybel
 requests
+networkx==1.11
 click
 pandas
+pybel
 pybel_tools
 pyuniprot
 pyhgnc
-networkx

@@ -12,7 +12,7 @@ __all__ = (
 
 __version__ = '0.1.1-dev'
 
-__title__ = 'ec'
+__title__ = 'bio2bel_ec'
 __description__ = "A package for parsing ec tree file"
 __url__ = 'https://github.com/bio2bel/ec'
 

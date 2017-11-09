@@ -10,10 +10,13 @@ PACKAGES = setuptools.find_packages(where='src')
 META_PATH = os.path.join('src', 'bio2bel_ec', '__init__.py')
 INSTALL_REQUIRES = [
     'requests',
+    'networkx==1.11',
     'click',
     'pandas',
+    'pybel',
     'pybel_tools',
-    'networkx',
+    'pyuniprot',
+    'pyhgnc',
 ]
 ENTRY_POINTS = {
     'console_scripts': [
