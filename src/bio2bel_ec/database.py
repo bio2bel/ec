@@ -77,7 +77,6 @@ class Manager(object):
 
         :param bool force_download: Should the data be downloaded again, or cache used if exists?
         """
-        tree_graph = populate_tree(force_download=force_download)
         data_dict = expasy_parser(force_download=force_download)
 
         id_enzyme = {}
@@ -125,12 +124,12 @@ class Manager(object):
 
                         enzyme_entry.proteins.append(protein_entry)
 
-        # TODO 3 add hierarchy data from tree_graph
+        tree_graph = populate_tree(force_download=force_download)
 
         for parent_id, child_id in tqdm(tree_graph.edges_iter(), desc='Hierarchy', total=tree_graph.number_of_edges()):
             if parent_id in id_enzyme.keys():
                 id_enzyme[child_id].parent = id_enzyme[parent_id]
 
-        self.session.commit()
+        # TODO fill in 4-code to 3-code relationships
 
-        pass  # TODO finish 3
+        self.session.commit()
