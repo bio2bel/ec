@@ -10,7 +10,7 @@ logging.basicConfig(level=20)
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from .enzyme import expasy_parser
+from .enzyme import *
 from .tree import populate_tree
 from .models import Base, Enzyme_Entry, Prosite_Entry, Protein_Entry
 from .constants import ENZCLASS_CONFIG_FILE_PATH, ENZCLASS_SQLITE_PATH

@@ -13,6 +13,10 @@ from bio2bel_ec.tree import download_ec_data
 
 __all__ = [
     'expasy_parser',
+    'ID',
+    'DE',
+    'PR',
+    'DR',
 ]
 
 #: The identifier of the entry (One)
