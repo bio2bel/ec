@@ -99,5 +99,7 @@ class Manager(object):
                         )
 
         #TODO 3 add hierarchy data from tree_graph
-            self.session.commit()
-            pass #TODO finish 3
+            for parent, child in tree_graph.edges_iter():
+                id_model[parent].children.append(id_model[child])
+        self.session.commit()
+        pass #TODO finish 3
