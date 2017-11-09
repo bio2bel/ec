@@ -28,7 +28,7 @@ enzyme_hierarchy = Table(
     Column('parent_id', Integer, ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)), primary_key=True),
     Column('child_id', Integer, ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)), primary_key=True),
 )
-
+#TODO add docstrings for all columns in classes
 class Enzyme_Entry(Base):
     """ExPASy's main entry"""
     __tablename__ = EC_ENTRY_TABLE_NAME
@@ -65,7 +65,7 @@ class Protein_Entry(Base):
     enzyme_id = Column(String(255), foreignkey=True)
     AC_Nb = Column(String(255))
     Entry_name = Column(String(255))
-    is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
+    #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
     ec = relationship(
         Enzyme_Entry,

@@ -81,10 +81,23 @@ class Manager(object):
         id_model = {}
 
         for data_cell in data_dict:
-            if not (data_cell['DELETED'] or data_cell['TRANSFERRED']): #if both are false then proceed
-                #TODO 0 first create an enzyme entry and add to enzyme_entry class
-                #TODO 1 second create the prosite entry IF EXIST
-                #TODO 2 third create protein entry if EXIST
-                pass #TODO finish 0, 1, and 2
+            if not (data_cell['DELETED'] or data_cell['TRANSFERRED']):  # if both are false then proceed
+                enzyme_entry = Enzyme_Entry(enzyme_id=data_cell[ID], description=data_cell[DE])
+                self.session.add(enzyme_entry)
+                id_model[data_cell[ID]] = enzyme_entry
+                if data_cell[PR]:
+                    for pr_id in data_cell[PR]:
+                        prosite_entry = Prosite_Entry(prosite_id=pr_id, enzyme_id=data_cell[ID])
+                        self.session.add(prosite_entry)
+                if data_cell[DR]:
+                    for dr_id in data_cell[DR]:
+                        protein_entry = Protein_Entry(
+                            enzyme_id=data_cell[ID],
+                            AC_Nb=dr_id['AC_Nb'],
+                            Entry_name=dr_id['Entry_name'],
+                            #  is_SwissProt=
+                        )
+
         #TODO 3 add hierarchy data from tree_graph
+            self.session.commit()
             pass #TODO finish 3
