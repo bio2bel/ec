@@ -75,8 +75,8 @@ class Manager(object):
 
         :param bool force_download: Should the data be downloaded again, or cache used if exists?
         """
-        tree_graph = populate_tree(force_download)
-        data_dict = expasy_parser(force_download)
+        tree_graph = populate_tree(force_download=force_download)
+        data_dict = expasy_parser(force_download=force_download)
 
         id_model = {}
 
@@ -97,9 +97,10 @@ class Manager(object):
                             Entry_name=dr_id['Entry_name'],
                             #  is_SwissProt=
                         )
+                        self.session.add(protein_entry)
 
         #TODO 3 add hierarchy data from tree_graph
-            for parent, child in tree_graph.edges_iter():
-                id_model[parent].children.append(id_model[child])
+            #for parent, child in tree_graph.edges_iter():
+                #id_model[parent].children.append(id_model[child])
         self.session.commit()
         pass #TODO finish 3

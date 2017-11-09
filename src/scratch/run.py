@@ -38,13 +38,18 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 #query = pyuniprot.query()
 #print(query.entry(as_df=True))
 
-from bio2bel_ec.enzyme import expasy_parser
-db = expasy_parser()
+#from bio2bel_ec.enzyme import expasy_parser
+#db = expasy_parser()
 #for entry in db:
 #    if entry['DELETED'] == True:
 #        print(entry['ID'])
 
-for entry in db:
-    if not entry['TRANSFERRED']:
-        print("{}, {}".format(entry['ID'], entry['DE']))
- 
+#for entry in db:
+#    if not entry['TRANSFERRED']:
+#        print("{}, {}".format(entry['ID'], entry['DE']))
+
+
+from bio2bel_ec.database import Manager
+
+a = Manager()
+a.populate()

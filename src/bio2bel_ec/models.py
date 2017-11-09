@@ -34,7 +34,7 @@ class Enzyme_Entry(Base):
     __tablename__ = EC_ENTRY_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
-    enzyme_id = Column(String(255), secondary_key=True)
+    enzyme_id = Column(String(255))
     description = Column(String(255))
 
     children = relationship(
@@ -49,8 +49,8 @@ class Prosite_Entry(Base):
     __tablename__ = PROSITE_ENTRY_TABLE_NAME
 
     id=Column(Integer, primary_key=True)
-    prosite_id = Column(String(255), secondary_key=True)
-    enzyme_id = Column(String(255),foreignkey=True)
+    prosite_id = Column(String(255))
+    enzyme_id = Column(String(255), ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)))
 
     ec = relationship(
         Enzyme_Entry,
@@ -62,7 +62,7 @@ class Protein_Entry(Base):
     __tablename__ = DR_ENTRY_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
-    enzyme_id = Column(String(255), foreignkey=True)
+    enzyme_id = Column(String(255), ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)))
     AC_Nb = Column(String(255))
     Entry_name = Column(String(255))
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)

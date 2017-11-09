@@ -19,13 +19,13 @@ __all__ = [
 ]
 
 
-def download_res(force=False):
+def download_res(force_download=False):
     """
 
     :param force: bool to force download
     :return: None
     """
-    if not os.path.exists(ENZCLASS_FILE) or force:
+    if not os.path.exists(ENZCLASS_FILE) or force_download:
         urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
 def download_ec_data(force_download=False):
@@ -52,7 +52,7 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
     :return networkx.DiGraph
     """
 
-    download_res()
+    download_res(force_download=force_download)
 
     graph = nx.DiGraph()
 
