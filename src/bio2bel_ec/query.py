@@ -2,15 +2,17 @@
 
 """This method has been eclipsed by direct database download"""
 
+from __future__ import print_function
+
 import os
 
 import pyuniprot
-from pybel.constants import IS_A
-from pybel.utils import ensure_quotes
-from pybel_tools.document_utils import write_boilerplate
-from pybel_tools.resources import get_latest_arty_namespace
 
-from .constants import EC_DATA_DIR
+from pybel.constants import IS_A
+from pybel.resources.arty import get_latest_arty_namespace
+from pybel.resources.document import make_knowledge_header
+from pybel.utils import ensure_quotes
+from .constants import DATA_DIR
 
 
 def get_data(taxid=9606, force=False):
@@ -80,23 +82,25 @@ def write_gene_ec_mapping(file):
     :param file file: A writable file or file-like
     :param pandas.DataFrame df: A data frame containing the original data source
     """
-
-    write_boilerplate(
-        document_name='HGNC Gene Family Definitions',
+    lines = make_knowledge_header(
+        name='HGNC Gene Family Definitions',
         authors='Aram Grigoryan',
         contact='aram.grigoryan@scai.fraunhofer.de',
         licenses='Creative Commons by 4.0',
         copyright='Copyright (c) 2017 Aram Grigoryan. All Rights Reserved.',
         description="""This BEL document represents the gene families curated by HGNC, describing various functional, structural, and logical classifications""",
-        namespace_dict={
+        namespace_url={
             'ec': get_latest_arty_namespace('enzyme-class'),
             'HGNC': get_latest_arty_namespace('hgnc-gene-families'),
         },
         namespace_patterns={},
-        annotations_dict={},
+        annotations_url={},
         annotations_patterns={},
         file=file
     )
+
+    for line in lines:
+        print(line, file=file)
 
     print('SET Citation = {{"URL","{}"}}'.format('http://www.uniprot.org/downloads'), file=file)
     print('SET Evidence = "HGNC to EC mapping"', file=file)
@@ -107,6 +111,6 @@ def write_gene_ec_mapping(file):
 
 
 if __name__ == '__main__':
-    filename = os.path.join(EC_DATA_DIR, 'hgnc_to_ec.bel')
+    filename = os.path.join(DATA_DIR, 'hgnc_to_ec.bel')
     with open(filename, 'w') as f:
         write_gene_ec_mapping(f)

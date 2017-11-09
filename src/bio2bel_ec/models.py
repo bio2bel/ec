@@ -1,73 +1,88 @@
 # -*- coding: utf-8 -*-
+
 """ExPASy database model"""
 
-from sqlalchemy import Column, String, Integer, Boolean, Table, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import backref, relationship
 
-EC_TABLE_PREFIX = 'expasy'
-EC_ENTRY_TABLE_NAME = '{}_entry'.format(EC_TABLE_PREFIX)
-EC_TREE_TABLE_NAME = '{}_tree'.format(EC_TABLE_PREFIX)
-
-PROSITE_TABLE_PREFIX = 'prosite'
-PROSITE_ENTRY_TABLE_NAME = '{}_entry'.format(PROSITE_TABLE_PREFIX)
-PROSITE_TREE_TABLE_NAME = '{}_tree'.format(PROSITE_TABLE_PREFIX)
-
-DR_TABLE_PREFIX = 'uniprot-swissprot'
-DR_ENTRY_TABLE_NAME = '{}_entry'.format(DR_TABLE_PREFIX)
-DR_TREE_TABLE_NAME = '{}_tree'.format(DR_TABLE_PREFIX)
-
-
-from sqlalchemy.ext.declarative import declarative_base
+TABLE_PREFIX = 'expasy'
+ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
+PROTEIN_TABLE_NAME = '{}_protein'.format(TABLE_PREFIX)
+PROSITE_TABLE_NAME = '{}_prosite'.format(TABLE_PREFIX)
+TREE_TABLE_NAME = '{}_tree'.format(TABLE_PREFIX)
+ENZYME_PROSITE_TABLE_NAME = '{}_enzyme_prosite'.format(TABLE_PREFIX)
+ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
 
 Base = declarative_base()
 
 enzyme_hierarchy = Table(
-    EC_TREE_TABLE_NAME,
+    TREE_TABLE_NAME,
     Base.metadata,
-    Column('parent_id', Integer, ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)), primary_key=True),
-    Column('child_id', Integer, ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)), primary_key=True),
+    Column('parent_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
+    Column('child_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
 )
-#TODO add docstrings for all columns in classes
-class Enzyme_Entry(Base):
+
+enzyme_prosite = Table(
+    ENZYME_PROSITE_TABLE_NAME,
+    Base.metadata,
+    Column('enzyme_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
+    Column('prosite_id', Integer, ForeignKey('{}.id'.format(PROSITE_TABLE_NAME)), primary_key=True),
+)
+
+enzyme_protein = Table(
+    ENZYME_PROTEIN_TABLE_NAME,
+    Base.metadata,
+    Column('enzyme_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
+    Column('protein_id', Integer, ForeignKey('{}.id'.format(PROTEIN_TABLE_NAME)), primary_key=True),
+)
+
+
+# TODO add docstrings for all columns in classes
+
+class Enzyme(Base):
     """ExPASy's main entry"""
-    __tablename__ = EC_ENTRY_TABLE_NAME
+    __tablename__ = ENZYME_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
-    enzyme_id = Column(String(255))
+
+    expasy_id = Column(String(255), doc='The ExPAsY enzyme code')
+
     description = Column(String(255))
 
-    children = relationship(
-        'Enzyme_Entry',
-        secondary=enzyme_hierarchy,
-        primaryjoin=(id == enzyme_hierarchy.c.parent_id),
-        secondaryjoin=(id == enzyme_hierarchy.c.child_id)
-    )
+    parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
+    parent = relationship('Enzyme')
 
-class Prosite_Entry(Base):
+    #children = relationship(
+    #    'Enzyme',
+    #    secondary=enzyme_hierarchy,
+    #    primaryjoin=(id == enzyme_hierarchy.c.parent_id),
+    #    secondaryjoin=(id == enzyme_hierarchy.c.child_id)
+    #)
+
+    def __str__(self):
+        return self.expasy_id
+
+
+class Prosite(Base):
     """Maps ec to prosite entries"""
-    __tablename__ = PROSITE_ENTRY_TABLE_NAME
-
-    id=Column(Integer, primary_key=True)
-    prosite_id = Column(String(255))
-    enzyme_id = Column(String(255), ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)))
-
-    ec = relationship(
-        Enzyme_Entry,
-        backref=backref(PROSITE_ENTRY_TABLE_NAME, uselist=True)
-    )
-
-class Protein_Entry(Base):
-    """Maps ec to swissprot or uniprot"""
-    __tablename__ = DR_ENTRY_TABLE_NAME
+    __tablename__ = PROSITE_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
-    enzyme_id = Column(String(255), ForeignKey('{}.id'.format(EC_ENTRY_TABLE_NAME)))
-    AC_Nb = Column(String(255))
+
+    prosite_id = Column(String(255))
+
+    enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
+
+
+class Protein(Base):
+    """Maps ec to swissprot or uniprot"""
+    __tablename__ = PROTEIN_TABLE_NAME
+
+    id = Column(Integer, primary_key=True)
+
+    enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
+
+    AC_Nb = Column(String(255), doc='')
     Entry_name = Column(String(255))
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
-
-    ec = relationship(
-        Enzyme_Entry,
-        backref=backref(DR_ENTRY_TABLE_NAME, uselist=True)
-    )

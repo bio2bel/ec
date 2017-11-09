@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import os
+import re
 from urllib.request import urlretrieve
 
 import networkx as nx
-import os
-import re
 
+from bio2bel_ec.constants import EC_DATA_FILE_REGEX, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, ENZCLASS_FILE, ENZCLASS_URL
+from pybel.resources.arty import get_latest_arty_namespace
+from pybel.resources.defaults import CONFIDENCE
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
-from pybel_tools.resources import CONFIDENCE, get_latest_arty_namespace
-
-from bio2bel_ec.constants import ENZCLASS_URL, ENZCLASS_FILE, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, EC_DATA_FILE_REGEX
 
 __all__ = [
     'populate_tree',
@@ -28,6 +28,7 @@ def download_res(force_download=False):
     if not os.path.exists(ENZCLASS_FILE) or force_download:
         urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
 
+
 def download_ec_data(force_download=False):
     """
     Downloads the file
@@ -35,6 +36,7 @@ def download_ec_data(force_download=False):
     """
     if not os.path.exists(ENZCLASS_DATA_FILE) or force_download:
         urlretrieve(ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE)
+
 
 def standard_ec_id(non_standard_ec_id):
     """
@@ -117,17 +119,17 @@ def write_expasy_tree_boilerplate(file=None):
     :param file file: A writeable file or file like. Defaults to stdout
     """
     write_boilerplate(
-        document_name='Expasy Enzyme Tree',
+        name='Expasy Enzyme Tree',
         authors='Aram Grigoryan and Charles Tapley Hoyt',
         contact='aram.grigoryan@scai.fraunhofer.de',
         licenses='Creative Commons by 4.0',
         copyright='Copyright (c) 2017 Aram Grigoryan. All Rights Reserved.',
         description="""This BEL document represents relations from EXPASY ENZYME nomenclature database""",
-        namespace_dict={'EC': get_latest_arty_namespace('enzyme-class')},
+        namespace_url={'EC': get_latest_arty_namespace('enzyme-class')},
         namespace_patterns={
-            #'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
+            # 'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
         },
-        annotations_dict={'Confidence': CONFIDENCE},
+        annotation_url={'Confidence': CONFIDENCE},
         file=file
     )
 

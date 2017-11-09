@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import os
 import configparser
 import logging
-log = logging.getLogger(__name__)
-log.setLevel(20)
-logging.basicConfig(level=20)
+import os
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
+from tqdm import tqdm
 
+from .constants import DEFAULT_CACHE_CONNECTION, ENZCLASS_CONFIG_FILE_PATH
 from .enzyme import *
+from .models import Base, Enzyme, Prosite, Protein
 from .tree import populate_tree
-from .models import Base, Enzyme_Entry, Prosite_Entry, Protein_Entry
-from .constants import ENZCLASS_CONFIG_FILE_PATH, ENZCLASS_SQLITE_PATH
+
+log = logging.getLogger(__name__)
+
 
 class Manager(object):
-    """Creates a connection to database and a persistient session using SQLAlchemy"""
+    """Creates a connection to database and a persistent session using SQLAlchemy"""
 
     def __init__(self, connection=None, echo=False):
         """
@@ -24,12 +25,13 @@ class Manager(object):
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         self.connection = self.get_connection_string(connection)
+        log.info('Using connection %s', connection)
         self.engine = create_engine(self.connection, echo=echo)
         self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
         self.session = scoped_session(self.sessionmaker)
-        self.create_tables()
+        self.create_all()
 
-    def create_tables(self, check_first=True):
+    def create_all(self, check_first=True):
         """creates all tables from models in your database
 
         :param bool check_first: True or False check if tables already exists
@@ -37,7 +39,7 @@ class Manager(object):
         log.info('create tables in {}'.format(self.engine.url))
         Base.metadata.create_all(self.engine, checkfirst=check_first)
 
-    def drop_tables(self):
+    def drop_all(self):
         """drops all tables in the database"""
         log.info('drop tables in {}'.format(self.engine.url))
         Base.metadata.drop_all(self.engine)
@@ -64,11 +66,11 @@ class Manager(object):
             return connection
 
         with open(cfp, 'w') as config_file:
-            config['database'] = {'sqlalchemy_connection_string': ENZCLASS_SQLITE_PATH}
+            config['database'] = {'sqlalchemy_connection_string': DEFAULT_CACHE_CONNECTION}
             config.write(config_file)
             log.info('create configuration file {}'.format(cfp))
 
-        return ENZCLASS_SQLITE_PATH
+        return DEFAULT_CACHE_CONNECTION
 
     def populate(self, force_download=False):
         """Populates the database
@@ -78,30 +80,57 @@ class Manager(object):
         tree_graph = populate_tree(force_download=force_download)
         data_dict = expasy_parser(force_download=force_download)
 
-        id_model = {}
+        id_enzyme = {}
+        id_prosite = {}
+        id_protein = {}
 
-        for data_cell in data_dict:
+        for data_cell in tqdm(data_dict, desc='ExPaSY'):
             if not (data_cell['DELETED'] or data_cell['TRANSFERRED']):  # if both are false then proceed
-                enzyme_entry = Enzyme_Entry(enzyme_id=data_cell[ID], description=data_cell[DE])
-                self.session.add(enzyme_entry)
-                id_model[data_cell[ID]] = enzyme_entry
-                if data_cell[PR]:
-                    for pr_id in data_cell[PR]:
-                        prosite_entry = Prosite_Entry(prosite_id=pr_id, enzyme_id=data_cell[ID])
-                        self.session.add(prosite_entry)
-                if data_cell[DR]:
-                    for dr_id in data_cell[DR]:
-                        protein_entry = Protein_Entry(
-                            enzyme_id=data_cell[ID],
-                            AC_Nb=dr_id['AC_Nb'],
-                            Entry_name=dr_id['Entry_name'],
-                            #  is_SwissProt=
-                        )
-                        self.session.add(protein_entry)
+                enzyme_entry = Enzyme(
+                    expasy_id=data_cell[ID],
+                    description=data_cell[DE]
+                )
 
-        #TODO 3 add hierarchy data from tree_graph
-            for parent, child in tree_graph.edges_iter():
-                if parent in id_model.keys():
-                    id_model[parent].children.append(id_model[child])
+                self.session.add(enzyme_entry)
+                id_enzyme[data_cell[ID]] = enzyme_entry
+
+                if PR in data_cell and data_cell[PR]:
+                    for pr_id in data_cell[PR]:
+
+                        if pr_id not in id_prosite:
+                            prosite_entry = Prosite(prosite_id=pr_id)
+                            id_prosite[pr_id] = prosite_entry
+                            self.session.add(prosite_entry)
+                        else:
+                            prosite_entry = id_prosite[pr_id]
+
+                        enzyme_entry.prosites.append(prosite_entry)
+
+                if DR in data_cell and data_cell[DR]:
+                    for dr_id in data_cell[DR]:
+
+                        ac_nb = dr_id['AC_Nb']
+                        entry_name = dr_id['Entry_name']
+
+                        if (ac_nb, entry_name) not in id_protein:
+                            protein_entry = Protein(
+                                AC_Nb=dr_id['AC_Nb'],
+                                Entry_name=dr_id['Entry_name'],
+                                #  is_SwissProt=
+                            )
+                            id_protein[ac_nb, entry_name] = protein_entry
+                            self.session.add(protein_entry)
+                        else:
+                            protein_entry = id_protein[ac_nb, entry_name]
+
+                        enzyme_entry.proteins.append(protein_entry)
+
+        # TODO 3 add hierarchy data from tree_graph
+
+        for parent_id, child_id in tqdm(tree_graph.edges_iter(), desc='Hierarchy', total=tree_graph.number_of_edges()):
+            if parent_id in id_enzyme.keys():
+                id_enzyme[child_id].parent = id_enzyme[parent_id]
+
         self.session.commit()
-        pass #TODO finish 3
+
+        pass  # TODO finish 3

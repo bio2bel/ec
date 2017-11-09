@@ -2,28 +2,22 @@
 
 import os
 
-from pybel.constants import PYBEL_DATA_DIR
-
 ENZCLASS_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 ENZCLASS_DATA_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
 
-ENZCLASS_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'expasy')
+BIO2BEL_DIR = os.environ.get('BIO2BEL_DIRECTORY', os.path.join(os.path.expanduser('~'), '.pybel', 'bio2bel'))
+DATA_DIR = os.path.join(BIO2BEL_DIR, 'expasy')
+os.makedirs(DATA_DIR, exist_ok=True)
 
-if not os.path.exists(ENZCLASS_DATA_DIR):
-    os.makedirs(ENZCLASS_DATA_DIR)
-
-ENZCLASS_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzclass.txt')
-ENZCLASS_DATA_FILE = os.path.join(ENZCLASS_DATA_DIR, 'enzyme.dat')
+ENZCLASS_FILE = os.path.join(DATA_DIR, 'enzclass.txt')
+ENZCLASS_DATA_FILE = os.path.join(DATA_DIR, 'enzyme.dat')
 ENZCLASS_DATA_TEST_FILE = os.path.join('../tests/', 'enzyme_test.dat')
 
-ENZCLASS_CONFIG_FILE_PATH = os.path.join(ENZCLASS_DATA_DIR, 'config.ini')
+ENZCLASS_CONFIG_FILE_PATH = os.path.join(DATA_DIR, 'config.ini')
 
-ENZCLASS_DATABASE_NAME = 'enzyme_dat.sqlite'
-ENZCLASS_SQLITE_PATH = 'sqlite:///' + os.path.join(ENZCLASS_DATA_DIR, ENZCLASS_DATABASE_NAME)
-
-EC_DATA_DIR = os.path.join(PYBEL_DATA_DIR, 'bio2bel', 'ec')
-if not os.path.exists(EC_DATA_DIR):
-    os.makedirs(EC_DATA_DIR)
+DEFAULT_CACHE_NAME = 'enzyme_dat.sqlite'
+DEFAULT_CACHE_PATH = os.path.join(DATA_DIR, DEFAULT_CACHE_NAME)
+DEFAULT_CACHE_CONNECTION = os.environ.get('BIO2BEL_DB', 'sqlite:///' + DEFAULT_CACHE_PATH)
 
 EC_DATA_FILE_REGEX = '(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
 EC_PATTERN_REGEX = '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'

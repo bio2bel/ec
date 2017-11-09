@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import re
 import logging
+import re
 
-log = logging.getLogger(__name__)
-log.setLevel(20)
-logging.basicConfig(level=20)
-
-from bio2bel_ec.constants import ENZCLASS_DATA_FILE, EC_PATTERN_REGEX, EC_DELETED_REGEX, EC_TRANSFERRED_REGEX, \
-    EC_PROSITE_REGEX
+from bio2bel_ec.constants import (
+    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX,
+    ENZCLASS_DATA_FILE,
+)
 from bio2bel_ec.tree import download_ec_data
 
 __all__ = [
@@ -18,6 +16,8 @@ __all__ = [
     'PR',
     'DR',
 ]
+
+log = logging.getLogger(__name__)
 
 #: The identifier of the entry (One)
 ID = 'ID'

@@ -1,4 +1,6 @@
 requests
+sqlalchemy
+tqdm
 networkx==1.11
 click
 pandas

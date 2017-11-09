@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pyuniprot
 
-from pybel.constants import PROTEIN, FUNCTION
+from bio2bel_ec.constants import SQLITE_DB_PATH, SQL_DEFAULTS
+from bio2bel_ec.tree import populate_tree
+from pybel.constants import FUNCTION, PROTEIN
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
-
-from bio2bel_ec.tree import populate_tree
-from bio2bel_ec.constants import SQL_DEFAULTS, SQLITE_DB_PATH
 
 __all__ = [
     'enrich_enzyme_classes',
 ]
-
 
 
 def mysql_connect(connection=SQL_DEFAULTS):
@@ -24,6 +23,7 @@ def mysql_connect(connection=SQL_DEFAULTS):
     """
     pyuniprot.set_mysql_connection(connection)
 
+
 def sqlite_connect(db_path=SQLITE_DB_PATH):
     """
     Sets SQLite connection
@@ -33,11 +33,13 @@ def sqlite_connect(db_path=SQLITE_DB_PATH):
     sqlite_db = os.path.join('sqlite:///', db_path)
     pyuniprot.set_connection(sqlite_db)
 
+
 def connect(con_str=None, mysql=True):
     if mysql:
         mysql_connect() if con_str is None else mysql_connect(con_str)
     else:
         sqlite_connect() if con_str is None else sqlite_connect(con_str)
+
 
 def get_parent(ec_str):
     """Get the parent enzyme string
@@ -47,6 +49,7 @@ def get_parent(ec_str):
     """
     graph = populate_tree()
     return graph.predecessors(ec_str)[-1]
+
 
 def node_is_protein(graph, node):
     """
@@ -95,4 +98,4 @@ def enrich_enzyme_classes(graph):
     for edge in graph.edges():
         print(edge)
     return graph
-    #raise NotImplementedError
+    # raise NotImplementedError
