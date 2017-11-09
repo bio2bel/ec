@@ -100,7 +100,8 @@ class Manager(object):
                         self.session.add(protein_entry)
 
         #TODO 3 add hierarchy data from tree_graph
-            #for parent, child in tree_graph.edges_iter():
-                #id_model[parent].children.append(id_model[child])
+            for parent, child in tree_graph.edges_iter():
+                if parent in id_model.keys():
+                    id_model[parent].children.append(id_model[child])
         self.session.commit()
         pass #TODO finish 3
