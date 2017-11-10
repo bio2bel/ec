@@ -143,6 +143,5 @@ class Manager(object):
                 # id_enzyme[child_id].parent.append(id_enzyme[parent_id])
                 pass
 
-        # TODO fill in 4-code to 3-code relationships
 
         self.session.commit()

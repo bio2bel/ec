@@ -125,6 +125,7 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
         """Apparantly Returns the full list of EC entries
         :return lst: lst
         """
+        #TODO make of use enzyme.py for filtering not used and removed entries
         download_ec_data()
         with open(ENZCLASS_DATA_FILE, 'r') as ec_file:
             e_read = ec_file.read()
