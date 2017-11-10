@@ -114,7 +114,8 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
                 continue
             head = line[:10]
             parent,child = give_edge(head)
-            name = edge_descpription(line, file)
+            name = line[11:]
+            name = name.strip().strip('.')
             if parent is not None:
                 graph.add_node(child, name=name)
                 graph.add_edge(parent, child)
@@ -138,7 +139,7 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
     id_list = get_full_list_of_ec_ids(force_download)
     for node in id_list:
         parent, child = give_edge(node)
-        name = edge_descpription(line)
+        name = edge_descpription(parent)
         if parent is not None:
             graph.add_node(child, name=name)
             graph.add_edge(parent, child)
