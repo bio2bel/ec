@@ -99,7 +99,7 @@ class Manager(object):
                 self.session.add(enzyme_parent_entry)
                 id_enzyme[data_cell[ID]] = enzyme_entry
                 id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
-                #id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
+                # id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
                 id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
 
                 if PR in data_cell and data_cell[PR]:
@@ -133,16 +133,12 @@ class Manager(object):
 
                         enzyme_entry.proteins.append(protein_entry)
 
-        print(id_enzyme)
         for parent_id, child_id in tqdm(tree_graph.edges_iter(), desc='Hierarchy', total=tree_graph.number_of_edges()):
             if parent_id in id_enzyme.keys():
-                #id_enzyme[child_id].parent = id_enzyme[parent_id]
-                #print(child_id, parent_id)
-                #id_enzyme[child_id].parent.append(id_enzyme[parent_id])
+                # id_enzyme[child_id].parent = id_enzyme[parent_id]
+                # print(child_id, parent_id)
+                # id_enzyme[child_id].parent.append(id_enzyme[parent_id])
                 pass
-
-
-
 
         # TODO fill in 4-code to 3-code relationships
 
