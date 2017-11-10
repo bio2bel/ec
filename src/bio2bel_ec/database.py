@@ -90,17 +90,20 @@ class Manager(object):
                     expasy_id=data_cell[ID],
                     description=data_cell[DE]
                 )
-                enzyme_parent_entry = Enzyme(
-                    expasy_id=give_edge(data_cell[ID])[0],
-                    description=edge_descpription(give_edge(data_cell[ID])[0])
-                )
 
                 self.session.add(enzyme_entry)
-                self.session.add(enzyme_parent_entry)
                 id_enzyme[data_cell[ID]] = enzyme_entry
-                id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
-                # id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
-                id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
+                if give_edge(data_cell[ID])[0] not in id_enzyme.keys():
+                    enzyme_parent_entry = Enzyme(
+                        expasy_id=give_edge(data_cell[ID])[0],
+                        description=edge_descpription(give_edge(data_cell[ID])[0])
+                    )
+                    self.session.add(enzyme_parent_entry)
+                    id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
+                    # id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
+                    id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
+                else:
+                    id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
 
                 if PR in data_cell and data_cell[PR]:
                     for pr_id in data_cell[PR]:
