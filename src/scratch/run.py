@@ -48,8 +48,12 @@ cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 #    if not entry['TRANSFERRED']:
 #        print("{}, {}".format(entry['ID'], entry['DE']))
 
+from bio2bel_ec.tree import give_edge
+
+print(give_edge('1.1.1.16'))
 
 from bio2bel_ec.database import Manager
 
 a = Manager()
-a.populate()
+#a.populate()
+

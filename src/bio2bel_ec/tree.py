@@ -16,6 +16,7 @@ __all__ = [
     'populate_tree',
     'write_expasy_tree',
     'standard_ec_id',
+    'give_edge'
 ]
 
 
@@ -30,8 +31,7 @@ def download_res(force_download=False):
 
 
 def download_ec_data(force_download=False):
-    """
-    Downloads the file
+    """Downloads the file
     :return None:
     """
     if not os.path.exists(ENZCLASS_DATA_FILE) or force_download:
@@ -39,13 +39,33 @@ def download_ec_data(force_download=False):
 
 
 def standard_ec_id(non_standard_ec_id):
-    """
-    Rerturns standardized ec id string
+    """Rerturns standardized ec id string
     :param str non_standard_ec_id: str
     :return str:
     """
     return non_standard_ec_id.replace(" ", "")
 
+
+def give_edge(head_str):
+    head_str = standard_ec_id(head_str)
+    nums = head_str.split('.')
+    for i, obj in enumerate(nums):
+        nums[i] = obj.strip()
+
+    while '-' in nums:
+        nums.remove('-')
+
+    if len(nums) == 1:
+        return None
+    elif len(nums) == 2:
+       return (standard_ec_id("{}. -. -.-".format(nums[0])),
+               standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
+    elif len(nums) == 3:
+        return (standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
+                standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
+    elif len(nums) == 4:
+        return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
+                standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
 
 def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
     """Populates graph from a given specific file.
@@ -58,26 +78,6 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
 
     graph = nx.DiGraph()
 
-    def give_edge(head_str):
-        nums = head_str.split('.')
-        for i, obj in enumerate(nums):
-            nums[i] = obj.strip()
-
-        while '-' in nums:
-            nums.remove('-')
-
-        if len(nums) == 1:
-            return None
-        elif len(nums) == 2:
-            return (standard_ec_id("{}. -. -.-".format(nums[0])),
-                    standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
-        elif len(nums) == 3:
-            return (standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
-                    standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
-        elif len(nums) == 4:
-            return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
-                    standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
-
     with open(str(fileName), 'r') as file:
         for line in file:
             line.rstrip('\n')
@@ -89,8 +89,7 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
                 graph.add_edge(*e)
 
     def get_full_list_of_ec_ids(force_download=False):
-        """
-        Apparantly Returns the full list of EC entries
+        """Apparantly Returns the full list of EC entries
         :return lst: lst
         """
         download_ec_data()
