@@ -100,7 +100,7 @@ class Manager(object):
                 id_enzyme[data_cell[ID]] = enzyme_entry
                 id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
                 #id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
-                id_enzyme[data_cell[ID]].parent.append(id_enzyme[give_edge(data_cell[ID])[0]])
+                id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
 
                 if PR in data_cell and data_cell[PR]:
                     for pr_id in data_cell[PR]:
