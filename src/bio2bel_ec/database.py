@@ -11,7 +11,7 @@ from tqdm import tqdm
 from .constants import DEFAULT_CACHE_CONNECTION, ENZCLASS_CONFIG_FILE_PATH
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
-from .tree import populate_tree
+from .tree import populate_tree, give_edge, edge_descpription
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +78,7 @@ class Manager(object):
         :param bool force_download: Should the data be downloaded again, or cache used if exists?
         """
         data_dict = expasy_parser(force_download=force_download)
+        tree_graph = populate_tree(force_download=force_download)
 
         id_enzyme = {}
         id_prosite = {}
@@ -89,9 +90,16 @@ class Manager(object):
                     expasy_id=data_cell[ID],
                     description=data_cell[DE]
                 )
+                enzyme_parent_entry = Enzyme(
+                    expasy_id=give_edge(data_cell[ID])[0],
+                    description=edge_descpription(give_edge(data_cell[ID])[0])
+                )
 
                 self.session.add(enzyme_entry)
+                self.session.add(enzyme_parent_entry)
                 id_enzyme[data_cell[ID]] = enzyme_entry
+                id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
+                #id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
 
                 if PR in data_cell and data_cell[PR]:
                     for pr_id in data_cell[PR]:
@@ -124,11 +132,12 @@ class Manager(object):
 
                         enzyme_entry.proteins.append(protein_entry)
 
-        tree_graph = populate_tree(force_download=force_download)
 
         for parent_id, child_id in tqdm(tree_graph.edges_iter(), desc='Hierarchy', total=tree_graph.number_of_edges()):
             if parent_id in id_enzyme.keys():
                 id_enzyme[child_id].parent = id_enzyme[parent_id]
+
+
 
 
         # TODO fill in 4-code to 3-code relationships

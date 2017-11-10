@@ -16,7 +16,8 @@ __all__ = [
     'populate_tree',
     'write_expasy_tree',
     'standard_ec_id',
-    'give_edge'
+    'give_edge',
+    'edge_descpription'
 ]
 
 
