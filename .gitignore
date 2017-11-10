@@ -110,3 +110,6 @@ ENV/
 
 # Dolphin on linux
 .directory
+
+src/scratch
+src/scratch/*
