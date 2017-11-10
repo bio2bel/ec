@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
 
-import os
 from pybel import BELGraph
 from pybel.constants import PROTEIN
 
-from bio2bel_ec.enrich import enrich_enzyme_classes, get_parent, annotate_parents
+from bio2bel_ec.enrich import annotate_parents, enrich_enzyme_classes, get_parent
 from bio2bel_ec.tree import standard_ec_id
 
 ec = standard_ec_id('1.14.99.1')
