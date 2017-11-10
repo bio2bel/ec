@@ -130,6 +130,7 @@ class Manager(object):
             if parent_id in id_enzyme.keys():
                 id_enzyme[child_id].parent = id_enzyme[parent_id]
 
+
         # TODO fill in 4-code to 3-code relationships
 
         self.session.commit()

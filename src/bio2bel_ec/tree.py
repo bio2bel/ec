@@ -45,6 +45,27 @@ def standard_ec_id(non_standard_ec_id):
     """
     return non_standard_ec_id.replace(" ", "")
 
+def non_standard_ec_id(standard_ec_id):
+    nums = standard_ec_id.split('.')
+    non_standard_ec_id = ''
+    for obj in nums:
+        if obj.isdigit():
+            if int(obj) > 9:
+                non_standard_ec_id += obj
+                non_standard_ec_id += '.'
+            else:
+                non_standard_ec_id += ' '
+                non_standard_ec_id += obj
+                non_standard_ec_id += '.'
+        else:
+            non_standard_ec_id += ' '
+            non_standard_ec_id += obj
+            non_standard_ec_id += '.'
+
+    k = non_standard_ec_id.rfind(' ')
+    non_standard_ec_id = non_standard_ec_id[:k] + non_standard_ec_id[k+1:]
+    return non_standard_ec_id.strip().strip('.')
+
 
 def give_edge(head_str):
     head_str = standard_ec_id(head_str)
@@ -56,7 +77,7 @@ def give_edge(head_str):
         nums.remove('-')
 
     if len(nums) == 1:
-        return None
+        return None, None
     elif len(nums) == 2:
        return (standard_ec_id("{}. -. -.-".format(nums[0])),
                standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
@@ -66,6 +87,14 @@ def give_edge(head_str):
     elif len(nums) == 4:
         return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
                 standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
+
+def edge_descpription(str, file=None):
+    str = non_standard_ec_id(str)
+    file = open(ENZCLASS_FILE, 'r') if file is None else file
+    for line in file:
+        if str in line:
+            return line.split('-  ')[1].strip().strip('.')
+    return None
 
 def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
     """Populates graph from a given specific file.
@@ -84,9 +113,11 @@ def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
             if not line[0].isnumeric():
                 continue
             head = line[:10]
-            e = give_edge(head)
-            if e is not None:
-                graph.add_edge(*e)
+            parent,child = give_edge(head)
+            name = edge_descpription(line, file)
+            if parent is not None:
+                graph.add_node(child, name=name)
+                graph.add_edge(parent, child)
 
     def get_full_list_of_ec_ids(force_download=False):
         """Apparantly Returns the full list of EC entries
