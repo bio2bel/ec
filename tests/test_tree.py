@@ -16,7 +16,7 @@ class TestTree(unittest.TestCase):
         with open(test_path) as f:
             self.graph = tree.populate_tree()
 
-    def TestLength(self):
+    def test_length(self):
         self.assertEqual(33, self.graph.number_of_nodes())
 
     def test_1(self):
