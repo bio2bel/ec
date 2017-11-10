@@ -94,9 +94,8 @@ def write_gene_ec_mapping(file):
             'HGNC': get_latest_arty_namespace('hgnc-gene-families'),
         },
         namespace_patterns={},
-        annotations_url={},
-        annotations_patterns={},
-        file=file
+        annotation_url={},
+        annotation_patterns={},
     )
 
     for line in lines:
