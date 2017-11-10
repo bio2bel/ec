@@ -3,8 +3,7 @@
 import unittest
 
 from bio2bel_ec.enzyme import expasy_parser
-
-from constants import ENZCLASS_DATA_TEST_FILE
+from tests.constants import ENZCLASS_DATA_TEST_FILE
 
 
 class TestEnzyme(unittest.TestCase):
