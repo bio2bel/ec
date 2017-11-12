@@ -1,44 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import os
-
-import pyuniprot
-
-from bio2bel_ec.constants import SQLITE_DB_PATH, SQL_DEFAULTS
-from bio2bel_ec.tree import populate_tree
 from pybel.constants import FUNCTION, PROTEIN
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
+from bio2bel_ec.tree import populate_tree
+
 __all__ = [
     'enrich_enzyme_classes',
 ]
-
-
-def mysql_connect(connection=SQL_DEFAULTS):
-    """
-    Sets a connection using MySQL
-    :param str connection:
-    :return None:
-    """
-    pyuniprot.set_mysql_connection(connection)
-
-
-def sqlite_connect(db_path=SQLITE_DB_PATH):
-    """
-    Sets SQLite connection
-    :param db_path: str
-    :return: None
-    """
-    sqlite_db = os.path.join('sqlite:///', db_path)
-    pyuniprot.set_connection(sqlite_db)
-
-
-def connect(con_str=None, mysql=True):
-    if mysql:
-        mysql_connect() if con_str is None else mysql_connect(con_str)
-    else:
-        sqlite_connect() if con_str is None else sqlite_connect(con_str)
 
 
 def get_parent(ec_str):
