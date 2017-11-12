@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from .constants import DEFAULT_CACHE_CONNECTION, ENZCLASS_CONFIG_FILE_PATH
+from .constants import DEFAULT_CACHE_CONNECTION, CONFIG_FILE_PATH
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
 from .tree import populate_tree, give_edge, edge_descpription
@@ -56,7 +56,7 @@ class Manager(object):
 
         config = configparser.ConfigParser()
 
-        cfp = ENZCLASS_CONFIG_FILE_PATH
+        cfp = CONFIG_FILE_PATH
 
         if os.path.exists(cfp):
             log.info('fetch database configuration from {}'.format(cfp))
