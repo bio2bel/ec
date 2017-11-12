@@ -21,19 +21,20 @@ __all__ = [
 ]
 
 
-def download_res(force_download=False):
+def download_res(path=None, force_download=False):  # TODO rename this function and document what it is
     """
 
-    :param force: bool to force download
-    :return: None
+    :param Optional[str] path: The destination of the download
+    :param force_download: bool to force download
     """
     if not os.path.exists(ENZCLASS_FILE) or force_download:
-        urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
+        urlretrieve(ENZCLASS_URL, path or ENZCLASS_FILE)
 
 
 def download_ec_data(force_download=False):
     """Downloads the file
-    :return None:
+
+    :param force_download: bool to force download
     """
     if not os.path.exists(ENZCLASS_DATA_FILE) or force_download:
         urlretrieve(ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE)
@@ -45,6 +46,7 @@ def standard_ec_id(non_standard_ec_id):
     :return str:
     """
     return non_standard_ec_id.replace(" ", "")
+
 
 def non_standard_ec_id(standard_ec_id):
     nums = standard_ec_id.split('.')
@@ -64,7 +66,7 @@ def non_standard_ec_id(standard_ec_id):
             non_standard_ec_id += '.'
 
     k = non_standard_ec_id.rfind(' ')
-    non_standard_ec_id = non_standard_ec_id[:k] + non_standard_ec_id[k+1:]
+    non_standard_ec_id = non_standard_ec_id[:k] + non_standard_ec_id[k + 1:]
     return non_standard_ec_id.strip().strip('.')
 
 
@@ -80,14 +82,15 @@ def give_edge(head_str):
     if len(nums) == 1:
         return None, None
     elif len(nums) == 2:
-       return (standard_ec_id("{}. -. -.-".format(nums[0])),
-               standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
+        return (standard_ec_id("{}. -. -.-".format(nums[0])),
+                standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
     elif len(nums) == 3:
         return (standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
                 standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
     elif len(nums) == 4:
         return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
                 standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
+
 
 def edge_descpription(str, file=None):
     str = non_standard_ec_id(str)
@@ -97,24 +100,24 @@ def edge_descpription(str, file=None):
             return line.split('-  ')[1].strip().strip('.')
     return None
 
-def populate_tree(fileName=ENZCLASS_FILE, force_download=False):
+
+def populate_tree(path=None, force_download=False):
     """Populates graph from a given specific file.
 
-    :param fileName str
+    :param Optional[str] path: Path to
     :return networkx.DiGraph
     """
-
     download_res(force_download=force_download)
 
     graph = nx.DiGraph()
 
-    with open(str(fileName), 'r') as file:
+    with open(path or ENZCLASS_FILE, 'r') as file:
         for line in file:
             line.rstrip('\n')
             if not line[0].isnumeric():
                 continue
             head = line[:10]
-            parent,child = give_edge(head)
+            parent, child = give_edge(head)
             name = line[11:]
             name = name.strip().strip('.')
             if parent is not None:

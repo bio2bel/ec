@@ -7,7 +7,7 @@ import re
 import setuptools
 
 PACKAGES = setuptools.find_packages(where='src')
-META_PATH = os.path.join('src', 'bio2bel_ec', '__init__.py')
+META_PATH = os.path.join('src', 'bio2bel_expasy', '__init__.py')
 INSTALL_REQUIRES = [
     'requests',
     'tqdm',
@@ -21,8 +21,11 @@ INSTALL_REQUIRES = [
     'pyhgnc',
 ]
 ENTRY_POINTS = {
+    'bio2bel': [
+        'expasy = bio2bel_expasy',
+    ],
     'console_scripts': [
-        'bio2bel_ec = bio2bel_ec.cli:main',
+        'bio2bel_expasy = bio2bel_expasy.cli:main',
     ]
 }
 
