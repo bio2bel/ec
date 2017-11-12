@@ -14,8 +14,8 @@ import flask_admin
 from flask import Flask
 from flask_admin.contrib.sqla import ModelView
 
-from bio2bel_ec.database import Manager
-from bio2bel_ec.models import *
+from .database import Manager
+from .models import *
 
 app = Flask(__name__)
 admin = flask_admin.Admin(app, url='/')

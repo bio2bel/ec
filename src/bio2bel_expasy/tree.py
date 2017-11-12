@@ -5,12 +5,12 @@ import re
 from urllib.request import urlretrieve
 
 import networkx as nx
-
-from bio2bel_ec.constants import EC_DATA_FILE_REGEX, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, ENZCLASS_FILE, ENZCLASS_URL
 from pybel.resources.arty import get_latest_arty_namespace
 from pybel.resources.defaults import CONFIDENCE
 from pybel.utils import ensure_quotes
 from pybel_tools.document_utils import write_boilerplate
+
+from .constants import EC_DATA_FILE_REGEX, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, ENZCLASS_FILE, ENZCLASS_URL
 
 __all__ = [
     'populate_tree',
@@ -128,7 +128,7 @@ def populate_tree(path=None, force_download=False):
         """Apparantly Returns the full list of EC entries
         :return lst: lst
         """
-        #TODO make of use enzyme.py for filtering not used and removed entries
+        # TODO make of use enzyme.py for filtering not used and removed entries
         download_ec_data()
         with open(ENZCLASS_DATA_FILE, 'r') as ec_file:
             e_read = ec_file.read()

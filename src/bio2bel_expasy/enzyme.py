@@ -3,11 +3,11 @@
 import logging
 import re
 
-from bio2bel_ec.constants import (
+from .constants import (
     EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX,
     ENZCLASS_DATA_FILE,
 )
-from bio2bel_ec.tree import download_ec_data
+from .tree import download_ec_data
 
 __all__ = [
     'expasy_parser',

@@ -8,10 +8,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from .constants import DEFAULT_CACHE_CONNECTION, CONFIG_FILE_PATH
+from .constants import CONFIG_FILE_PATH, DEFAULT_CACHE_CONNECTION
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
-from .tree import populate_tree, give_edge, edge_descpription
+from .tree import edge_descpription, give_edge, populate_tree
 
 log = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from pybel.constants import FUNCTION, PROTEIN
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
-from bio2bel_ec.tree import populate_tree
+from .tree import populate_tree
 
 __all__ = [
     'enrich_enzyme_classes',
