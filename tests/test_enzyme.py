@@ -3,7 +3,7 @@
 import unittest
 
 from bio2bel_expasy.enzyme import expasy_parser
-from bio2bel_expasy.constants import ENZCLASS_FILE
+from tests.constants import ENZCLASS_FILE
 
 
 class TestEnzyme(unittest.TestCase):
@@ -12,38 +12,38 @@ class TestEnzyme(unittest.TestCase):
 
         :return: None
         """
-        db = expasy_parser()
+        db = expasy_parser(ENZCLASS_FILE)
         #
-        self.assertEqual(7177, len(db))
+        self.assertEqual(3, len(db))
         #
         self.assertEqual(False, db[0]['DELETED'])
         self.assertEqual(0, len(db[0]['TRANSFERRED']))
-        self.assertEqual('1.1.1.1', db[0]['ID'])
-        self.assertEqual('Alcohol dehydrogenase.', db[0]['DE'])
-        self.assertIn('Aldehyde reductase', db[0]['AN'])
-        self.assertEqual('(1) An alcohol + NAD(+) = an aldehyde or ketone + NADH.(2) A secondary alcohol + NAD(+) = a ketone + NADH.', db[0]['CA'])
-        self.assertIn('Zn(2+) or Fe cation', db[0]['CF'])
-        self.assertIn('PDOC00058', db[0]['PR'])
-        self.assertEqual('P07327', db[0]['DR'][0]['AC_Nb'])
-        self.assertEqual('ADH1A_HUMAN', db[0]['DR'][0]['Entry_name'])
-        self.assertEqual('P28469', db[0]['DR'][1]['AC_Nb'])
-        self.assertEqual('ADH1A_MACMU', db[0]['DR'][1]['Entry_name'])
-        self.assertEqual('Q5RBP7', db[0]['DR'][2]['AC_Nb'])
-        self.assertEqual('ADH1A_PONAB', db[0]['DR'][2]['Entry_name'])
-        self.assertEqual('P25405', db[0]['DR'][3]['AC_Nb'])
-        self.assertEqual('ADH1A_SAAHA', db[0]['DR'][3]['Entry_name'])
+        self.assertEqual('1.1.1.2', db[0]['ID'])
+        self.assertEqual('Alcohol dehydrogenase (NADP(+)).', db[0]['DE'])
+        self.assertIn('Aldehyde reductase (NADPH)', db[0]['AN'])
+        self.assertEqual('An alcohol + NADP(+) = an aldehyde + NADPH.', db[0]['CA'])
+        self.assertIn('Zn(2+)', db[0]['CF'])
+        self.assertIn('PDOC00061', db[0]['PR'])
+        self.assertEqual('Q6AZW2', db[0]['DR'][0]['AC_Nb'])
+        self.assertEqual('A1A1A_DANRE', db[0]['DR'][0]['Entry_name'])
+        self.assertEqual('Q568L5', db[0]['DR'][1]['AC_Nb'])
+        self.assertEqual('A1A1B_DANRE', db[0]['DR'][1]['Entry_name'])
+        self.assertEqual('Q24857', db[0]['DR'][2]['AC_Nb'])
+        self.assertEqual('ADH3_ENTHI', db[0]['DR'][2]['Entry_name'])
+        self.assertEqual('Q04894', db[0]['DR'][3]['AC_Nb'])
+        self.assertEqual('ADH6_YEAST', db[0]['DR'][3]['Entry_name'])
         self.assertEqual(
-            '-!- Acts on primary or secondary alcohols or hemi-acetals with very broad specificity; however the enzyme oxidizes methanol much more poorly than ethanol.-!- The animal, but not the yeast, enzyme acts also on cyclic secondary alcohols.',
+            '-!- Some members of this group oxidize only primary alcohols; others act also on secondary alcohols.-!- May be identical with EC 1.1.1.19, EC 1.1.1.33 and EC 1.1.1.55.-!- Re-specific with respect to NADPH.',
             db[0]['CC'])
         #
-        self.assertEqual('1.1.1.5', db[4]['ID'])
-        self.assertEqual(False, db[4]['DELETED'])
-        self.assertEqual(2, len(db[4]['TRANSFERRED']))
-        self.assertIn('1.1.1.303', db[4]['TRANSFERRED'])
-        self.assertIn('1.1.1.304', db[4]['TRANSFERRED'])
+        self.assertEqual('1.1.1.5', db[1]['ID'])
+        self.assertEqual(False, db[1]['DELETED'])
+        self.assertEqual(2, len(db[1]['TRANSFERRED']))
+        self.assertIn('1.1.1.303', db[1]['TRANSFERRED'])
+        self.assertIn('1.1.1.304', db[1]['TRANSFERRED'])
         #
-        self.assertEqual('1.1.1.74', db[73]['ID'])
-        self.assertEqual(True, db[73]['DELETED'])
+        self.assertEqual('1.1.1.74', db[2]['ID'])
+        self.assertEqual(True, db[2]['DELETED'])
 
 
 if __name__ == '__main__':
