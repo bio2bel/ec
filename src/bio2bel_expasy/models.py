@@ -16,13 +16,6 @@ ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
 
 Base = declarative_base()
 
-enzyme_hierarchy = Table(
-    TREE_TABLE_NAME,
-    Base.metadata,
-    Column('parent_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
-    Column('child_id', Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), primary_key=True),
-)
-
 enzyme_prosite = Table(
     ENZYME_PROSITE_TABLE_NAME,
     Base.metadata,
