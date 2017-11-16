@@ -3,8 +3,8 @@
 import os
 import unittest
 
-from bio2bel_ec import tree
-from bio2bel_ec.constants import ENZCLASS_FILE, ENZCLASS_URL
+from bio2bel_expasy import tree
+from bio2bel_expasy.constants import ENZCLASS_FILE, ENZCLASS_URL
 
 test_path = ENZCLASS_FILE
 
