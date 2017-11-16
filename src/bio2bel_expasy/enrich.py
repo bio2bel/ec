@@ -5,6 +5,7 @@ from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
 from .tree import populate_tree
+from .database import Manager
 
 __all__ = [
     'enrich_enzyme_classes',
@@ -22,8 +23,8 @@ def get_parent(ec_str):
 
 
 def node_is_protein(graph, node):
-    """
-    True if node is protein, False if else.
+    """True if node is protein, False if else.
+
     :param graph: BELGraph
     :param node: tuple node
     :return: bool
@@ -53,8 +54,8 @@ def annotate_all_parents(graph):
         annotate_parents(graph, node)
 
 
-@pipeline.mutator
-def enrich_enzyme_classes(graph):
+@pipeline.in_place_mutator
+def enrich_enzyme_classes(graph, connection=None):
     """Enriches Enzyme Classes for proteins in the graph
 
     1. Gets a list of proteins
@@ -64,8 +65,10 @@ def enrich_enzyme_classes(graph):
 
     :param pybel.BELGraph graph: A BEL graph
     """
+    m = Manager.ensure(connection)
+
     annotate_all_parents(graph)
     for edge in graph.edges():
         print(edge)
-    return graph
+
     # raise NotImplementedError

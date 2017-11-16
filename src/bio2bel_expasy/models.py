@@ -41,7 +41,7 @@ class Enzyme(Base):
 
     expasy_id = Column(String(255), doc='The ExPAsY enzyme code')
 
-    description = Column(String(255))
+    description = Column(String(255), doc='Description')
 
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     parent = relationship('Enzyme')
@@ -63,7 +63,7 @@ class Prosite(Base):
 
     id = Column(Integer, primary_key=True)
 
-    prosite_id = Column(String(255))
+    prosite_id = Column(String(255), doc='ProSite Identifier')
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
 
@@ -76,6 +76,6 @@ class Protein(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
 
-    AC_Nb = Column(String(255), doc='')
-    Entry_name = Column(String(255))
+    AC_Nb = Column(String(255), doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
+    Entry_name = Column(String(255), doc='Swiss-Prot entry name')
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
