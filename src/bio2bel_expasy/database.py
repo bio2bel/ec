@@ -136,12 +136,4 @@ class Manager(object):
 
                         enzyme_entry.proteins.append(protein_entry)
 
-        for parent_id, child_id in tqdm(tree_graph.edges_iter(), desc='Hierarchy', total=tree_graph.number_of_edges()):
-            if parent_id in id_enzyme.keys():
-                # id_enzyme[child_id].parent = id_enzyme[parent_id]
-                # print(child_id, parent_id)
-                # id_enzyme[child_id].parent.append(id_enzyme[parent_id])
-                pass
-
-
         self.session.commit()
