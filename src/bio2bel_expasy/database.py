@@ -144,8 +144,18 @@ class Manager(object):
         """Returns the parent ID of expasy_id if exist otherwise returns None
 
         :param str _id: ExPASy ID of enzyme which parent is needed
+        :rtype str
         """
 
         #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id == 2)
         #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == _id).one_or_none())
-        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = _id).first()[0]).first()
+        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = _id).first()[0]).first()[0]
+
+    def get_description(self, _id):
+        """Return the Description of the enzyme, None if doesn't exist
+
+        :param str _id: ExPASy ID of the enzyme which Description is needed
+        :rtype str
+        """
+
+        return self.session.query(Enzyme.description).filter_by(expasy_id=_id).first()[0]
