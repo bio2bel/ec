@@ -31,8 +31,6 @@ enzyme_protein = Table(
 )
 
 
-# TODO add docstrings for all columns in classes
-
 class Enzyme(Base):
     """ExPASy's main entry"""
     __tablename__ = ENZYME_TABLE_NAME
@@ -76,6 +74,6 @@ class Protein(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
 
-    AC_Nb = Column(String(255), doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
+    accession_number = Column(String(255), doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
     Entry_name = Column(String(255), doc='Swiss-Prot entry name')
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)

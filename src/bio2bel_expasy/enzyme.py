@@ -110,7 +110,7 @@ def expasy_parser_helper(enzclass_file):
             for dr_tuple in line[5:-2].split(';'):
                 dr_tuple = dr_tuple.strip()
                 ec_data_entry[DR].append({
-                    'AC_Nb': dr_tuple.split(', ')[0],
+                    'accession_number': dr_tuple.split(', ')[0],
                     'Entry_name': dr_tuple.split(', ')[1]
                 })
         else:

@@ -120,12 +120,12 @@ class Manager(object):
                 if DR in data_cell and data_cell[DR]:
                     for dr_id in data_cell[DR]:
 
-                        ac_nb = dr_id['AC_Nb']
+                        ac_nb = dr_id['accession_number']
                         entry_name = dr_id['Entry_name']
 
                         if (ac_nb, entry_name) not in id_protein:
                             protein_entry = Protein(
-                                AC_Nb=dr_id['AC_Nb'],
+                                AC_Nb=dr_id['accession_number'],
                                 Entry_name=dr_id['Entry_name'],
                                 #  is_SwissProt=
                             )
