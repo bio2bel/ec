@@ -12,16 +12,6 @@ __all__ = [
 ]
 
 
-def get_parent(ec_str):
-    """Get the parent enzyme string
-
-    :param str ec_str: The child enzyme string
-    :rtype str: str
-    """
-    graph = populate_tree()
-    return graph.predecessors(ec_str)[-1]
-
-
 def node_is_protein(graph, node):
     """True if node is protein, False if else.
 

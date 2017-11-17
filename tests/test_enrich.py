@@ -6,8 +6,8 @@ import unittest
 from pybel import BELGraph
 from pybel.constants import PROTEIN
 
-from bio2bel_ec.enrich import annotate_parents, enrich_enzyme_classes, get_parent
-from bio2bel_ec.tree import standard_ec_id
+from bio2bel_expasy.enrich import annotate_parents, enrich_enzyme_classes
+from bio2bel_expasy.tree import standard_ec_id
 
 ec = standard_ec_id('1.14.99.1')
 ec_p = standard_ec_id('1.14.99.-')
