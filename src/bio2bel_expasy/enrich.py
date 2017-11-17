@@ -28,8 +28,9 @@ def annotate_parents(graph, node):
     :param BELGraph graph: A BEL graph
     :param tuple node: A PyBEL node tuple
     """
-    parent_node = (node[0], node[1], get_parent(node[2]))
-    graph.add_edge(parent_node, node)
+    # parent_node = (node[0], node[1], get_parent(node[2]))
+    #graph.add_edge(parent_node, node)
+    raise NotImplementedError
 
 
 def annotate_all_parents(graph):
@@ -37,11 +38,13 @@ def annotate_all_parents(graph):
 
     :param BELGraph graph: A BEL graph
     """
-    nodes = list(filter_nodes(graph, node_is_protein))
-    print(len(nodes))
+    raise NotImplementedError
 
-    for node in nodes:
-        annotate_parents(graph, node)
+    # nodes = list(filter_nodes(graph, node_is_protein))
+    # print(len(nodes))
+    #
+    # for node in nodes:
+    #     annotate_parents(graph, node)
 
 
 @pipeline.in_place_mutator
