@@ -4,7 +4,7 @@ import configparser
 import logging
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Integer
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
@@ -136,4 +136,16 @@ class Manager(object):
 
                         enzyme_entry.proteins.append(protein_entry)
 
+        log.info("\nBuilding (Committing) DataBase ...\n")
+
         self.session.commit()
+
+    def get_parent(self, _id):
+        """Returns the parent ID of expasy_id if exist otherwise returns None
+
+        :param str _id: ExPASy ID of enzyme which parent is needed
+        """
+
+        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id == 2)
+        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == _id).one_or_none())
+        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = _id).first()[0]).first()
