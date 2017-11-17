@@ -125,7 +125,7 @@ class Manager(object):
 
                         if (ac_nb, entry_name) not in id_protein:
                             protein_entry = Protein(
-                                AC_Nb=dr_id['accession_number'],
+                                accession_number=dr_id['accession_number'],
                                 Entry_name=dr_id['Entry_name'],
                                 #  is_SwissProt=
                             )
