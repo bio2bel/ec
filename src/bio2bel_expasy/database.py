@@ -194,3 +194,12 @@ class Manager(object):
         """
 
         return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Protein.enzymes).filter(Protein.enzymes.any(Protein.accession_number==_id)).all()]
+
+    def get_children(self, _id):
+        """Returns list of Expasy ID's which are children for given Expasy _id
+
+        :param _id:
+        :return:
+        """
+        #  self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=_id).first()[0]).all()]
