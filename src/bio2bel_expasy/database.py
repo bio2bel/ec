@@ -185,3 +185,12 @@ class Manager(object):
         """
 
         return [a for a in self.session.query(Protein.accession_number, Protein.Entry_name).filter(Protein.enzymes.any(Enzyme.expasy_id==_id)).all()]
+
+    def get_expasy_from_uniprot(self, _id):
+        """Returns Enzyme ID list associated with the given uniprot accession_number
+
+        :param _id:
+        :return:
+        """
+
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Protein.enzymes).filter(Protein.enzymes.any(Protein.accession_number==_id)).all()]
