@@ -163,7 +163,16 @@ class Manager(object):
     def get_prosite(self, _id):
         """Returns list of Prosite ID's associated with the given Enzyme ID
         :param str _id: ExPASy ID
-        :return: sqlalchemy result list
+        :return: resulting list of strings
         """
 
         return [a[0] for a in self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id==_id)).all()]
+
+    def get_expasy_form_prosite(self, _id):
+        """Returns Enzyme ID lists associated with the given Proside ID
+
+        :param str _id: Prosite ID
+        :return: list of strings
+        """
+
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Prosite.enzymes).filter(Prosite.enzymes.any(Prosite.prosite_id==_id)).all()]
