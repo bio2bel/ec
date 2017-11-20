@@ -11,7 +11,7 @@ from tqdm import tqdm
 from .constants import CONFIG_FILE_PATH, DEFAULT_CACHE_CONNECTION
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
-from .tree import edge_descpription, give_edge, populate_tree
+from .tree import edge_descpription, give_edge, populate_tree, standard_ec_id
 
 log = logging.getLogger(__name__)
 
@@ -139,6 +139,17 @@ class Manager(object):
         log.info("\nBuilding (Committing) DataBase ...\n")
 
         self.session.commit()
+
+    def get_enzyme_by_id(self, expasy_id):
+        """Gets an enzyme by its ExPAsY identifier.
+        
+        Implementation note: canonicalizes identifier to remove all spaces first.
+
+        :param str expasy_id: The ExPAsY database identifier. Example: 1.3.3.- or 1.3.3.19
+        :rtype: Optional[Enzyme]
+        """
+        canonical_expasy_id = standard_ec_id(expasy_id)
+        return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
     def get_parent(self, _id):
         """Returns the parent ID of expasy_id if exist otherwise returns None
