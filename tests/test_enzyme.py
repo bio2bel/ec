@@ -3,7 +3,7 @@
 import unittest
 
 from bio2bel_expasy.enzyme import expasy_parser
-from tests.constants import ENZCLASS_FILE
+from tests.constants import ENZCLASS_DATA_FILE
 
 
 class TestEnzyme(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestEnzyme(unittest.TestCase):
 
         :return: None
         """
-        db = expasy_parser(ENZCLASS_FILE)
+        db = expasy_parser(ENZCLASS_DATA_FILE)
         #
         self.assertEqual(3, len(db))
         #
