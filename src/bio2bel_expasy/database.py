@@ -45,6 +45,20 @@ class Manager(object):
         Base.metadata.drop_all(self.engine)
 
     @staticmethod
+    def ensure(connection=None):
+        """Checks and allows for a Manager to be passed to the function.
+
+        :param connection: can be either a already build manager or a connection string to build a manager with.
+        """
+        if connection is None or isinstance(connection, str):
+            return Manager(connection=connection)
+
+        if isinstance(connection, Manager):
+            return connection
+
+        raise TypeError
+
+    @staticmethod
     def get_connection_string(connection=None):
         """Return the SQLAlchemy connection string if it is set
 
