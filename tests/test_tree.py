@@ -4,28 +4,25 @@ import os
 import unittest
 
 from bio2bel_expasy import tree
-from bio2bel_expasy.constants import ENZCLASS_FILE, ENZCLASS_URL
+from tests.constants import ENZCLASS_FILE, ENZCLASS_DATA_FILE
 
-test_path = ENZCLASS_FILE
+#test_path = ENZCLASS_FILE
 
 
 class TestTree(unittest.TestCase):
     def setUp(self):
-        if not os.path.isfile(ENZCLASS_FILE):
-            tree.urlretrieve(ENZCLASS_URL, ENZCLASS_FILE)
-        with open(test_path) as f:
-            self.graph = tree.populate_tree()
+        self.graph = tree.populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_FILE, force_download=False)
 
     def test_length(self):
         """Assert that the number of nodes present in the test file is what we expect"""
-        self.assertEqual(7549, self.graph.number_of_nodes())
+        self.assertEqual(13, self.graph.number_of_nodes())
 
     def test_node_existence(self):
         """Assert that the given nodes and their parent relationships are present"""
-        self.assertIn(tree.standard_ec_id('5. 4. 2.-'), self.graph.edge[tree.standard_ec_id('5. 4. -.-')])
+        self.assertIn(tree.standard_ec_id('1. 1. -.-'), self.graph.edge[tree.standard_ec_id('1. -. -.-')])
 
-        self.assertIn(tree.standard_ec_id('6. 6. 1.-'), self.graph.edge[tree.standard_ec_id('6. 6. -.-')])
-        self.assertIn(tree.standard_ec_id('6. 6. -.-'), self.graph.edge[tree.standard_ec_id('6. -. -.-')])
+        self.assertIn(tree.standard_ec_id('1. 1. 1.-'), self.graph.edge[tree.standard_ec_id('1. 1. -.-')])
+        self.assertIn(tree.standard_ec_id('1. 1.99.-'), self.graph.edge[tree.standard_ec_id('1. 1. -.-')])
 
 
 if __name__ == '__main__':

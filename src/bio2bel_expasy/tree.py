@@ -101,17 +101,17 @@ def edge_descpription(str, file=None):
     return None
 
 
-def populate_tree(path=None, force_download=False):
+def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_FILE , force_download=False):
     """Populates graph from a given specific file.
 
-    :param Optional[str] path: Path to
+    :param Optional[str] path_enzclass: Path to
     :return networkx.DiGraph
     """
     download_res(force_download=force_download)
 
     graph = nx.DiGraph()
 
-    with open(path or ENZCLASS_FILE, 'r') as file:
+    with open(path_enzclass, 'r') as file:
         for line in file:
             line.rstrip('\n')
             if not line[0].isnumeric():
@@ -128,9 +128,9 @@ def populate_tree(path=None, force_download=False):
         """Apparantly Returns the full list of EC entries
         :return lst: lst
         """
-        # TODO make of use enzyme.py for filtering not used and removed entries
-        download_ec_data()
-        with open(ENZCLASS_DATA_FILE, 'r') as ec_file:
+
+        download_ec_data(force_download=force_download)
+        with open(path_enzclass_data, 'r') as ec_file:
             e_read = ec_file.read()
 
             matches = re.finditer(EC_DATA_FILE_REGEX, e_read)
@@ -141,7 +141,7 @@ def populate_tree(path=None, force_download=False):
 
             return new_list
 
-    id_list = get_full_list_of_ec_ids(force_download)
+    id_list = get_full_list_of_ec_ids(force_download=force_download)
     for node in id_list:
         parent, child = give_edge(node)
         if parent is not None:
