@@ -15,7 +15,7 @@ class TestTree(unittest.TestCase):
 
     def test_length(self):
         """Assert that the number of nodes present in the test file is what we expect"""
-        self.assertEqual(13, self.graph.number_of_nodes())
+        self.assertEqual(13, self.graph.number_of_nodes()) #  10 + 3
 
     def test_node_existence(self):
         """Assert that the given nodes and their parent relationships are present"""
