@@ -6,6 +6,8 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 
+from pybel.constants import ABUNDANCE, FUNCTION, NAME, NAMESPACE, PATHOLOGY, PROTEIN
+
 TABLE_PREFIX = 'expasy'
 ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
 PROTEIN_TABLE_NAME = '{}_protein'.format(TABLE_PREFIX)
@@ -44,15 +46,19 @@ class Enzyme(Base):
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     parent = relationship('Enzyme')
 
-    #children = relationship(
-    #    'Enzyme',
-    #    secondary=enzyme_hierarchy,
-    #    primaryjoin=(id == enzyme_hierarchy.c.parent_id),
-    #    secondaryjoin=(id == enzyme_hierarchy.c.child_id)
-    #)
-
     def __str__(self):
         return self.expasy_id
+
+    def serialize_to_bel(self):
+        """Returns Dict object of Enzyme Class Data for Bel
+
+        :return: dict
+        """
+        return {
+            FUNCTION: PROTEIN,
+            NAMESPACE: ENZYME_TABLE_NAME,
+            NAME: self.expasy_id
+        }
 
 
 class Prosite(Base):
@@ -64,6 +70,17 @@ class Prosite(Base):
     prosite_id = Column(String(255), doc='ProSite Identifier')
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
+
+    def serialize_to_bel(self):
+        """Returns Dict object of Prosite Class Data for Bel
+
+        :return: dict
+        """
+        return {
+            FUNCTION: PROTEIN,
+            NAMESPACE: PROSITE_TABLE_NAME,
+            NAME: self.prosite_id
+        }
 
 
 class Protein(Base):
@@ -77,3 +94,14 @@ class Protein(Base):
     accession_number = Column(String(255), doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
     Entry_name = Column(String(255), doc='Swiss-Prot entry name')
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
+
+    def serialize_to_bel(self):
+        """Returns Dict object of UniProtKB Class Data for Bel
+
+        :return: dict
+        """
+        return {
+            FUNCTION: PROTEIN,
+            NAMESPACE: PROSITE_TABLE_NAME,
+            NAME: self.accession_number
+        }
