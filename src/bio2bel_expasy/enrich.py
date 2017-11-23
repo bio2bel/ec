@@ -1,15 +1,34 @@
 # -*- coding: utf-8 -*-
 
-from pybel.constants import FUNCTION, PROTEIN
+import logging
+
+from pybel.constants import FUNCTION, PROTEIN, NAMESPACE
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
-from .tree import populate_tree
 from .database import Manager
+
+log = logging.getLogger(__name__)
 
 __all__ = [
     'enrich_enzyme_classes',
 ]
+
+
+def _check_namespaces(data, bel_function, bel_namespace):
+    """Makes code more structured and reusable."""
+    if data[FUNCTION] != bel_function:
+        return False
+
+    if NAMESPACE not in data:
+        return False
+
+    if data[NAMESPACE] == bel_namespace:
+        return True
+
+    elif data[NAMESPACE] != bel_namespace:
+        log.warning("Unable to map namespace: %s", data[NAMESPACE])
+        return False
 
 
 def node_is_protein(graph, node):
@@ -29,7 +48,7 @@ def annotate_parents(graph, node):
     :param tuple node: A PyBEL node tuple
     """
     # parent_node = (node[0], node[1], get_parent(node[2]))
-    #graph.add_edge(parent_node, node)
+    # graph.add_edge(parent_node, node)
     raise NotImplementedError
 
 
@@ -64,4 +83,4 @@ def enrich_enzyme_classes(graph, connection=None):
     for edge in graph.edges():
         print(edge)
 
-    # raise NotImplementedError
+        # raise NotImplementedError

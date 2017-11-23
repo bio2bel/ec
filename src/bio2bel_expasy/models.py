@@ -91,8 +91,10 @@ class Protein(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
 
-    accession_number = Column(String(255), doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
+    accession_number = Column(String(255),
+                              doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
     Entry_name = Column(String(255), doc='Swiss-Prot entry name')
+
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
     def serialize_to_bel(self):
