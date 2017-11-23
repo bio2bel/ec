@@ -16,6 +16,8 @@ TREE_TABLE_NAME = '{}_tree'.format(TABLE_PREFIX)
 ENZYME_PROSITE_TABLE_NAME = '{}_enzyme_prosite'.format(TABLE_PREFIX)
 ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
 
+BEL_EXPASY = 'expasy'
+
 Base = declarative_base()
 
 enzyme_prosite = Table(
@@ -56,7 +58,7 @@ class Enzyme(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: ENZYME_TABLE_NAME,
+            NAMESPACE: BEL_EXPASY,
             NAME: self.expasy_id
         }
 
@@ -78,7 +80,7 @@ class Prosite(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: PROSITE_TABLE_NAME,
+            NAMESPACE: BEL_EXPASY,
             NAME: self.prosite_id
         }
 
@@ -104,6 +106,6 @@ class Protein(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: PROSITE_TABLE_NAME,
+            NAMESPACE: BEL_EXPASY,
             NAME: self.accession_number
         }
