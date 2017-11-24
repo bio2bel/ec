@@ -8,6 +8,8 @@ from pybel_tools import pipeline
 
 from .database import Manager
 
+EXPASY = 'expasy'
+
 log = logging.getLogger(__name__)
 
 __all__ = [
@@ -77,11 +79,12 @@ def enrich_enzyme_classes(graph, connection=None):
 
     :param pybel.BELGraph graph: A BEL graph
     :param connection: connection string or manager
+    :rtype: pybel.BELGraph
     """
     m = Manager.ensure(connection)
 
     for node, data in graph.nodes(data=True):
-        if not _check_namespaces(data, PROTEIN, 'expasy'):
+        if not _check_namespaces(data, PROTEIN, EXPASY):
             continue
         uniprot_list = m.get_uniprot(data[NAME])
 
@@ -91,5 +94,29 @@ def enrich_enzyme_classes(graph, connection=None):
         for prot in uniprot_list:
             protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
             graph.add_unqualified_edge(node, protein_tuple, IS_A)
+
+    return graph
+
+
+@pipeline.in_place_mutator
+def enrich_prosite_classes(graph, connection=None):
+    """enriches Enzyme classes for prosite in the graph
+
+    :param graph:
+    :param connection:
+    :rtype pybel.BELGraph
+    """
+    m = Manager.ensure(connection=connection)
+
+    for node, data in graph.noes(data=True):
+        if not _check_namespaces(data, PROTEIN, EXPASY):
+            continue
+        prosite_list = m.get_prosite(data[NAME])
+        if not prosite_list:
+            log.warning('Unable to find node %s', node)
+            continue
+        for prosite in prosite_list:
+            prosite_tuple = graph.add_node_from_data(prosite.serialize_to_bel())
+            graph.add_unqualified_edge(node, prosite_tuple, IS_A)
 
     return graph
