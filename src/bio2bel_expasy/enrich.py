@@ -102,7 +102,7 @@ def enrich_enzyme_classes(graph, connection=None):
 def enrich_prosite_classes(graph, connection=None):
     """enriches Enzyme classes for prosite in the graph
 
-    :param graph:
+    :param pybel.BELGraph graph:
     :param connection:
     :rtype pybel.BELGraph
     """
@@ -118,5 +118,29 @@ def enrich_prosite_classes(graph, connection=None):
         for prosite in prosite_list:
             prosite_tuple = graph.add_node_from_data(prosite.serialize_to_bel())
             graph.add_unqualified_edge(node, prosite_tuple, IS_A)
+
+    return graph
+
+
+@pipeline.in_place_mutator
+def enrich_parents_classes(graph, connection=None):
+    """
+
+    :param pybel.BELGraph graph:
+    :param connection:
+    :rtype pybel.BELGraph
+    """
+    m = Manager.ensure()
+
+    for node, data in graph.nodes(data=True):
+        if not _check_namespaces(data, PROTEIN, EXPASY):
+            continue
+        parents_list = m.get_parent()
+        if not parents_list:
+            log.warning('Unable to find node %s', node)
+            continue
+        for parent in parents_list:
+            parent_tuple = graph.add_node_from_data(parent.serialize_to_bel())
+            graph.add_unqualified_edge(node, parent_tuple, IS_A)
 
     return graph
