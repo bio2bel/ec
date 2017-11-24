@@ -2,7 +2,7 @@
 
 import logging
 
-from pybel.constants import FUNCTION, PROTEIN, NAMESPACE, NAME
+from pybel.constants import FUNCTION, PROTEIN, NAMESPACE, NAME, IS_A
 from pybel.struct.filters import filter_nodes
 from pybel_tools import pipeline
 
@@ -79,22 +79,16 @@ def enrich_enzyme_classes(graph, connection=None):
     """
     m = Manager.ensure(connection)
 
-    #annotate_all_parents(graph)
     for node, data in graph.nodes(data=True):
-        if _check_namespaces(data, PROTEIN, 'expasy'):
-            uniprot_list = m.get_uniprot(data[NAME])
-        else:
+        if not _check_namespaces(data, PROTEIN, 'expasy'):
             continue
+        uniprot_list = m.get_uniprot(data[NAME])
+
         if not uniprot_list:
             log.warning("Unable to find node: %s", node)
             continue
-        #for prot in uniprot_list:
-            #graph.add_node_from_data(prot.serialize_to_bel())
+        for prot in uniprot_list:
+            protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
+            graph.add_unqualified_edge(node, protein_tuple, IS_A)
 
-        #return uniprot_list #TODO remove
-    graph.add_node_from_data(m   .serialize_to_bel())
     return graph
-
-
-
-        # raise NotImplementedError

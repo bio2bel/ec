@@ -212,14 +212,17 @@ class Manager(object):
 
         return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Prosite.enzymes).filter(Prosite.enzymes.any(Prosite.prosite_id==_id)).all()]
 
-    def get_uniprot(self, _id):
+    def get_uniprot(self, expasy_id):
         """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
 
-        :param str _id:
-        :return:
+        :param str expasy_id:
+        :rtype: Optional[list[Protein]]
         """
+        enzyme = self.get_enzyme_by_id(expasy_id)
+        if enzyme is None:
+            raise IndexError
+        return enzyme.proteins
 
-        return [a for a in self.session.query(Protein.accession_number, Protein.Entry_name).filter(Protein.enzymes.any(Enzyme.expasy_id==_id)).all()]
 
     def get_expasy_from_uniprot(self, _id):
         """Returns Enzyme ID list associated with the given uniprot accession_number
