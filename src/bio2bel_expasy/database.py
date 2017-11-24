@@ -199,7 +199,7 @@ class Manager(object):
         """Return the Description of the enzyme, None if doesn't exist
 
         :param str expasy_id: ExPASy ID of the enzyme which Description is needed
-        :rtype str
+        :rtype: str
         """
 
         return self.session.query(Enzyme.description).filter_by(expasy_id=expasy_id).first()[0]
@@ -207,7 +207,7 @@ class Manager(object):
     def get_prosite(self, expasy_id):
         """Returns list of Prosite ID's associated with the given Enzyme ID
         :param str expasy_id: ExPASy ID
-        :return: resulting list of strings
+        :rtype: resulting list of strings
         """
 
         return [a[0] for a in self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id == expasy_id)).all()]
@@ -216,7 +216,7 @@ class Manager(object):
         """Returns Enzyme ID lists associated with the given Proside ID
 
         :param str prosite_id: Prosite ID
-        :return: list of strings
+        :rtype: list of strings
         """
 
         prosite = self.get_prosite_by_id(prosite_id)
@@ -241,7 +241,7 @@ class Manager(object):
         """Returns Enzyme ID list associated with the given uniprot accession_number
 
         :param uniprot_id:
-        :return:
+        :rtype: Manager[list[Enzyme]]
         """
         protein = self.get_protein_by_id(uniprot_id)
         if protein is None:
@@ -253,7 +253,7 @@ class Manager(object):
         """Returns list of Expasy ID's which are children for given Expasy _id
 
         :param expasy_id:
-        :return:
+        :rtype: list
         """
 
 
