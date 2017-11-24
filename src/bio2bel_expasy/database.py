@@ -172,7 +172,7 @@ class Manager(object):
         :return:
         """
 
-        return self.session.query(Protein).filter(uniprot_id in Protein.accession_number).one_or_none()
+        return self.session.query(Protein).filter(uniprot_id == Protein.accession_number).one_or_none()
 
     def get_prosite_by_id(self, prosite_id):
         """Returns prosite entry for given prosite_id
