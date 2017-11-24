@@ -171,20 +171,18 @@ class Manager(object):
         :param str expasy_id: ExPASy ID of enzyme which parent is needed
         :rtype str
         """
+        enzyme = self.get_enzyme_by_id(_id)
+        if enzyme is None:
+            raise IndexError
+        return enzyme.parent
 
-        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id == 2)
-        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == expasy_id).one_or_none())
-        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = expasy_id).first()[0]).first()[0]
     def get_parent_classy_way(self, _id):
         """Do it classy
 
         :param str _id: ExPASy ID of enzyme which parent is needed
         :rtype str
         """
-        enzyme = self.get_enzyme_by_id(_id)
-        if enzyme is None:
-            raise IndexError
-        return enzyme.parent
+
 
     def get_description(self, expasy_id):
         """Return the Description of the enzyme, None if doesn't exist
@@ -230,6 +228,7 @@ class Manager(object):
         :param uniprot_id:
         :return:
         """
+        #enzyme = self.
 
         return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Protein.enzymes).filter(Protein.enzymes.any(Protein.accession_number == uniprot_id)).all()]
 
@@ -239,5 +238,5 @@ class Manager(object):
         :param expasy_id:
         :return:
         """
-        #  self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in
+
         return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=expasy_id).first()[0]).all()]
