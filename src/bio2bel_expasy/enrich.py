@@ -88,8 +88,12 @@ def enrich_enzyme_classes(graph, connection=None):
         if not uniprot_list:
             log.warning("Unable to find node: %s", node)
             continue
+        #for prot in uniprot_list:
+            #graph.add_node_from_data(prot.serialize_to_bel())
 
-        return uniprot_list #TODO remove
+        #return uniprot_list #TODO remove
+    graph.add_node_from_data(m.Enzyme.serialize_to_bel())
+    return graph
 
 
 
