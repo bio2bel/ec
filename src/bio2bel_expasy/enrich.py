@@ -71,11 +71,12 @@ def enrich_enzyme_classes(graph, connection=None):
     """Enriches Enzyme Classes for proteins in the graph
 
     1. Gets a list of proteins
-    2. looks up their entries with PyUniProt
+    2. get UniProtKB entries
     3. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
     4. Ensures all parent enzyme classes for those enzyme classes
 
     :param pybel.BELGraph graph: A BEL graph
+    :param connection: connection string or manager
     """
     m = Manager.ensure(connection)
 
