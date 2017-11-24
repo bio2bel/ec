@@ -28,3 +28,7 @@ EC_PATTERN_REGEX = '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
 EC_PROSITE_REGEX = '(PDOC|PS)(\d+)'
 EC_DELETED_REGEX = 'Deleted entry'
 EC_TRANSFERRED_REGEX = 'Transferred entry'
+
+EXPASY = 'expasy'
+PROSITE = 'prosite'
+UNIPROT = 'up'
