@@ -165,16 +165,16 @@ class Manager(object):
         canonical_expasy_id = standard_ec_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
-    def get_parent(self, _id):
+    def get_parent(self, expasy_id):
         """Returns the parent ID of expasy_id if exist otherwise returns None
 
-        :param str _id: ExPASy ID of enzyme which parent is needed
+        :param str expasy_id: ExPASy ID of enzyme which parent is needed
         :rtype str
         """
 
         #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id == 2)
-        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == _id).one_or_none())
-        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = _id).first()[0]).first()[0]
+        #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == expasy_id).one_or_none())
+        return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = expasy_id).first()[0]).first()[0]
     def get_parent_classy_way(self, _id):
         """Do it classy
 
@@ -186,31 +186,31 @@ class Manager(object):
             raise IndexError
         return enzyme.parent
 
-    def get_description(self, _id):
+    def get_description(self, expasy_id):
         """Return the Description of the enzyme, None if doesn't exist
 
-        :param str _id: ExPASy ID of the enzyme which Description is needed
+        :param str expasy_id: ExPASy ID of the enzyme which Description is needed
         :rtype str
         """
 
-        return self.session.query(Enzyme.description).filter_by(expasy_id=_id).first()[0]
+        return self.session.query(Enzyme.description).filter_by(expasy_id=expasy_id).first()[0]
 
-    def get_prosite(self, _id):
+    def get_prosite(self, expasy_id):
         """Returns list of Prosite ID's associated with the given Enzyme ID
-        :param str _id: ExPASy ID
+        :param str expasy_id: ExPASy ID
         :return: resulting list of strings
         """
 
-        return [a[0] for a in self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id==_id)).all()]
+        return [a[0] for a in self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id == expasy_id)).all()]
 
-    def get_expasy_form_prosite(self, _id):
+    def get_expasy_form_prosite(self, prosite_id):
         """Returns Enzyme ID lists associated with the given Proside ID
 
-        :param str _id: Prosite ID
+        :param str prosite_id: Prosite ID
         :return: list of strings
         """
 
-        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Prosite.enzymes).filter(Prosite.enzymes.any(Prosite.prosite_id==_id)).all()]
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Prosite.enzymes).filter(Prosite.enzymes.any(Prosite.prosite_id == prosite_id)).all()]
 
     def get_uniprot(self, expasy_id):
         """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
@@ -224,20 +224,20 @@ class Manager(object):
         return enzyme.proteins
 
 
-    def get_expasy_from_uniprot(self, _id):
+    def get_expasy_from_uniprot(self, uniprot_id):
         """Returns Enzyme ID list associated with the given uniprot accession_number
 
-        :param _id:
+        :param uniprot_id:
         :return:
         """
 
-        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Protein.enzymes).filter(Protein.enzymes.any(Protein.accession_number==_id)).all()]
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).join(Enzyme, Protein.enzymes).filter(Protein.enzymes.any(Protein.accession_number == uniprot_id)).all()]
 
-    def get_children(self, _id):
+    def get_children(self, expasy_id):
         """Returns list of Expasy ID's which are children for given Expasy _id
 
-        :param _id:
+        :param expasy_id:
         :return:
         """
         #  self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in self.session.query(Enzyme.expasy_id).filter(Enzyme.parent_id in
-        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=_id).first()[0]).all()]
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=expasy_id).first()[0]).all()]
