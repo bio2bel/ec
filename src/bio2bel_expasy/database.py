@@ -194,7 +194,6 @@ class Manager(object):
             raise IndexError
         return enzyme.parent
 
-
     def get_description(self, expasy_id):
         """Return the Description of the enzyme, None if doesn't exist
 
@@ -210,7 +209,8 @@ class Manager(object):
         :rtype: resulting list of strings
         """
 
-        return [a[0] for a in self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id == expasy_id)).all()]
+        return [a[0] for a in
+                self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id == expasy_id)).all()]
 
     def get_expasy_form_prosite(self, prosite_id):
         """Returns Enzyme ID lists associated with the given Proside ID
@@ -236,7 +236,6 @@ class Manager(object):
             raise IndexError
         return enzyme.proteins
 
-
     def get_expasy_from_uniprot(self, uniprot_id):
         """Returns Enzyme ID list associated with the given uniprot accession_number
 
@@ -248,7 +247,6 @@ class Manager(object):
             raise IndexError
         return protein.enzymes
 
-
     def get_children(self, expasy_id):
         """Returns list of Expasy ID's which are children for given Expasy _id
 
@@ -256,5 +254,5 @@ class Manager(object):
         :rtype: list
         """
 
-
-        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=expasy_id).first()[0]).all()]
+        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(
+            parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=expasy_id).first()[0]).all()]
