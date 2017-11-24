@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import configparser
 import logging
-import os
 
-from sqlalchemy import create_engine, Integer
+from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from .constants import CONFIG_FILE_PATH, DEFAULT_CACHE_CONNECTION
+from .constants import DEFAULT_CACHE_CONNECTION
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
 from .tree import edge_descpription, give_edge, populate_tree, standard_ec_id
@@ -24,11 +22,11 @@ class Manager(object):
         :param str connection: SQLAlchemy
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
-        self.connection = self.get_connection_string(connection)
-        log.info('Using connection %s', connection)
+        self.connection = connection or DEFAULT_CACHE_CONNECTION
+        log.info('using connection %s', connection)
         self.engine = create_engine(self.connection, echo=echo)
-        self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
-        self.session = scoped_session(self.sessionmaker)
+        self.session_maker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
+        self.session = scoped_session(self.session_maker)
         self.create_all()
 
     def create_all(self, check_first=True):
@@ -57,34 +55,6 @@ class Manager(object):
             return connection
 
         raise TypeError
-
-    @staticmethod
-    def get_connection_string(connection=None):
-        """Return the SQLAlchemy connection string if it is set
-
-        :param connection: get the SQLAlchemy connection string
-        :rtype: str
-        """
-        if connection:
-            return connection
-
-        config = configparser.ConfigParser()
-
-        cfp = CONFIG_FILE_PATH
-
-        if os.path.exists(cfp):
-            log.info('fetch database configuration from {}'.format(cfp))
-            config.read(cfp)
-            connection = config['database']['sqlalchemy_connection_string']
-            log.info('load connection string from {}: {}'.format(cfp, connection))
-            return connection
-
-        with open(cfp, 'w') as config_file:
-            config['database'] = {'sqlalchemy_connection_string': DEFAULT_CACHE_CONNECTION}
-            config.write(config_file)
-            log.info('create configuration file {}'.format(cfp))
-
-        return DEFAULT_CACHE_CONNECTION
 
     def populate(self, force_download=False):
         """Populates the database
