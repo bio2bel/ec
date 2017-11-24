@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import cli
+from .database import Manager
 
 __version__ = '0.1.1-dev'
 
