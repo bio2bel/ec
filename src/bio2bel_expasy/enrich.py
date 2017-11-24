@@ -92,7 +92,7 @@ def enrich_enzyme_classes(graph, connection=None):
             #graph.add_node_from_data(prot.serialize_to_bel())
 
         #return uniprot_list #TODO remove
-    graph.add_node_from_data(m.Enzyme.serialize_to_bel())
+    graph.add_node_from_data(m   .serialize_to_bel())
     return graph
 
 

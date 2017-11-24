@@ -175,6 +175,16 @@ class Manager(object):
         #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id == 2)
         #return self.session.query(Enzyme.expasy_id).filter(Enzyme.id in self.session.query(Enzyme.parent_id).filter(Enzyme.expasy_id == _id).one_or_none())
         return self.session.query(Enzyme.expasy_id).filter_by(id=self.session.query(Enzyme.parent_id).filter_by(expasy_id = _id).first()[0]).first()[0]
+    def get_parent_classy_way(self, _id):
+        """Do it classy
+
+        :param str _id: ExPASy ID of enzyme which parent is needed
+        :rtype str
+        """
+        enzyme = self.get_enzyme_by_id(_id)
+        if enzyme is None:
+            raise IndexError
+        return enzyme.parent
 
     def get_description(self, _id):
         """Return the Description of the enzyme, None if doesn't exist
