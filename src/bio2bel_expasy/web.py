@@ -23,8 +23,8 @@ class EnzymeView(ModelView):
     column_list = ('expasy_id', 'description', 'parents')
 
 
-def add_admin(app, session, url=None):
-    admin = flask_admin.Admin(app, url=(url or '/'))
+def add_admin(app, session, **kwargs):
+    admin = flask_admin.Admin(app, **kwargs)
     admin.add_view(EnzymeView(Enzyme, session))
     admin.add_view(ModelView(Prosite, session))
     admin.add_view(ModelView(Protein, session))
