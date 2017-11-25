@@ -6,7 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from .constants import DEFAULT_CACHE_CONNECTION
+from bio2bel.utils import get_connection
+from .constants import MODULE_NAME
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
 from .tree import edge_descpription, give_edge, populate_tree, standard_ec_id
@@ -22,7 +23,7 @@ class Manager(object):
         :param str connection: SQLAlchemy
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
-        self.connection = connection or DEFAULT_CACHE_CONNECTION
+        self.connection = get_connection(MODULE_NAME, connection=connection)
         log.info('using connection %s', connection)
         self.engine = create_engine(self.connection, echo=echo)
         self.session_maker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
