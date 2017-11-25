@@ -23,15 +23,15 @@ class EnzymeView(ModelView):
     column_list = ('expasy_id', 'description', 'parents')
 
 
-def add_admin(app, manager, url='/'):
-    admin = flask_admin.Admin(app, url=url)
-    admin.add_view(EnzymeView(Enzyme, manager.session))
-    admin.add_view(ModelView(Prosite, manager.session))
-    admin.add_view(ModelView(Protein, manager.session))
+def add_admin(app, session, url=None):
+    admin = flask_admin.Admin(app, url=(url or '/'))
+    admin.add_view(EnzymeView(Enzyme, session))
+    admin.add_view(ModelView(Prosite, session))
+    admin.add_view(ModelView(Protein, session))
     return admin
 
 
-def create_app(connection=None):
+def create_app(connection=None, url=None):
     """Creates a Flask application
 
     :type connection: Optional[str]
@@ -39,7 +39,7 @@ def create_app(connection=None):
     """
     app = Flask(__name__)
     manager = Manager(connection=connection)
-    add_admin(app, manager)
+    add_admin(app, manager.session, url=url)
     return app
 
 
