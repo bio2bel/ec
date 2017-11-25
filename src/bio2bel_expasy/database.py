@@ -105,18 +105,18 @@ class Manager(object):
                     for dr_id in data_cell[DR]:
 
                         accession_number = dr_id['accession_number']
-                        Entry_name = dr_id['Entry_name']
+                        entry_name = dr_id['entry_name']
 
-                        if (accession_number, Entry_name) not in id_protein:
+                        if (accession_number, entry_name) not in id_protein:
                             protein_entry = Protein(
-                                accession_number=dr_id['accession_number'],
-                                Entry_name=dr_id['Entry_name'],
+                                accession_number=accession_number,
+                                entry_name=entry_name,
                                 #  is_SwissProt=
                             )
-                            id_protein[accession_number, Entry_name] = protein_entry
+                            id_protein[accession_number, entry_name] = protein_entry
                             self.session.add(protein_entry)
                         else:
-                            protein_entry = id_protein[accession_number, Entry_name]
+                            protein_entry = id_protein[accession_number, entry_name]
 
                         enzyme_entry.proteins.append(protein_entry)
 
