@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import cli
-from .database import Manager
+from .manager import Manager
 
 __version__ = '0.1.1-dev'
 

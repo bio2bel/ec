@@ -6,7 +6,7 @@ import sys
 import click
 
 from .constants import DEFAULT_CACHE_CONNECTION
-from .database import Manager
+from .manager import Manager
 from .query import write_gene_ec_mapping
 from .tree import write_expasy_tree
 

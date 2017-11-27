@@ -5,7 +5,7 @@ import logging
 from pybel.constants import FUNCTION, IS_A, NAME, NAMESPACE, PROTEIN
 from pybel_tools import pipeline
 from .constants import EXPASY
-from .database import Manager
+from .manager import Manager
 
 log = logging.getLogger(__name__)
 
