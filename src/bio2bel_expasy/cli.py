@@ -13,7 +13,7 @@ from .tree import write_expasy_tree
 
 @click.group()
 def main():
-    """Tools for writing EC"""
+    """ExPASy to BEL"""
     logging.basicConfig(level=10)
 
 
