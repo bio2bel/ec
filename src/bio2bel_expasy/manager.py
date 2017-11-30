@@ -78,17 +78,24 @@ class Manager(object):
 
                 self.session.add(enzyme_entry)
                 id_enzyme[data_cell[ID]] = enzyme_entry
-                if give_edge(data_cell[ID])[0] not in id_enzyme.keys():
-                    enzyme_parent_entry = Enzyme(
-                        expasy_id=give_edge(data_cell[ID])[0],
-                        description=edge_descpription(give_edge(data_cell[ID])[0])
-                    )
-                    self.session.add(enzyme_parent_entry)
-                    id_enzyme[give_edge(data_cell[ID])[0]] = enzyme_parent_entry
-                    # id_enzyme[data_cell[ID]].parent = id_enzyme[give_edge(data_cell[ID])[0]]
-                    id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
-                else:
-                    id_enzyme[give_edge(data_cell[ID])[0]].parent.append(id_enzyme[data_cell[ID]])
+                parent_id = give_edge(data_cell[ID])[0]
+                child_id = data_cell[ID]
+                while (parent_id):
+                    if parent_id not in id_enzyme.keys():
+                        enzyme_parent_entry = Enzyme(
+                            expasy_id=parent_id,
+                            description=edge_descpription(parent_id)
+                        )
+                        self.session.add(enzyme_parent_entry)
+                        id_enzyme[parent_id] = enzyme_parent_entry
+                        id_enzyme[parent_id].parent.append(id_enzyme[child_id])
+                    else:
+                        id_enzyme[parent_id].parent.append(id_enzyme[child_id])
+
+                    child_id = parent_id
+                    parent_id = give_edge(parent_id)[0]
+
+
 
                 if PR in data_cell and data_cell[PR]:
                     for pr_id in data_cell[PR]:
@@ -207,6 +214,7 @@ class Manager(object):
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
         if enzyme is None:
+            print(expasy_id)
             raise IndexError
         return enzyme.proteins
 
