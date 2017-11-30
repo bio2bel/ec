@@ -209,8 +209,11 @@ class Manager(object):
         :rtype: resulting list of strings
         """
 
-        return [a[0] for a in
-                self.session.query(Prosite.prosite_id).filter(Prosite.enzymes.any(Enzyme.expasy_id == expasy_id)).all()]
+        enzyme = self.get_enzyme_by_id(expasy_id)
+        if enzyme is None:
+            raise IndexError
+
+        return enzyme.prosites
 
     def get_expasy_form_prosite(self, prosite_id):
         """Returns Enzyme ID lists associated with the given Proside ID
