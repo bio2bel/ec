@@ -69,7 +69,7 @@ class Manager(object):
         id_prosite = {}
         id_protein = {}
 
-        for data_cell in tqdm(data_dict, desc='ExPaSY'):
+        for data_cell in tqdm(data_dict, desc='ExPASy'):
             if not (data_cell['DELETED'] or data_cell['TRANSFERRED']):  # if both are false then proceed
                 enzyme_entry = Enzyme(
                     expasy_id=data_cell[ID],
