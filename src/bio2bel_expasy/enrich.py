@@ -79,6 +79,7 @@ def enrich_prosite_classes(graph, connection=None):
     :rtype pybel.BELGraph
     """
     m = Manager.ensure(connection=connection)
+    graph = enrich_parents_classes(graph=graph)
 
     for node, data in graph.noes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
