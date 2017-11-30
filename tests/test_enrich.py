@@ -14,24 +14,12 @@ ec_p = standard_ec_id('1.14.99.-')
 ec_pp = standard_ec_id('1.14. -.-')
 ec_ppp = standard_ec_id('1. -. -.-')
 
-cyclooxygenase = PROTEIN, 'HGNC', 'PTGS2'
 cyclooxygenase_ec = PROTEIN, 'EC', ec
 cyclooxygenase_ec_p = PROTEIN, 'EC', ec_p
 cyclooxygenase_ec_pp = PROTEIN, 'EC', ec_pp
 cyclooxygenase_ec_ppp = PROTEIN, 'EC', ec_ppp
 
 
-class TestAnnotateParent(unittest.TestCase):
-    def test_single(self):
-        graph = BELGraph()
-        graph.add_simple_node(*cyclooxygenase)
-
-        self.assertEqual(1, graph.number_of_nodes())
-
-        annotate_parents(graph, cyclooxygenase)
-
-        self.assertEqual(2, graph.number_of_nodes())
-        self.assertIn(cyclooxygenase_ec_p, graph)
 
 
 class TestTree(unittest.TestCase):
@@ -95,7 +83,6 @@ class TestEnrich(unittest.TestCase):
         self.assertIn(cyclooxygenase_ec_pp, graph)
         self.assertIn(cyclooxygenase_ec_ppp, graph)
 
-        self.assertIn(cyclooxygenase_ec, graph.edge[cyclooxygenase])
         self.assertIn(cyclooxygenase_ec_p, graph.edge[cyclooxygenase_ec])
         self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
         self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
