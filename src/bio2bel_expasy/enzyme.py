@@ -3,10 +3,7 @@
 import logging
 import re
 
-from .constants import (
-    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX,
-    ENZCLASS_DATA_FILE,
-)
+from .constants import EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, ENZCLASS_DATA_FILE
 from .tree import download_ec_data
 
 __all__ = [
@@ -111,7 +108,7 @@ def expasy_parser_helper(enzclass_file):
                 dr_tuple = dr_tuple.strip()
                 ec_data_entry[DR].append({
                     'accession_number': dr_tuple.split(', ')[0],
-                    'Entry_name': dr_tuple.split(', ')[1]
+                    'entry_name': dr_tuple.split(', ')[1]
                 })
         else:
             log.warning(" Unknown Descriptor is found. Risk of missed data or corrupt/wrong file.")

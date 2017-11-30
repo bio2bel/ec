@@ -2,13 +2,10 @@
 
 import logging
 
-from pybel.constants import FUNCTION, PROTEIN, NAMESPACE, NAME, IS_A
-from pybel.struct.filters import filter_nodes
+from pybel.constants import FUNCTION, IS_A, NAME, NAMESPACE, PROTEIN
 from pybel_tools import pipeline
-
-from .database import Manager
-
-EXPASY = 'expasy'
+from .constants import EXPASY
+from .manager import Manager
 
 log = logging.getLogger(__name__)
 

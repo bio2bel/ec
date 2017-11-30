@@ -9,16 +9,14 @@ import setuptools
 PACKAGES = setuptools.find_packages(where='src')
 META_PATH = os.path.join('src', 'bio2bel_expasy', '__init__.py')
 INSTALL_REQUIRES = [
+    'pybel>=0.9.6',
+    'pybel_tools>=0.4.6',
     'requests',
     'tqdm',
     'sqlalchemy',
     'networkx==1.11',
     'click',
     'pandas',
-    'pybel',
-    'pybel_tools',
-    'pyuniprot',
-    'pyhgnc',
 ]
 ENTRY_POINTS = {
     'bio2bel': [

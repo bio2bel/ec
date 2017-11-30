@@ -6,7 +6,8 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 
-from pybel.constants import ABUNDANCE, FUNCTION, NAME, NAMESPACE, PATHOLOGY, PROTEIN
+from pybel.constants import FUNCTION, NAME, NAMESPACE, PROTEIN
+from .constants import EXPASY, PROSITE, UNIPROT
 
 TABLE_PREFIX = 'expasy'
 ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
@@ -15,8 +16,6 @@ PROSITE_TABLE_NAME = '{}_prosite'.format(TABLE_PREFIX)
 TREE_TABLE_NAME = '{}_tree'.format(TABLE_PREFIX)
 ENZYME_PROSITE_TABLE_NAME = '{}_enzyme_prosite'.format(TABLE_PREFIX)
 ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
-
-BEL_EXPASY = 'expasy'
 
 Base = declarative_base()
 
@@ -58,7 +57,7 @@ class Enzyme(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: BEL_EXPASY,
+            NAMESPACE: EXPASY,
             NAME: self.expasy_id
         }
 
@@ -80,7 +79,7 @@ class Prosite(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: BEL_EXPASY,
+            NAMESPACE: PROSITE,
             NAME: self.prosite_id
         }
 
@@ -94,8 +93,8 @@ class Protein(Base):
     enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
 
     accession_number = Column(String(255),
-                              doc='Swiss-Prot  primary accession  number of the entry to which reference is being made')
-    Entry_name = Column(String(255), doc='Swiss-Prot entry name')
+                              doc='Swiss-Prot primary accession number of the entry to which reference is being made')
+    entry_name = Column(String(255), doc='Swiss-Prot entry name')
 
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
@@ -106,6 +105,6 @@ class Protein(Base):
         """
         return {
             FUNCTION: PROTEIN,
-            NAMESPACE: BEL_EXPASY,
+            NAMESPACE: UNIPROT,
             NAME: self.accession_number
         }

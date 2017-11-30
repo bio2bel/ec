@@ -6,14 +6,14 @@ import sys
 import click
 
 from .constants import DEFAULT_CACHE_CONNECTION
-from .database import Manager
+from .manager import Manager
 from .query import write_gene_ec_mapping
 from .tree import write_expasy_tree
 
 
 @click.group()
 def main():
-    """Tools for writing EC"""
+    """ExPASy to BEL"""
     logging.basicConfig(level=10)
 
 
@@ -46,9 +46,11 @@ def drop(connection):
 
 
 @main.command()
-def web():
+@click.option('-c', '--connection', help='Defaults to {}'.format(DEFAULT_CACHE_CONNECTION))
+def web(connection):
     """Run the web app"""
-    from .web import app
+    from .web import create_app
+    app = create_app(connection=connection)
     app.run(host='0.0.0.0', port=5000)
 
 
