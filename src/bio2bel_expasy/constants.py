@@ -27,3 +27,5 @@ EC_TRANSFERRED_REGEX = 'Transferred entry'
 EXPASY = 'expasy'
 PROSITE = 'prosite'
 UNIPROT = 'up'
+
+ENTRY_NAME = 'entry_name'

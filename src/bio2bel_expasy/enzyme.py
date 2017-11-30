@@ -3,7 +3,7 @@
 import logging
 import re
 
-from .constants import EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, ENZCLASS_DATA_FILE
+from .constants import EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, ENZCLASS_DATA_FILE, ENTRY_NAME
 from .tree import download_ec_data
 
 __all__ = [

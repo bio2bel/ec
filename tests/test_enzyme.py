@@ -4,6 +4,7 @@ import unittest
 
 from bio2bel_expasy.enzyme import expasy_parser
 from tests.constants import ENZCLASS_DATA_FILE
+from bio2bel_expasy.constants import ENTRY_NAME
 
 
 class TestEnzyme(unittest.TestCase):
@@ -25,13 +26,13 @@ class TestEnzyme(unittest.TestCase):
         self.assertIn('Zn(2+)', db[0]['CF'])
         self.assertIn('PDOC00061', db[0]['PR'])
         self.assertEqual('Q6AZW2', db[0]['DR'][0]['accession_number'])
-        self.assertEqual('A1A1A_DANRE', db[0]['DR'][0]['Entry_name'])
+        self.assertEqual('A1A1A_DANRE', db[0]['DR'][0][ENTRY_NAME])
         self.assertEqual('Q568L5', db[0]['DR'][1]['accession_number'])
-        self.assertEqual('A1A1B_DANRE', db[0]['DR'][1]['Entry_name'])
+        self.assertEqual('A1A1B_DANRE', db[0]['DR'][1][ENTRY_NAME])
         self.assertEqual('Q24857', db[0]['DR'][2]['accession_number'])
-        self.assertEqual('ADH3_ENTHI', db[0]['DR'][2]['Entry_name'])
+        self.assertEqual('ADH3_ENTHI', db[0]['DR'][2][ENTRY_NAME])
         self.assertEqual('Q04894', db[0]['DR'][3]['accession_number'])
-        self.assertEqual('ADH6_YEAST', db[0]['DR'][3]['Entry_name'])
+        self.assertEqual('ADH6_YEAST', db[0]['DR'][3][ENTRY_NAME])
         self.assertEqual(
             '-!- Some members of this group oxidize only primary alcohols; others act also on secondary alcohols.-!- May be identical with EC 1.1.1.19, EC 1.1.1.33 and EC 1.1.1.55.-!- Re-specific with respect to NADPH.',
             db[0]['CC'])
