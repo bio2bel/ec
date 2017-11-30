@@ -6,3 +6,4 @@ sqlalchemy
 tqdm
 click
 pandas
+bio2bel
