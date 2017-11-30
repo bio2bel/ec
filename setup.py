@@ -17,6 +17,7 @@ INSTALL_REQUIRES = [
     'networkx==1.11',
     'click',
     'pandas',
+    'bio2bel',
 ]
 ENTRY_POINTS = {
     'bio2bel': [
