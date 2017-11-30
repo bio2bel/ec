@@ -95,8 +95,6 @@ class Manager(object):
                     child_id = parent_id
                     parent_id = give_edge(parent_id)[0]
 
-
-
                 if PR in data_cell and data_cell[PR]:
                     for pr_id in data_cell[PR]:
 

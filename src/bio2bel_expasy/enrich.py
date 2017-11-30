@@ -108,9 +108,9 @@ def enrich_parents_classes(graph, connection=None):
     for node, data in graph.nodes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
             continue
-        parents_list = m.get_parent()
+        parents_list = m.get_parent(data[NAME])
         if not parents_list:
-            log.warning('Unable to find node %s', node)
+            log.warning('enrich_parents_classes(): Unable to find node %s', data[NAME])
             continue
         for parent in parents_list:
             parent_tuple = graph.add_node_from_data(parent.serialize_to_bel())
