@@ -60,7 +60,7 @@ class TestEnrich(unittest.TestCase):
         """Tests that the connection from the enzyme subsubclass to subclass and class is made and also
         the entire class hierarchy is ensured"""
         graph = BELGraph()
-        graph.add_simple_node(*cyclooxygenase_ec_p)
+        graph.add_simple_node(*cyclooxygenase_ec)
 
         self.assertEqual(1, graph.number_of_nodes())
 
@@ -69,9 +69,6 @@ class TestEnrich(unittest.TestCase):
         self.assertIn(cyclooxygenase_ec_p, graph)
         self.assertIn(cyclooxygenase_ec_pp, graph)
         self.assertIn(cyclooxygenase_ec_ppp, graph)
-
-        self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
-        self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
 
     def test_enrich_instance(self):
         """Tests that the connection from the protein to the actual enzyme class is made and also
