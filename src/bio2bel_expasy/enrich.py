@@ -61,7 +61,7 @@ def enrich_enzyme_classes(graph, connection=None):
         uniprot_list = m.get_uniprot(data[NAME])
 
         if not uniprot_list:
-            log.warning("Unable to find node: %s", node)
+            log.warning("enrich_enzyme_classes():Unable to find node: %s", node)
             continue
         for prot in uniprot_list:
             protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
@@ -86,7 +86,7 @@ def enrich_prosite_classes(graph, connection=None):
             continue
         prosite_list = m.get_prosite(data[NAME])
         if not prosite_list:
-            log.warning('Unable to find node %s', node)
+            log.warning('enrich_prosite_classes():Unable to find node %s', node)
             continue
         for prosite in prosite_list:
             prosite_tuple = graph.add_node_from_data(prosite.serialize_to_bel())
@@ -103,17 +103,44 @@ def enrich_parents_classes(graph, connection=None):
     :param connection:
     :rtype pybel.BELGraph
     """
-    m = Manager.ensure()
+    m = Manager.ensure(connection=connection)
 
     for node, data in graph.nodes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
             continue
-        parents_list = m.get_parent(data[NAME])
-        if not parents_list:
+        parent = m.get_parent(data[NAME])
+        if not parent:
             log.warning('enrich_parents_classes(): Unable to find node %s', data[NAME])
             continue
-        for parent in parents_list:
+
+        while parent:
             parent_tuple = graph.add_node_from_data(parent.serialize_to_bel())
             graph.add_unqualified_edge(node, parent_tuple, IS_A)
+            parent = m.get_parent(parent_tuple[2])
+
+    return graph
+
+
+@pipeline.in_place_mutator
+def enrich_children_classes(graph, connection=None):
+    """
+
+    :param pybel.BELGraph graph:
+    :param connection:
+    :rtype pybel.BELGraph
+    """
+    m = Manager.ensure(connection=connection)
+
+    for node, data in graph.nodes(data=True):
+        if not _check_namespaces(data, PROTEIN, EXPASY):
+            continue
+        children = m.get_children(data[NAME])
+        if not children:
+            log.warning("enrich_children_classes(): Unable to find node %s", data[NAME])
+            continue
+
+        for child in children:
+            children_tuple = graph.add_node_from_data(child.serialize_to_bel())
+            graph.add_unqualified_edge(node, children_tuple, IS_A)
 
     return graph
