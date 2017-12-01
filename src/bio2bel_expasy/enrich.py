@@ -54,6 +54,8 @@ def enrich_enzyme_classes(graph, connection=None):
     :rtype: pybel.BELGraph
     """
     m = Manager.ensure(connection)
+    graph = enrich_parents_classes(graph=graph)
+    graph = enrich_children_classes(graph=graph)
 
     for node, data in graph.nodes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
@@ -80,6 +82,7 @@ def enrich_prosite_classes(graph, connection=None):
     """
     m = Manager.ensure(connection=connection)
     graph = enrich_parents_classes(graph=graph)
+    graph = enrich_children_classes(graph=graph)
 
     for node, data in graph.noes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
