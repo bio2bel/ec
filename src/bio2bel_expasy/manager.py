@@ -88,9 +88,9 @@ class Manager(object):
                         )
                         self.session.add(enzyme_parent_entry)
                         id_enzyme[parent_id] = enzyme_parent_entry
-                        id_enzyme[parent_id].parent.append(id_enzyme[child_id])
+                        id_enzyme[parent_id].children.append(id_enzyme[child_id])
                     else:
-                        id_enzyme[parent_id].parent.append(id_enzyme[child_id])
+                        id_enzyme[parent_id].children.append(id_enzyme[child_id])
 
                     child_id = parent_id
                     parent_id = give_edge(parent_id)[0]

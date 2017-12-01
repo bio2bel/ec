@@ -45,7 +45,7 @@ class Enzyme(Base):
     description = Column(String(255), doc='Description')
 
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
-    parent = relationship('Enzyme')
+    children = relationship('Enzyme', backref=backref('parent', remote_side=[id]))
 
     def __str__(self):
         return self.expasy_id
