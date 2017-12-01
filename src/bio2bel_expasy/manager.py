@@ -233,6 +233,8 @@ class Manager(object):
         :param expasy_id:
         :rtype: list
         """
-
-        return [a[0] for a in self.session.query(Enzyme.expasy_id).filter_by(
-            parent_id=self.session.query(Enzyme.id).filter_by(expasy_id=expasy_id).first()[0]).all()]
+        enzyme = self.get_enzyme_by_id(expasy_id)
+        if enzyme is None:
+            print(expasy_id)
+            raise IndexError
+        return enzyme.children
