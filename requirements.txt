@@ -7,6 +7,3 @@ tqdm
 click
 pandas
 bio2bel
-pytest
-tox
-coverage
