@@ -9,3 +9,4 @@ pandas
 bio2bel
 pytest
 tox
+coverage
