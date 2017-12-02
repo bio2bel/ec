@@ -71,6 +71,11 @@ def non_standard_ec_id(standard_ec_id):
 
 
 def give_edge(head_str):
+    """Returns (parent, child) tuple for given id
+
+    :param head_str:
+    :return: tuple
+    """
     head_str = standard_ec_id(head_str)
     nums = head_str.split('.')
     for i, obj in enumerate(nums):
