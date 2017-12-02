@@ -41,7 +41,8 @@ def download_ec_data(force_download=False):
 
 
 def standard_ec_id(non_standard_ec_id):
-    """Rerturns standardized ec id string
+    """Rerturns standardized expasy id string
+
     :param str non_standard_ec_id: str
     :return str:
     """
