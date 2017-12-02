@@ -40,6 +40,12 @@ prosite_pattern = re.compile(EC_PROSITE_REGEX)
 
 
 def expasy_parser(path=None, force_download=False):
+    """Interface to call expasy_parser_helper(enzclass_file) method.
+
+    :param Optional[str] path: path to the file
+    :param Optional[bool] force_download: True to force download resources
+    :return list[dict]: list of data containing dictionaries
+    """
     download_ec_data(force_download)
 
     path = ENZCLASS_DATA_FILE if path is None else path
