@@ -21,11 +21,11 @@ __all__ = [
 ]
 
 
-def download_res(path=None, force_download=False):  # TODO rename this function and document what it is
-    """
+def download_res(path=None, force_download=False):
+    """Download database resources if not found
 
     :param Optional[str] path: The destination of the download
-    :param force_download: bool to force download
+    :param Optional[bool] force_download: True to force download
     """
     if not os.path.exists(ENZCLASS_FILE) or force_download:
         urlretrieve(ENZCLASS_URL, path or ENZCLASS_FILE)
