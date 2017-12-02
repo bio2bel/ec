@@ -1,5 +1,5 @@
-ExPASy ENZYME Database
-======================
+Bio2BEL ExPASy |build| |coverage|
+=================================
 This repository downloads and parses the enzyme classes from the ExPASy ENZYME database
 
 Data Source
@@ -43,3 +43,12 @@ To enrich the proteins in a BEL Graph with their enzyme classes, use:
 >>> from bio2bel_ec import enrich_enzyme_classes
 >>> graph = ... # get a BEL graph
 >>> enrich_enzyme_classes(graph)
+
+
+.. |build| image:: https://travis-ci.org/bio2bel/expasy.svg?branch=master
+    :target: https://travis-ci.org/bio2bel/expasy
+    :alt: Build Status
+
+.. |coverage| image:: https://codecov.io/gh/bio2bel/expasy/coverage.svg?branch=master
+    :target: https://codecov.io/gh/bio2bel/expasy?branch=master
+    :alt: Coverage Status
