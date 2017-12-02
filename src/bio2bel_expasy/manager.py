@@ -163,7 +163,7 @@ class Manager(object):
         """Returns the parent ID of expasy_id if exist otherwise returns None
 
         :param str expasy_id: ExPASy ID of enzyme which parent is needed
-        :rtype str
+        :rtype: str
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
         if enzyme is None:
