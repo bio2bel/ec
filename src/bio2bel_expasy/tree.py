@@ -49,6 +49,11 @@ def standard_ec_id(non_standard_ec_id):
 
 
 def non_standard_ec_id(standard_ec_id):
+    """Returns non canonical way of given expasy_id found in hierarchy data file.
+
+    :param standard_ec_id:
+    :return: str
+    """
     nums = standard_ec_id.split('.')
     non_standard_ec_id = ''
     for obj in nums:
