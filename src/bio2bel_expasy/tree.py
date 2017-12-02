@@ -17,7 +17,7 @@ __all__ = [
     'write_expasy_tree',
     'standard_ec_id',
     'give_edge',
-    'edge_descpription'
+    'edge_description'
 ]
 
 
@@ -92,7 +92,7 @@ def give_edge(head_str):
                 standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
 
 
-def edge_descpription(expasy_id, file=None):
+def edge_description(expasy_id, file=None):
     expasy_id = non_standard_ec_id(expasy_id)
     file = open(ENZCLASS_FILE, 'r') if file is None else file
     for line in file:

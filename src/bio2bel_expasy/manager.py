@@ -10,7 +10,7 @@ from bio2bel.utils import get_connection
 from .constants import MODULE_NAME
 from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
-from .tree import edge_descpription, give_edge, populate_tree, standard_ec_id
+from .tree import edge_description, give_edge, populate_tree, standard_ec_id
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ class Manager(object):
                     if parent_id not in id_enzyme.keys():
                         enzyme_parent_entry = Enzyme(
                             expasy_id=parent_id,
-                            description=edge_descpription(parent_id)
+                            description=edge_description(parent_id)
                         )
                         self.session.add(enzyme_parent_entry)
                         id_enzyme[parent_id] = enzyme_parent_entry
