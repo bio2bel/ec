@@ -100,7 +100,7 @@ def enrich_prosite_classes(graph, connection=None):
 
 @pipeline.in_place_mutator
 def enrich_parents_classes(graph, connection=None):
-    """
+    """Enriches graph nodes with parents.
 
     :param pybel.BELGraph graph:
     :param connection:
@@ -126,7 +126,7 @@ def enrich_parents_classes(graph, connection=None):
 
 @pipeline.in_place_mutator
 def enrich_children_classes(graph, connection=None):
-    """
+    """Enriches graph nodes with children.
 
     :param pybel.BELGraph graph:
     :param connection:
