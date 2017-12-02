@@ -1,6 +1,10 @@
 [run]
 branch = True
 source = bio2bel_expasy
+omit =
+    src/bio2bel_expasy/__main__.py
+    src/bio2bel_expasy/cli.py
+    tests/*
 
 [paths]
 source =
@@ -9,3 +13,6 @@ source =
 
 [report]
 show_missing = True
+exclude_lines =
+    def __str__
+    def __repr__
