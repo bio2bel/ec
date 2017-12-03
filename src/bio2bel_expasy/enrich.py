@@ -84,7 +84,7 @@ def enrich_prosite_classes(graph, connection=None):
     graph = enrich_parents_classes(graph=graph)
     graph = enrich_children_classes(graph=graph)
 
-    for node, data in graph.noes(data=True):
+    for node, data in graph.nodes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
             continue
         prosite_list = m.get_prosite(data[NAME])

@@ -6,20 +6,20 @@ import unittest
 
 from pybel import BELGraph
 from pybel.constants import PROTEIN
-from bio2bel.utils import get_data_dir
 from bio2bel.constants import DEFAULT_CACHE_PATH
 
-from bio2bel_expasy.enrich import enrich_enzyme_classes
+from bio2bel_expasy.enrich import enrich_enzyme_classes, enrich_prosite_classes
 from bio2bel_expasy.tree import standard_ec_id
-from bio2bel_expasy.constants import EXPASY, MODULE_NAME
+from bio2bel_expasy.constants import EXPASY
 from bio2bel_expasy.manager import Manager
 
-
+test_expasy_id = standard_ec_id('1.1.1.1')
 ec = standard_ec_id('1.14.99.1')
 ec_p = standard_ec_id('1.14.99.-')
 ec_pp = standard_ec_id('1.14. -.-')
 ec_ppp = standard_ec_id('1. -. -.-')
 
+dehydrogenase_test_expasy_id = PROTEIN, EXPASY, test_expasy_id
 cyclooxygenase_ec = PROTEIN, EXPASY, ec
 cyclooxygenase_ec_p = PROTEIN, EXPASY, ec_p
 cyclooxygenase_ec_pp = PROTEIN, EXPASY, ec_pp
@@ -57,7 +57,7 @@ class TestTree(unittest.TestCase):
 
 class TestEnrich(unittest.TestCase):
     def setUp(self):
-        m = Manager()
+        self.m = Manager()
 
     def test_enrich_class(self):
         """Tests that the connection from the subclass to the enzyme class is inferred"""
@@ -105,6 +105,22 @@ class TestEnrich(unittest.TestCase):
         #self.assertIn(cyclooxygenase_ec_p, graph.edge[cyclooxygenase_ec])
         #self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
         #self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
+
+    def test_prosite_classes(self):
+        """Tests prosite enrichment
+
+        :return:
+        """
+        graph = BELGraph()
+        graph.add_simple_node(*dehydrogenase_test_expasy_id)
+
+        self.assertEqual(1, graph.number_of_nodes())
+
+        enrich_prosite_classes(graph=graph)
+
+        self.assertIn((PROTEIN, 'prosite', 'PDOC00058'), graph)
+
+
 
 
 if __name__ == '__main__':
