@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 __all__ = [
     'enrich_enzyme_classes',
+    'enrich_prosite_classes',
 ]
 
 
@@ -33,9 +34,9 @@ def _check_namespaces(data, bel_function, bel_namespace):
 def node_is_protein(graph, node):
     """True if node is protein, False if else.
 
-    :param graph: BELGraph
+    :param pybel.BELGraph graph: A Bel Graph
     :param node: tuple node
-    :return: bool
+    :rtype bool: True if node is protein
     """
     return PROTEIN == graph.node[node][FUNCTION]
 
@@ -74,7 +75,7 @@ def enrich_enzyme_classes(graph, connection=None):
 
 @pipeline.in_place_mutator
 def enrich_prosite_classes(graph, connection=None):
-    """enriches Enzyme classes for prosite in the graph
+    """enriches Enzyme classes for Prosite in the graph.
 
     :param pybel.BELGraph graph:
     :param connection:

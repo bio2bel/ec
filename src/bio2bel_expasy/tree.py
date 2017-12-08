@@ -53,7 +53,7 @@ def non_standard_ec_id(standard_ec_id):
     """Returns non canonical way of given expasy_id found in hierarchy data file.
 
     :param standard_ec_id:
-    :return: str
+    :rtype str:  a string
     """
     nums = standard_ec_id.split('.')
     non_standard_ec_id = ''
@@ -79,8 +79,8 @@ def non_standard_ec_id(standard_ec_id):
 def give_edge(head_str):
     """Returns (parent, child) tuple for given id
 
-    :param head_str:
-    :return: tuple
+    :param str head_str:
+    :rtype tuple: parent child tuple
     """
     head_str = standard_ec_id(head_str)
     nums = head_str.split('.')
@@ -104,6 +104,12 @@ def give_edge(head_str):
 
 
 def edge_description(expasy_id, file=None):
+    """Reads description from the expasy data file.
+
+    :param str expasy_id:
+    :param str file: filepath
+    :rtype str: description
+    """
     expasy_id = non_standard_ec_id(expasy_id)
     file = open(ENZCLASS_FILE, 'r') if file is None else file
     for line in file:
@@ -116,7 +122,7 @@ def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_
     """Populates graph from a given specific file.
 
     :param Optional[str] path_enzclass: Path to
-    :return networkx.DiGraph
+    :rtype networkx.DiGraph: a directed graph
     """
     download_res(force_download=force_download)
 
@@ -137,7 +143,9 @@ def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_
 
     def get_full_list_of_ec_ids(force_download=False):
         """Apparantly Returns the full list of EC entries
-        :return lst: lst
+
+        :param bool force_download: True to force download
+        :rtype lst: lst
         """
 
         download_ec_data(force_download=force_download)
