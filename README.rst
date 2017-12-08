@@ -28,19 +28,19 @@ mirror sites in different continents currently serve the user community.
 
 Installation
 ------------
-:code:`pip3 install git+https://github.com/bio2bel/ec.git`
+:code:`pip3 install git+https://gitlab.scai.fraunhofer.de/bio/PyExPASy.git`
 
 Command Line Interface
 ----------------------
 To output the hierarchy of enzyme classes, type the following in the command line:
 
-:code:`bio2bel_ec write -f ~/Desktop/ec.bel`
+:code:`bio2bel_expasy write -f ~/Desktop/ec.bel`
 
 Programmatic Interface
 ----------------------
 To enrich the proteins in a BEL Graph with their enzyme classes, use:
 
->>> from bio2bel_ec import enrich_enzyme_classes
+>>> from bio2bel_expasy import enrich_enzyme_classes
 >>> graph = ... # get a BEL graph
 >>> enrich_enzyme_classes(graph)
 
