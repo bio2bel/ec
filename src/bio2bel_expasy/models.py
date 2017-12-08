@@ -72,6 +72,9 @@ class Prosite(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
 
+    def __str__(self):
+        return self.prosite_id
+
     def serialize_to_bel(self):
         """Returns Dict object of Prosite Class Data for Bel
 
@@ -97,6 +100,9 @@ class Protein(Base):
     entry_name = Column(String(255), doc='Swiss-Prot entry name')
 
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
+
+    def __str__(self):
+        return self.accession_number
 
     def serialize_to_bel(self):
         """Returns Dict object of UniProtKB Class Data for Bel
