@@ -112,7 +112,7 @@ def edge_description(expasy_id, file=None):
     return None
 
 
-def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_FILE , force_download=False):
+def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_FILE, force_download=False):
     """Populates graph from a given specific file.
 
     :param Optional[str] path_enzclass: Path to

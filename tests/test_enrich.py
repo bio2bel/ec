@@ -28,8 +28,8 @@ cyclooxygenase_ec_ppp = PROTEIN, EXPASY, ec_ppp
 
 class TestCreation(unittest.TestCase):
     """tests connection and database creation"""
-    def setUp(self):
 
+    def setUp(self):
         print(DEFAULT_CACHE_PATH)
         if not os.path.exists(DEFAULT_CACHE_PATH):
             self.m = Manager()
@@ -40,11 +40,12 @@ class TestCreation(unittest.TestCase):
         """if database created"""
         self.assertTrue(os.path.exists(DEFAULT_CACHE_PATH))
 
+
 class TestTree(unittest.TestCase):
     """Tests that the function for getting the parent given an enzyme string works"""
+
     def setUp(self):
         self.m = Manager()
-
 
     def test_instance(self):
         self.assertEqual(ec_p, str(self.m.get_parent(ec)))
@@ -54,6 +55,7 @@ class TestTree(unittest.TestCase):
 
     def test_class(self):
         self.assertEqual(ec_ppp, str(self.m.get_parent(ec_pp)))
+
 
 class TestEnrich(unittest.TestCase):
     def setUp(self):
@@ -69,9 +71,9 @@ class TestEnrich(unittest.TestCase):
         graph = enrich_enzyme_classes(graph)
 
         self.assertIn(cyclooxygenase_ec_pp, graph)
-        #self.assertIn(cyclooxygenase_ec_ppp, graph)
+        # self.assertIn(cyclooxygenase_ec_ppp, graph)
 
-        #self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
+        # self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
 
     def test_enrich_subclass(self):
         """Tests that the connection from the enzyme subsubclass to subclass and class is made and also
@@ -102,9 +104,9 @@ class TestEnrich(unittest.TestCase):
         self.assertIn(cyclooxygenase_ec_pp, graph)
         self.assertIn(cyclooxygenase_ec_ppp, graph)
 
-        #self.assertIn(cyclooxygenase_ec_p, graph.edge[cyclooxygenase_ec])
-        #self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
-        #self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
+        # self.assertIn(cyclooxygenase_ec_p, graph.edge[cyclooxygenase_ec])
+        # self.assertIn(cyclooxygenase_ec_pp, graph.edge[cyclooxygenase_ec_p])
+        # self.assertIn(cyclooxygenase_ec_ppp, graph.edge[cyclooxygenase_ec_pp])
 
     def test_prosite_classes(self):
         """Tests prosite enrichment
@@ -119,8 +121,6 @@ class TestEnrich(unittest.TestCase):
         enrich_prosite_classes(graph=graph)
 
         self.assertIn((PROTEIN, 'prosite', 'PDOC00058'), graph)
-
-
 
 
 if __name__ == '__main__':
