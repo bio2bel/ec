@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This library helps to download and pars the enzyme classes from the ExPASy ENZYME database.
 It allows access to all important entries in the database via various query functions.
-In addition gives necessary functionality to enrich pybel.BELGraph graphs with relevant information.
+In addition it gives necessary functionality to enrich pybel.BELGraph graphs with relevant information.
 
 """
 
