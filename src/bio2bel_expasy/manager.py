@@ -212,7 +212,6 @@ class Manager(object):
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
         if enzyme is None:
-            print(expasy_id)
             raise IndexError
         return enzyme.proteins
 
