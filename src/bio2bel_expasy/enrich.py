@@ -3,7 +3,6 @@
 import logging
 
 from pybel.constants import FUNCTION, IS_A, NAME, NAMESPACE, PROTEIN
-from pybel_tools import pipeline
 from .constants import EXPASY
 from .manager import Manager
 
@@ -41,7 +40,6 @@ def node_is_protein(graph, node):
     return PROTEIN == graph.node[node][FUNCTION]
 
 
-@pipeline.in_place_mutator
 def enrich_enzyme_classes(graph, connection=None):
     """Enriches Enzyme Classes for proteins in the graph
 
@@ -73,13 +71,12 @@ def enrich_enzyme_classes(graph, connection=None):
     return graph
 
 
-@pipeline.in_place_mutator
 def enrich_prosite_classes(graph, connection=None):
     """enriches Enzyme classes for Prosite in the graph.
 
     :param pybel.BELGraph graph:
     :param connection:
-    :rtype pybel.BELGraph
+    :rtype: pybel.BELGraph
     """
     m = Manager.ensure(connection=connection)
     graph = enrich_parents_classes(graph=graph)
@@ -99,7 +96,6 @@ def enrich_prosite_classes(graph, connection=None):
     return graph
 
 
-@pipeline.in_place_mutator
 def enrich_parents_classes(graph, connection=None):
     """Enriches graph nodes with parents.
 
@@ -125,7 +121,6 @@ def enrich_parents_classes(graph, connection=None):
     return graph
 
 
-@pipeline.in_place_mutator
 def enrich_children_classes(graph, connection=None):
     """Enriches graph nodes with children.
 

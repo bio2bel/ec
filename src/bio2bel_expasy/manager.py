@@ -195,7 +195,7 @@ class Manager(object):
         """Returns Enzyme ID lists associated with the given Proside ID
 
         :param str prosite_id: Prosite ID
-        :rtype: list of strings
+        :rtype: list[str]
         """
 
         prosite = self.get_prosite_by_id(prosite_id)

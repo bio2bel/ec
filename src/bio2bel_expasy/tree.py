@@ -5,19 +5,14 @@ import re
 from urllib.request import urlretrieve
 
 import networkx as nx
-from pybel.resources.arty import get_latest_arty_namespace
-from pybel.resources.defaults import CONFIDENCE
-from pybel.utils import ensure_quotes
-from pybel_tools.document_utils import write_boilerplate
 
 from .constants import EC_DATA_FILE_REGEX, ENZCLASS_DATA_FILE, ENZCLASS_DATA_URL, ENZCLASS_FILE, ENZCLASS_URL
 
 __all__ = [
-    'populate_tree',
-    'write_expasy_tree',
     'standard_ec_id',
     'give_edge',
-    'edge_description'
+    'edge_description',
+    'populate_tree',
 ]
 
 
@@ -40,47 +35,47 @@ def download_ec_data(force_download=False):
         urlretrieve(ENZCLASS_DATA_URL, ENZCLASS_DATA_FILE)
 
 
-def standard_ec_id(non_standard_ec_id):
+def standard_ec_id(ns_ec_id):
     """Rerturns standardized expasy id string
 
-    :param str non_standard_ec_id: str
-    :return str:
+    :param str ns_ec_id: str
+    :rtype: str
     """
-    return non_standard_ec_id.replace(" ", "")
+    return ns_ec_id.replace(" ", "")
 
 
-def non_standard_ec_id(standard_ec_id):
+def non_standard_ec_id(s_ec_id):
     """Returns non canonical way of given expasy_id found in hierarchy data file.
 
-    :param standard_ec_id:
-    :rtype str:  a string
+    :param str s_ec_id: A standardized enzyme class string
+    :rtype: str
     """
-    nums = standard_ec_id.split('.')
-    non_standard_ec_id = ''
+    nums = s_ec_id.split('.')
+    ns_ec_id = ''
     for obj in nums:
         if obj.isdigit():
             if int(obj) > 9:
-                non_standard_ec_id += obj
-                non_standard_ec_id += '.'
+                ns_ec_id += obj
+                ns_ec_id += '.'
             else:
-                non_standard_ec_id += ' '
-                non_standard_ec_id += obj
-                non_standard_ec_id += '.'
+                ns_ec_id += ' '
+                ns_ec_id += obj
+                ns_ec_id += '.'
         else:
-            non_standard_ec_id += ' '
-            non_standard_ec_id += obj
-            non_standard_ec_id += '.'
+            ns_ec_id += ' '
+            ns_ec_id += obj
+            ns_ec_id += '.'
 
-    k = non_standard_ec_id.rfind(' ')
-    non_standard_ec_id = non_standard_ec_id[:k] + non_standard_ec_id[k + 1:]
-    return non_standard_ec_id.strip().strip('.')
+    k = ns_ec_id.rfind(' ')
+    ns_ec_id = ns_ec_id[:k] + ns_ec_id[k + 1:]
+    return ns_ec_id.strip().strip('.')
 
 
 def give_edge(head_str):
     """Returns (parent, child) tuple for given id
 
     :param str head_str:
-    :rtype tuple: parent child tuple
+    :rtype: tuple
     """
     head_str = standard_ec_id(head_str)
     nums = head_str.split('.')
@@ -90,15 +85,17 @@ def give_edge(head_str):
     while '-' in nums:
         nums.remove('-')
 
-    if len(nums) == 1:
+    l_nums = len(nums)
+
+    if l_nums == 1:
         return None, None
-    elif len(nums) == 2:
+    elif l_nums == 2:
         return (standard_ec_id("{}. -. -.-".format(nums[0])),
                 standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
-    elif len(nums) == 3:
+    elif l_nums == 3:
         return (standard_ec_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
                 standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
-    elif len(nums) == 4:
+    elif l_nums == 4:
         return (standard_ec_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
                 standard_ec_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
 
@@ -108,7 +105,7 @@ def edge_description(expasy_id, file=None):
 
     :param str expasy_id:
     :param str file: filepath
-    :rtype str: description
+    :rtype: str
     """
     expasy_id = non_standard_ec_id(expasy_id)
     file = open(ENZCLASS_FILE, 'r') if file is None else file
@@ -122,7 +119,7 @@ def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_
     """Populates graph from a given specific file.
 
     :param Optional[str] path_enzclass: Path to
-    :rtype networkx.DiGraph: a directed graph
+    :rtype: networkx.DiGraph
     """
     download_res(force_download=force_download)
 
@@ -166,56 +163,3 @@ def populate_tree(path_enzclass=ENZCLASS_FILE, path_enzclass_data=ENZCLASS_DATA_
         if parent is not None:
             graph.add_edge(parent, child)
     return graph
-
-
-def write_expasy_tree_boilerplate(file=None):
-    """Writes the BEL document header to the file
-
-    :param file file: A writeable file or file like. Defaults to stdout
-    """
-    write_boilerplate(
-        name='Expasy Enzyme Tree',
-        authors='Aram Grigoryan and Charles Tapley Hoyt',
-        contact='aram.grigoryan@scai.fraunhofer.de',
-        licenses='Creative Commons by 4.0',
-        copyright='Copyright (c) 2017 Aram Grigoryan. All Rights Reserved.',
-        description="""This BEL document represents relations from EXPASY ENZYME nomenclature database""",
-        namespace_url={'EC': get_latest_arty_namespace('enzyme-class')},
-        namespace_patterns={
-            # 'EC': '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*',
-        },
-        annotation_url={'Confidence': CONFIDENCE},
-        file=file
-    )
-
-
-def write_expasy_tree_body(graph, file):
-    """Creates the lines of BEL document that represents the Expasy Enzyme tree
-
-    :param networkx.DiGraph graph: A graph representing the Expasy tree from :func:`main`
-    :param file file: A writeable file or file-like. Defaults to stdout.
-    """
-    print('SET Citation = {"PubMed","Expasy","12824418"}', file=file)
-    print('SET Evidence = "Expasy Definitions"', file=file)
-    print('SET Confidence = "Axiomatic"', file=file)
-
-    for parent, child in graph.edges_iter():
-        print(
-            'p(EC:{}) isA p(EC:{})'.format(
-                ensure_quotes(child),
-                ensure_quotes(parent),
-            ),
-            file=file
-        )
-
-    print('UNSET ALL', file=file)
-
-
-def write_expasy_tree(file=None):
-    """Creates the entire BEL document representing the Expasy tree
-
-    :param file file: A writeable file or file-like. Defaults to stdout.
-    """
-    graph = populate_tree()
-    write_expasy_tree_boilerplate(file)
-    write_expasy_tree_body(graph, file)

@@ -1,25 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import sys
 
 import click
 
 from .constants import DEFAULT_CACHE_CONNECTION
 from .manager import Manager
-from .tree import write_expasy_tree
 
 
 @click.group()
 def main():
     """ExPASy to BEL"""
     logging.basicConfig(level=10)
-
-
-@main.command()
-@click.option('-e', '--eoutput', type=click.File('w'), default=sys.stdout)
-def write(eoutput):
-    write_expasy_tree(eoutput)
 
 
 @main.command()
@@ -31,20 +23,25 @@ def populate(connection):
 
 
 @main.command()
+@click.option('-y', '--yes', is_flag=True)
 @click.option('-c', '--connection', help='Defaults to {}'.format(DEFAULT_CACHE_CONNECTION))
-def drop(connection):
+def drop(yes, connection):
     """Drops the database"""
-    m = Manager(connection=connection)
-    m.drop_all()
+    if yes or click.confirm('Drop database?'):
+        m = Manager(connection=connection)
+        m.drop_all()
 
 
 @main.command()
 @click.option('-c', '--connection', help='Defaults to {}'.format(DEFAULT_CACHE_CONNECTION))
-def web(connection):
+@click.option('-v', '--debug', is_flag=True)
+@click.option('-p', '--port')
+@click.option('-h', '--host')
+def web(connection, debug, port, host):
     """Run the web app"""
     from .web import create_app
     app = create_app(connection=connection)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == '__main__':
