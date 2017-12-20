@@ -142,38 +142,38 @@ class Manager(object):
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
     def get_protein_by_id(self, uniprot_id):
-        """Returns protein entry for given uniprot_id
+        """Returns protein entry for given UniProt identifier
 
-        :param uniprot_id:
-        :return:
+        :param str uniprot_id: A UniProt identifier
+        :rtype: Optional[Protein]
         """
-
         return self.session.query(Protein).filter(uniprot_id == Protein.accession_number).one_or_none()
 
     def get_prosite_by_id(self, prosite_id):
-        """Returns prosite entry for given prosite_id
+        """Returns ProSite entry for given ProSite identifier
 
         :param prosite_id:
-        :return:
+        :rtype: Optional[Enzyme]
         """
-
         return self.session.query(Prosite).filter(prosite_id == Prosite.prosite_id).one_or_none()
 
     def get_parent(self, expasy_id):
-        """Returns the parent ID of expasy_id if exist otherwise returns None
+        """Returns the parent ID of ExPASy identifier if exist otherwise returns None
 
-        :param str expasy_id: ExPASy ID of enzyme which parent is needed
-        :rtype: str
+        :param str expasy_id: An ExPASy identifier
+        :rtype: Optional[Enzyme]
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
+
         if enzyme is None:
-            raise IndexError
+            return
+
         return enzyme.parent
 
     def get_description(self, expasy_id):
         """Return the Description of the enzyme, None if doesn't exist
 
-        :param str expasy_id: ExPASy ID of the enzyme which Description is needed
+        :param str expasy_id: An ExPASy identifier
         :rtype: str
         """
 
@@ -181,58 +181,65 @@ class Manager(object):
 
     def get_prosite(self, expasy_id):
         """Returns list of Prosite ID's associated with the given Enzyme ID
-        :param str expasy_id: ExPASy ID
-        :rtype: resulting list of strings
-        """
 
+        :param str expasy_id: An ExPASy identifier
+        :rtype: Optional[list[Enzyme]]
+        """
         enzyme = self.get_enzyme_by_id(expasy_id)
+
         if enzyme is None:
-            raise IndexError
+            return
 
         return enzyme.prosites
 
     def get_expasy_form_prosite(self, prosite_id):
-        """Returns Enzyme ID lists associated with the given Proside ID
+        """Returns Enzyme ID lists associated with the given ProSite ID
 
-        :param str prosite_id: Prosite ID
-        :rtype: list[str]
+        :param str prosite_id: ProSite identifier
+        :rtype: Optional[list[Enzyme]]
         """
-
         prosite = self.get_prosite_by_id(prosite_id)
+
         if prosite is None:
-            raise IndexError
+            return
 
         return prosite.enzymes
 
     def get_uniprot(self, expasy_id):
         """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
 
-        :param str expasy_id:
+        :param str expasy_id: An ExPASy identifier
         :rtype: Optional[list[Protein]]
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
+
         if enzyme is None:
-            raise IndexError
+            return
+
         return enzyme.proteins
 
     def get_expasy_from_uniprot(self, uniprot_id):
         """Returns Enzyme ID list associated with the given uniprot accession_number
 
-        :param uniprot_id:
-        :rtype: Manager[list[Enzyme]]
+        :param str uniprot_id: A UniProt identifier
+        :rtype: Optional[list[Enzyme]]
         """
         protein = self.get_protein_by_id(uniprot_id)
+
         if protein is None:
-            raise IndexError
+            return
+
         return protein.enzymes
 
     def get_children(self, expasy_id):
         """Returns list of Expasy ID's which are children for given Expasy _id
 
-        :param expasy_id:
-        :rtype: list
+        :param str expasy_id: An ExPASy identifier
+        :rtype: Optional[list[Enzyme]]
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
+
         if enzyme is None:
-            raise IndexError
+            return
+
         return enzyme.children

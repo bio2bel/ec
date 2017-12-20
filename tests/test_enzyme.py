@@ -2,9 +2,9 @@
 
 import unittest
 
+from bio2bel_expasy.constants import ENTRY_NAME
 from bio2bel_expasy.enzyme import expasy_parser
 from tests.constants import ENZCLASS_DATA_FILE
-from bio2bel_expasy.constants import ENTRY_NAME
 
 
 class TestEnzyme(unittest.TestCase):

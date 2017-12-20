@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import os
 import logging
+import os
 import unittest
 
+from bio2bel.constants import DEFAULT_CACHE_PATH
+from bio2bel_expasy.constants import EXPASY
+from bio2bel_expasy.enrich import enrich_enzyme_classes, enrich_prosite_classes
+from bio2bel_expasy.manager import Manager
+from bio2bel_expasy.tree import standard_ec_id
 from pybel import BELGraph
 from pybel.constants import PROTEIN
-from bio2bel.constants import DEFAULT_CACHE_PATH
-
-from bio2bel_expasy.enrich import enrich_enzyme_classes, enrich_prosite_classes
-from bio2bel_expasy.tree import standard_ec_id
-from bio2bel_expasy.constants import EXPASY
-from bio2bel_expasy.manager import Manager
 
 test_expasy_id = standard_ec_id('1.1.1.1')
 ec = standard_ec_id('1.14.99.1')

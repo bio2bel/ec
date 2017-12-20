@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os
 import unittest
 
 from bio2bel_expasy import tree
-from tests.constants import ENZCLASS_FILE, ENZCLASS_DATA_FILE
-
-#test_path = ENZCLASS_FILE
+from tests.constants import ENZCLASS_DATA_FILE, ENZCLASS_FILE
 
 
 class TestTree(unittest.TestCase):
