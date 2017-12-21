@@ -46,7 +46,7 @@ man_pages = [
     (master_doc, 'pybel', 'Bio2BEL ExPASy Documentation', [author], 1)
 ]
 texinfo_documents = [
-    (master_doc, 'Bio2BEL ExPASy', 'Bio2BEL ExPASy Documentation', author, 'Bio2BEL ExPASy', 'One line description of project.', 'Miscellaneous'),
+    (master_doc, 'Bio2BEL ExPASy', 'Bio2BEL ExPASy Documentation', author, 'Bio2BEL ExPASy', 'Parse, store, and serialize ENZYME to BEL.', 'Miscellaneous'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
@@ -54,7 +54,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'networkx': ('https://networkx.github.io/', None),
     'sqlalchemy': ('https://docs.sqlalchemy.org/en/latest', None),
-    'pybel': ('https://pybe.readthedocs.io/en/latest/', None),
+    'pybel': ('https://pybel.readthedocs.io/en/latest/', None),
 }
 
 autodoc_member_order = 'bysource'

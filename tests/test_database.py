@@ -4,7 +4,7 @@ import unittest
 
 from bio2bel_expasy.constants import ENTRY_NAME
 from bio2bel_expasy.parser.database import get_expasy_database
-from tests.constants import DATABASE_TEST_FILE, TREE_TEST_FILE, TemporaryCacheClsMixin, PopulatedDatabaseMixin
+from tests.constants import DATABASE_TEST_FILE, PopulatedDatabaseMixin
 
 
 class TestParseEnzyme(unittest.TestCase):

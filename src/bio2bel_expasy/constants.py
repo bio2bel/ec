@@ -8,14 +8,14 @@ MODULE_NAME = 'expasy'
 DATA_DIR = get_data_dir(MODULE_NAME)
 DEFAULT_CACHE_CONNECTION = get_connection(MODULE_NAME)
 
-#: TODO add docstring
+#: The web location of the enzyme class tree document
 EXPASY_TREE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
-#: TODO add docstring
+#: The local cache location where the enzyme class tree document is stored
 EXPASY_TREE_FILE = os.path.join(DATA_DIR, 'enzclass.txt')
 
-#: TODO add docstring
+#: The web location of the ENZYME database document
 EXPASY_DATABASE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
-#: TODO add docstring
+#: The local cache location where the ENZYME database document is stored
 EXPASY_DATABASE_FILE = os.path.join(DATA_DIR, 'enzyme.dat')
 
 EC_DATA_FILE_REGEX = '(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'

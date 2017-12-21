@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------
-        ENZYME nomenclature database (TESTING FILE, Author: Aram Grigoryan)
+        ENZYME nomenclature database
         SIB Swiss Institute of Bioinformatics; Geneva, Switzerland
 ----------------------------------------------------------------------------
 

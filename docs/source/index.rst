@@ -1,17 +1,15 @@
-Welcome to Bio2BEL ExPASy's documentation!
-==========================================
+Bio2BEL ExPASy
+==============
+.. automodule:: bio2bel_expasy
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
-.. automodule:: bio2bel_expasy.manager
-   :members:
-
-.. automodule:: bio2bel_expasy.enrich
-   :members:
-
+   manager
+   models
+   enrichment
+   constants
 
 Indices and tables
 ==================

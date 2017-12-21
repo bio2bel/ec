@@ -30,16 +30,6 @@ def _check_namespaces(data, bel_function, bel_namespace):
         return False
 
 
-def node_is_protein(graph, node):
-    """True if node is protein, False if else.
-
-    :param pybel.BELGraph graph: A Bel Graph
-    :param node: tuple node
-    :rtype bool: True if node is protein
-    """
-    return PROTEIN == graph.node[node][FUNCTION]
-
-
 def enrich_enzyme_classes(graph, connection=None):
     """Enriches Enzyme Classes for proteins in the graph
 
@@ -72,7 +62,7 @@ def enrich_enzyme_classes(graph, connection=None):
 
 
 def enrich_prosite_classes(graph, connection=None):
-    """enriches Enzyme classes for Prosite in the graph.
+    """enriches Enzyme classes for ProSite in the graph.
 
     :param pybel.BELGraph graph:
     :param connection:
@@ -101,7 +91,7 @@ def enrich_parents_classes(graph, connection=None):
 
     :param pybel.BELGraph graph:
     :param connection:
-    :rtype pybel.BELGraph
+    :rtype: pybel.BELGraph
     """
     m = Manager.ensure(connection=connection)
 
@@ -126,7 +116,7 @@ def enrich_children_classes(graph, connection=None):
 
     :param pybel.BELGraph graph:
     :param connection:
-    :rtype pybel.BELGraph
+    :rtype: pybel.BELGraph
     """
     m = Manager.ensure(connection=connection)
 

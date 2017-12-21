@@ -94,8 +94,8 @@ class Protein(Base):
     enzymes = relationship('Enzyme', secondary=enzyme_protein, backref=backref('proteins'))
 
     accession_number = Column(String(255),
-                              doc='Swiss-Prot primary accession number of the entry to which reference is being made')
-    entry_name = Column(String(255), doc='Swiss-Prot entry name')
+                              doc='UniProt `accession number <http://www.uniprot.org/help/accession_numbers>`_')
+    entry_name = Column(String(255), doc='UniProt `entry name <http://www.uniprot.org/help/entry_name>`_.')
 
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
