@@ -87,22 +87,23 @@ class Manager(object):
         :param bool cache: If true, the data is downloaded to the file system, else it is loaded from the internet
         :param bool force_download: If true, overwrites a previously cached file
         """
-        tree_graph = get_tree(path=path, force_download=force_download)
+        tree = get_tree(path=path, force_download=force_download)
 
         id_enzyme = {}
 
-        for expasy_id, data in tree_graph.nodes_iter(data=True):
+        for expasy_id, data in tqdm(tree.nodes_iter(data=True), desc='Classes', total=tree.number_of_nodes()):
             enzyme = id_enzyme[expasy_id] = Enzyme(
                 expasy_id=expasy_id,
                 description=data['description']
             )
             self.session.add(enzyme)
 
-        for parent_id, child_id in tree_graph.edges_iter():
+        for parent_id, child_id in tqdm(tree.edges_iter(), desc='Tree', total=tree.number_of_edges()):
             parent = id_enzyme[parent_id]
             child = id_enzyme[child_id]
             parent.children.append(child)
 
+        log.info("committing")
         self.session.commit()
 
     def populate_database(self, path=None, cache=True, force_download=False):
@@ -116,7 +117,7 @@ class Manager(object):
 
         id_enzyme = {}
         id_prosite = {}
-        id_protein = {}
+        id_uniprot = {}
 
         for data_cell in tqdm(data_dict, desc='Database'):
             if data_cell['DELETED'] or data_cell['TRANSFERRED']:
@@ -135,26 +136,26 @@ class Manager(object):
             enzyme.parent = self.get_enzyme_by_id(parent_id)
 
             for prosite_id in data_cell.get(PR, []):
-                prosite_entry = id_protein.get(prosite_id)
+                prosite = id_prosite.get(prosite_id)
 
-                if prosite_entry is None:
-                    prosite_entry = id_prosite[prosite_id] = Prosite(prosite_id=prosite_id)
-                    self.session.add(prosite_entry)
+                if prosite is None:
+                    prosite = id_prosite[prosite_id] = Prosite(prosite_id=prosite_id)
+                    self.session.add(prosite)
 
-                enzyme.prosites.append(prosite_entry)
+                enzyme.prosites.append(prosite)
 
             for uniprot_data in data_cell.get(DR, []):
                 up_tup = accession_number, entry_name = uniprot_data['accession_number'], uniprot_data['entry_name']
-                protein_entry = id_protein.get(up_tup)
+                protein = id_uniprot.get(up_tup)
 
-                if protein_entry is None:
-                    protein_entry = id_protein[up_tup] = Protein(
+                if protein is None:
+                    protein = id_uniprot[up_tup] = Protein(
                         accession_number=accession_number,
                         entry_name=entry_name,
                     )
-                    self.session.add(protein_entry)
+                    self.session.add(protein)
 
-                enzyme.proteins.append(protein_entry)
+                enzyme.proteins.append(protein)
 
         log.info("committing")
         self.session.commit()
