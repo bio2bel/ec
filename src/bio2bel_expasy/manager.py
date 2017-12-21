@@ -94,7 +94,7 @@ class Manager(object):
         for expasy_id, data in tree_graph.nodes_iter(data=True):
             enzyme = id_enzyme[expasy_id] = Enzyme(
                 expasy_id=expasy_id,
-                description=data['name']
+                description=data['description']
             )
             self.session.add(enzyme)
 

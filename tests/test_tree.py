@@ -7,6 +7,7 @@ from networkx import DiGraph
 from bio2bel_expasy.parser.tree import get_tree, standard_ec_id
 from tests.constants import TREE_TEST_FILE, TemporaryCacheClsMixin
 
+DESCRIPTION = 'description'
 
 class TestParseTree(unittest.TestCase):
     @classmethod
@@ -19,13 +20,13 @@ class TestParseTree(unittest.TestCase):
     def test_has_nodes(self):
         x = standard_ec_id('1. -. -.-')
         self.assertIn(x, self.tree)
-        self.assertIn('name', self.tree.node[x])
-        self.assertEqual('Oxidoreductases', self.tree.node[x]['name'])
+        self.assertIn(DESCRIPTION, self.tree.node[x])
+        self.assertEqual('Oxidoreductases', self.tree.node[x][DESCRIPTION])
 
         x = standard_ec_id('1. 1. -.-')
         self.assertIn(x, self.tree)
-        self.assertIn('name', self.tree.node[x])
-        self.assertEqual('Acting on the CH-OH group of donors', self.tree.node[x]['name'])
+        self.assertIn(DESCRIPTION, self.tree.node[x])
+        self.assertEqual('Acting on the CH-OH group of donors', self.tree.node[x][DESCRIPTION])
 
         self.assertIn(standard_ec_id('1. 1. 1.-'), self.tree)
         self.assertIn(standard_ec_id('1. 1. 2.-'), self.tree)
@@ -38,8 +39,8 @@ class TestParseTree(unittest.TestCase):
 
         x = standard_ec_id('2. -. -.-')
         self.assertIn(x, self.tree)
-        self.assertIn('name', self.tree.node[x])
-        self.assertEqual('Transferases', self.tree.node[x]['name'])
+        self.assertIn(DESCRIPTION, self.tree.node[x])
+        self.assertEqual('Transferases', self.tree.node[x][DESCRIPTION])
 
         self.assertIn(standard_ec_id('2. 4.  2.-'), self.tree)
         self.assertIn(standard_ec_id('2. 4. 99.-'), self.tree)

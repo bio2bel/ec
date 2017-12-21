@@ -79,7 +79,7 @@ def get_tree(path=None, force_download=False):
             parent, child = give_edge(head)
             name = line[11:]
             name = name.strip().strip('.')
-            graph.add_node(child, name=name)
+            graph.add_node(child, description=name)
             if parent is not None:
                 graph.add_edge(parent, child)
 
