@@ -21,7 +21,6 @@ test_class = protein(name=test_class_id, namespace='EXPASY')
 test_prosite = protein(identifier='PDOC00061', namespace='PROSITE')
 
 
-@unittest.skip
 class TestEnrich(PopulatedDatabaseMixin):
     def test_enrich_class(self):
         """Tests that the connection from the subclass to the enzyme class is inferred"""

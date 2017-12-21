@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Setup module for ``bio2bel_expasy``"""
+
 import codecs
 import os
 import re
@@ -7,7 +9,19 @@ import re
 import setuptools
 
 PACKAGES = setuptools.find_packages(where='src')
+KEYWORDS = ['Biological Expression Language', 'BEL', 'Systems Biology', 'Networks Biology', 'ExPASy']
 META_PATH = os.path.join('src', 'bio2bel_expasy', '__init__.py')
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3.6',
+    'Topic :: Scientific/Engineering :: Bio-Informatics'
+]
 INSTALL_REQUIRES = [
     'pybel>=0.9.6',
     'requests',
