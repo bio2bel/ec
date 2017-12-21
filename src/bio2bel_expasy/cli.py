@@ -40,7 +40,7 @@ def drop(yes, connection):
 def web(connection, debug, port, host):
     """Run the web app"""
     from .web import create_app
-    app = create_app(connection=connection)
+    app = create_app(connection=connection, url='/')
     app.run(host=host, port=port, debug=debug)
 
 

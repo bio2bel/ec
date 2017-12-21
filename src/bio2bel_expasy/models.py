@@ -6,8 +6,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 
-from pybel.constants import FUNCTION, NAME, NAMESPACE, PROTEIN
-from .constants import EXPASY, PROSITE, UNIPROT
+from pybel.dsl import protein
 
 TABLE_PREFIX = 'expasy'
 ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
@@ -40,7 +39,7 @@ class Enzyme(Base):
 
     id = Column(Integer, primary_key=True)
 
-    expasy_id = Column(String(255), doc='The ExPAsY enzyme code')
+    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPAsY enzyme code')
 
     description = Column(String(255), doc='Description')
 
@@ -51,15 +50,15 @@ class Enzyme(Base):
         return self.expasy_id
 
     def serialize_to_bel(self):
-        """Returns Dict object of Enzyme Class Data for Bel
+        """Returns a PyBEL node data dictionary representing this enzyme
 
         :return: dict
         """
-        return {
-            FUNCTION: PROTEIN,
-            NAMESPACE: EXPASY,
-            NAME: self.expasy_id
-        }
+        return protein(
+            namespace='EXPASY',
+            name=str(self.description),
+            identifier=str(self.expasy_id)
+        )
 
 
 class Prosite(Base):
@@ -68,7 +67,7 @@ class Prosite(Base):
 
     id = Column(Integer, primary_key=True)
 
-    prosite_id = Column(String(255), doc='ProSite Identifier')
+    prosite_id = Column(String(255), unique=True, index=True, nullable=False, doc='ProSite Identifier')
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
 
@@ -76,15 +75,14 @@ class Prosite(Base):
         return self.prosite_id
 
     def serialize_to_bel(self):
-        """Returns Dict object of Prosite Class Data for Bel
+        """Returns a PyBEL node data dictionary representing this ProSite entry
 
         :return: dict
         """
-        return {
-            FUNCTION: PROTEIN,
-            NAMESPACE: PROSITE,
-            NAME: self.prosite_id
-        }
+        return protein(
+            namespace='PROSOTE',
+            identifier=str(self.prosite_id)
+        )
 
 
 class Protein(Base):
@@ -105,12 +103,12 @@ class Protein(Base):
         return self.accession_number
 
     def serialize_to_bel(self):
-        """Returns Dict object of UniProtKB Class Data for Bel
+        """Returns a PyBEL node data dictionary representing this UniProt entry
 
         :return: dict
         """
-        return {
-            FUNCTION: PROTEIN,
-            NAMESPACE: UNIPROT,
-            NAME: self.accession_number
-        }
+        return protein(
+            namespace='UNIPROT',
+            name=str(self.entry_name),
+            identifier=str(self.accession_number)
+        )

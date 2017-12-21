@@ -9,14 +9,14 @@ DATA_DIR = get_data_dir(MODULE_NAME)
 DEFAULT_CACHE_CONNECTION = get_connection(MODULE_NAME)
 
 #: TODO add docstring
-ENZCLASS_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
+EXPASY_TREE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 #: TODO add docstring
-ENZCLASS_FILE = os.path.join(DATA_DIR, 'enzclass.txt')
+EXPASY_TREE_FILE = os.path.join(DATA_DIR, 'enzclass.txt')
 
 #: TODO add docstring
-ENZCLASS_DATA_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
+EXPASY_DATABASE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
 #: TODO add docstring
-ENZCLASS_DATA_FILE = os.path.join(DATA_DIR, 'enzyme.dat')
+EXPASY_DATABASE_FILE = os.path.join(DATA_DIR, 'enzyme.dat')
 
 EC_DATA_FILE_REGEX = '(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
 EC_PATTERN_REGEX = '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'

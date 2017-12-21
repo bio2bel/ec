@@ -8,9 +8,9 @@ from tqdm import tqdm
 
 from bio2bel.utils import get_connection
 from .constants import MODULE_NAME
-from .enzyme import *
 from .models import Base, Enzyme, Prosite, Protein
-from .tree import edge_description, give_edge, populate_tree, standard_ec_id
+from .parser.database import *
+from .parser.tree import get_tree, give_edge, standard_ec_id
 
 log = logging.getLogger(__name__)
 
@@ -57,105 +57,118 @@ class Manager(object):
 
         raise TypeError
 
-    def populate(self, force_download=False):
-        """Populates the database
+    def get_or_create_enzyme(self, expasy_id, description=None):
+        """Gets an enzyme from the database or creates it
 
-        :param bool force_download: Should the data be downloaded again, or cache used if exists?
+        :param str expasy_id:
+        :param Optional[str] description:
+        :rtype: Enzyme
         """
-        data_dict = expasy_parser(force_download=force_download)
-        tree_graph = populate_tree(force_download=force_download)
+        enzyme = self.get_enzyme_by_id(expasy_id)
+
+        if enzyme is None:
+            enzyme = Enzyme(
+                expasy_id=expasy_id,
+                description=description
+            )
+            self.session.add(enzyme)
+
+        return enzyme
+
+    def populate(self, tree_path=None, database_path=None):
+        """Populates everything"""
+        self.populate_tree(path=tree_path)
+        self.populate_database(path=database_path)
+
+    def populate_tree(self, path=None, cache=True, force_download=False):
+        """Downloads and populates the expasy tree
+
+        :param Optional[str] path: A custom url to download
+        :param bool cache: If true, the data is downloaded to the file system, else it is loaded from the internet
+        :param bool force_download: If true, overwrites a previously cached file
+        """
+        tree_graph = get_tree(path=path, force_download=force_download)
+
+        id_enzyme = {}
+
+        for expasy_id, data in tree_graph.nodes_iter(data=True):
+            enzyme = id_enzyme[expasy_id] = Enzyme(
+                expasy_id=expasy_id,
+                description=data['name']
+            )
+            self.session.add(enzyme)
+
+        for parent_id, child_id in tree_graph.edges_iter():
+            parent = id_enzyme[parent_id]
+            child = id_enzyme[child_id]
+            parent.children.append(child)
+
+        self.session.commit()
+
+    def populate_database(self, path=None, cache=True, force_download=False):
+        """Populates the ExPASy database.
+
+        :param Optional[str] path: A custom url to download
+        :param bool cache: If true, the data is downloaded to the file system, else it is loaded from the internet
+        :param bool force_download: If true, overwrites a previously cached file
+        """
+        data_dict = get_expasy_database(path=path, force_download=force_download)
 
         id_enzyme = {}
         id_prosite = {}
         id_protein = {}
 
-        for data_cell in tqdm(data_dict, desc='ExPASy'):
-            if not (data_cell['DELETED'] or data_cell['TRANSFERRED']):  # if both are false then proceed
-                enzyme_entry = Enzyme(
-                    expasy_id=data_cell[ID],
-                    description=data_cell[DE]
-                )
+        for data_cell in tqdm(data_dict, desc='Database'):
+            if data_cell['DELETED'] or data_cell['TRANSFERRED']:
+                continue  # if both are false then proceed
 
-                self.session.add(enzyme_entry)
-                id_enzyme[data_cell[ID]] = enzyme_entry
-                parent_id = give_edge(data_cell[ID])[0]
-                child_id = data_cell[ID]
-                while (parent_id):
-                    if parent_id not in id_enzyme.keys():
-                        enzyme_parent_entry = Enzyme(
-                            expasy_id=parent_id,
-                            description=edge_description(parent_id)
-                        )
-                        self.session.add(enzyme_parent_entry)
-                        id_enzyme[parent_id] = enzyme_parent_entry
-                        id_enzyme[parent_id].children.append(id_enzyme[child_id])
-                    else:
-                        id_enzyme[parent_id].children.append(id_enzyme[child_id])
+            expasy_id = data_cell[ID]
 
-                    child_id = parent_id
-                    parent_id = give_edge(parent_id)[0]
+            enzyme = id_enzyme[expasy_id] = Enzyme(
+                expasy_id=expasy_id,
+                description=data_cell[DE]
+            )
 
-                if PR in data_cell and data_cell[PR]:
-                    for pr_id in data_cell[PR]:
+            self.session.add(enzyme)
 
-                        if pr_id not in id_prosite:
-                            prosite_entry = Prosite(prosite_id=pr_id)
-                            id_prosite[pr_id] = prosite_entry
-                            self.session.add(prosite_entry)
-                        else:
-                            prosite_entry = id_prosite[pr_id]
+            parent_id, _ = give_edge(data_cell[ID])
+            enzyme.parent = self.get_enzyme_by_id(parent_id)
 
-                        enzyme_entry.prosites.append(prosite_entry)
+            for prosite_id in data_cell.get(PR, []):
+                prosite_entry = id_protein.get(prosite_id)
 
-                if DR in data_cell and data_cell[DR]:
-                    for dr_id in data_cell[DR]:
+                if prosite_entry is None:
+                    prosite_entry = id_prosite[prosite_id] = Prosite(prosite_id=prosite_id)
+                    self.session.add(prosite_entry)
 
-                        accession_number = dr_id['accession_number']
-                        entry_name = dr_id['entry_name']
+                enzyme.prosites.append(prosite_entry)
 
-                        if (accession_number, entry_name) not in id_protein:
-                            protein_entry = Protein(
-                                accession_number=accession_number,
-                                entry_name=entry_name,
-                                #  is_SwissProt=
-                            )
-                            id_protein[accession_number, entry_name] = protein_entry
-                            self.session.add(protein_entry)
-                        else:
-                            protein_entry = id_protein[accession_number, entry_name]
+            for uniprot_data in data_cell.get(DR, []):
+                up_tup = accession_number, entry_name = uniprot_data['accession_number'], uniprot_data['entry_name']
+                protein_entry = id_protein.get(up_tup)
 
-                        enzyme_entry.proteins.append(protein_entry)
+                if protein_entry is None:
+                    protein_entry = id_protein[up_tup] = Protein(
+                        accession_number=accession_number,
+                        entry_name=entry_name,
+                    )
+                    self.session.add(protein_entry)
 
-        log.info("\nBuilding (Committing) DataBase ...\n")
+                enzyme.proteins.append(protein_entry)
 
+        log.info("committing")
         self.session.commit()
 
     def get_enzyme_by_id(self, expasy_id):
-        """Gets an enzyme by its ExPAsY identifier.
+        """Gets an enzyme by its ExPASy identifier.
         
         Implementation note: canonicalizes identifier to remove all spaces first.
 
-        :param str expasy_id: The ExPAsY database identifier. Example: 1.3.3.- or 1.3.3.19
+        :param str expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
         :rtype: Optional[Enzyme]
         """
         canonical_expasy_id = standard_ec_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
-
-    def get_protein_by_id(self, uniprot_id):
-        """Returns protein entry for given UniProt identifier
-
-        :param str uniprot_id: A UniProt identifier
-        :rtype: Optional[Protein]
-        """
-        return self.session.query(Protein).filter(uniprot_id == Protein.accession_number).one_or_none()
-
-    def get_prosite_by_id(self, prosite_id):
-        """Returns ProSite entry for given ProSite identifier
-
-        :param prosite_id:
-        :rtype: Optional[Enzyme]
-        """
-        return self.session.query(Prosite).filter(prosite_id == Prosite.prosite_id).one_or_none()
 
     def get_parent(self, expasy_id):
         """Returns the parent ID of ExPASy identifier if exist otherwise returns None
@@ -170,17 +183,37 @@ class Manager(object):
 
         return enzyme.parent
 
-    def get_description(self, expasy_id):
-        """Return the Description of the enzyme, None if doesn't exist
+    def get_children(self, expasy_id):
+        """Returns list of Expasy ID's which are children for given Expasy _id
 
         :param str expasy_id: An ExPASy identifier
-        :rtype: str
+        :rtype: Optional[list[Enzyme]]
         """
+        enzyme = self.get_enzyme_by_id(expasy_id)
 
-        return self.session.query(Enzyme.description).filter_by(expasy_id=expasy_id).first()[0]
+        if enzyme is None:
+            return
+
+        return enzyme.children
+
+    def get_protein_by_id(self, uniprot_id):
+        """Returns protein entry for given UniProt identifier
+
+        :param str uniprot_id: A UniProt identifier
+        :rtype: Optional[Protein]
+        """
+        return self.session.query(Protein).filter(Protein.accession_number == uniprot_id).one_or_none()
+
+    def get_prosite_by_id(self, prosite_id):
+        """Returns the ProSite entry for given ProSite identifier
+
+        :param str prosite_id: A ProSite identifier
+        :rtype: Optional[Enzyme]
+        """
+        return self.session.query(Prosite).filter(Prosite.prosite_id == prosite_id).one_or_none()
 
     def get_prosite(self, expasy_id):
-        """Returns list of Prosite ID's associated with the given Enzyme ID
+        """Returns list of ProSites associated with the enzyme corresponding to the given identifier
 
         :param str expasy_id: An ExPASy identifier
         :rtype: Optional[list[Enzyme]]
@@ -205,7 +238,7 @@ class Manager(object):
 
         return prosite.enzymes
 
-    def get_uniprot(self, expasy_id):
+    def get_uniprots_by_expasy_id(self, expasy_id):
         """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
 
         :param str expasy_id: An ExPASy identifier
@@ -218,7 +251,7 @@ class Manager(object):
 
         return enzyme.proteins
 
-    def get_expasy_from_uniprot(self, uniprot_id):
+    def get_expasy_from_uniprot_id(self, uniprot_id):
         """Returns Enzyme ID list associated with the given uniprot accession_number
 
         :param str uniprot_id: A UniProt identifier
@@ -230,16 +263,3 @@ class Manager(object):
             return
 
         return protein.enzymes
-
-    def get_children(self, expasy_id):
-        """Returns list of Expasy ID's which are children for given Expasy _id
-
-        :param str expasy_id: An ExPASy identifier
-        :rtype: Optional[list[Enzyme]]
-        """
-        enzyme = self.get_enzyme_by_id(expasy_id)
-
-        if enzyme is None:
-            return
-
-        return enzyme.children

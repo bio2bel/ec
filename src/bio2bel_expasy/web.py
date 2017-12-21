@@ -35,6 +35,7 @@ def create_app(connection=None, url=None):
     """Creates a Flask application
 
     :type connection: Optional[str]
+    :type url: Optional[str]
     :rtype: flask.Flask
     """
     app = Flask(__name__)

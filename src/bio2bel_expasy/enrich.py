@@ -59,7 +59,7 @@ def enrich_enzyme_classes(graph, connection=None):
     for node, data in graph.nodes(data=True):
         if not _check_namespaces(data, PROTEIN, EXPASY):
             continue
-        uniprot_list = m.get_uniprot(data[NAME])
+        uniprot_list = m.get_uniprots_by_expasy_id(data[NAME])
 
         if not uniprot_list:
             log.warning("enrich_enzyme_classes():Unable to find node: %s", node)

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 import re
+from urllib.request import urlretrieve
 
-from .constants import EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, ENZCLASS_DATA_FILE, \
-    ENTRY_NAME
-from .tree import download_ec_data
+from ..constants import (
+    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX,
+    EXPASY_DATABASE_FILE, EXPASY_DATABASE_URL,
+)
 
 __all__ = [
-    'expasy_parser',
+    'get_expasy_database',
     'ID',
     'DE',
     'PR',
@@ -40,24 +43,33 @@ transferred_pattern = re.compile(EC_TRANSFERRED_REGEX)
 prosite_pattern = re.compile(EC_PROSITE_REGEX)
 
 
-def expasy_parser(path=None, force_download=False):
+def download_expasy_database(force_download=False):
+    """Downloads the expasy database
+
+    :param force_download: bool to force download
+    """
+    if not os.path.exists(EXPASY_DATABASE_FILE) or force_download:
+        urlretrieve(EXPASY_DATABASE_URL, EXPASY_DATABASE_FILE)
+
+
+def get_expasy_database(path=None, force_download=False):
     """Interface to call expasy_parser_helper(enzclass_file) method.
 
     :param Optional[str] path: path to the file
     :param Optional[bool] force_download: True to force download resources
     :return list[dict]: list of data containing dictionaries
     """
-    download_ec_data(force_download)
+    if path is None:
+        download_expasy_database(force_download=force_download)
 
-    path = ENZCLASS_DATA_FILE if path is None else path
-
-    with open(path, 'r') as enzclass_file:
-        return expasy_parser_helper(enzclass_file)
+    with open(path or EXPASY_DATABASE_FILE, 'r') as enzclass_file:
+        return _get_expasy_database_helper(enzclass_file)
 
 
-def expasy_parser_helper(enzclass_file):
+def _get_expasy_database_helper(enzclass_file):
     """Parses the ExPASy database file. Returns a list of enzyme entry dictionaries
 
+    :param file enzclass_file: An iterator over the ExPASy database file or file-like
     :rtype: list[dict]
     """
     expasy_db = []

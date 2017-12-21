@@ -3,17 +3,18 @@
 import unittest
 
 from bio2bel_expasy.constants import ENTRY_NAME
-from bio2bel_expasy.enzyme import expasy_parser
-from tests.constants import ENZCLASS_DATA_FILE
+from bio2bel_expasy.parser.database import get_expasy_database
+from tests.constants import DATABASE_TEST_FILE, TREE_TEST_FILE, TemporaryCacheClsMixin, PopulatedDatabaseMixin
 
 
-class TestEnzyme(unittest.TestCase):
+class TestParseEnzyme(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.database = get_expasy_database(path=DATABASE_TEST_FILE)
+
     def test_all(self):
-        """Tests everything for the ENZCLASS_DATA_TEST_FILE
-
-        :return: None
-        """
-        db = expasy_parser(ENZCLASS_DATA_FILE)
+        """Tests everything for the ENZCLASS_DATA_TEST_FILE"""
+        db = self.database
         #
         self.assertEqual(3, len(db))
         #
@@ -47,5 +48,25 @@ class TestEnzyme(unittest.TestCase):
         self.assertEqual(True, db[2]['DELETED'])
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestPopulateDatabase(PopulatedDatabaseMixin):
+    def test_get_protein(self):
+        protein = self.manager.get_protein_by_id('Q6AZW2')
+        self.assertIsNotNone(protein)
+
+    def test_get_prosite(self):
+        prosite = self.manager.get_prosite_by_id('PDOC00061')
+        self.assertIsNotNone(prosite)
+
+    def test_get_entry(self):
+        enzyme = self.manager.get_enzyme_by_id('1.1.1.2')
+        self.assertIsNotNone(enzyme)
+        self.assertEqual('1.1.1.2', enzyme.expasy_id)
+
+        self.assertIsNotNone(enzyme.parent, msg="missing enzyme's parent")
+        self.assertEqual('1.1.1.-', enzyme.parent.expasy_id)
+
+        protein = self.manager.get_protein_by_id('Q6AZW2')
+        self.assertIn(protein, enzyme.proteins)
+
+        prosite = self.manager.get_prosite_by_id('PDOC00061')
+        self.assertIn(prosite, enzyme.prosites)
