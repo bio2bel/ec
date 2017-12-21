@@ -39,7 +39,7 @@ class Enzyme(Base):
 
     id = Column(Integer, primary_key=True)
 
-    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPAsY enzyme code')
+    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPASy enzyme code')
 
     description = Column(String(255), doc='Description')
 
@@ -80,7 +80,7 @@ class Prosite(Base):
         :return: dict
         """
         return protein(
-            namespace='PROSOTE',
+            namespace='PROSITE',
             identifier=str(self.prosite_id)
         )
 
