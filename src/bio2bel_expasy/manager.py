@@ -7,10 +7,12 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
 from bio2bel.utils import get_connection
-from .constants import MODULE_NAME
+from pybel.constants import IS_A, NAME, PROTEIN
+from .constants import EXPASY, MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein
 from .parser.database import *
 from .parser.tree import get_tree, give_edge, standard_ec_id
+from .utils import check_namespaces
 
 log = logging.getLogger(__name__)
 
@@ -264,3 +266,46 @@ class Manager(object):
             return
 
         return protein.enzymes
+
+    def enrich_proteins(self, graph):
+        """Enriches proteins in the BEL graph with IS_A relations to their enzyme classes.
+
+        1. Gets a list of UniProt proteins
+        2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
+
+        :param pybel.BELGraph graph: A BEL graph
+        """
+        for node, data in graph.nodes(data=True):
+            if not check_namespaces(data, PROTEIN, EXPASY):
+                continue
+            uniprot_list = self.get_uniprots_by_expasy_id(data[NAME])
+
+            if not uniprot_list:
+                log.warning("enrich_enzyme_classes():Unable to find node: %s", node)
+                continue
+            for prot in uniprot_list:
+                protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
+                graph.add_unqualified_edge(node, protein_tuple, IS_A)
+
+    def enrich_enzymes(self, graph):
+        """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
+
+        :param pybel.BELGraph graph: A BEL graph
+        """
+        raise NotImplementedError
+
+    def enrich_prosite_classes(self, graph):
+        """enriches Enzyme classes for ProSite in the graph.
+
+        :param pybel.BELGraph graph: A BEL graph
+        """
+        for node, data in graph.nodes(data=True):
+            if not check_namespaces(data, PROTEIN, EXPASY):
+                continue
+            prosite_list = self.get_prosite(data[NAME])
+            if not prosite_list:
+                log.warning('enrich_prosite_classes():Unable to find node %s', node)
+                continue
+            for prosite in prosite_list:
+                prosite_tuple = graph.add_node_from_data(prosite.serialize_to_bel())
+                graph.add_unqualified_edge(node, prosite_tuple, IS_A)
