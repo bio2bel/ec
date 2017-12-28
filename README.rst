@@ -24,7 +24,7 @@ mirror sites in different continents currently serve the user community.
 
 Installation
 ------------
-:code:`pip3 install git+https://gitlab.scai.fraunhofer.de/bio/PyExPASy.git`
+:code:`pip3 install git+https://github.com/bio2bel/expasy.git`
 
 Command Line Interface
 ----------------------
@@ -36,9 +36,9 @@ Programmatic Interface
 ----------------------
 To enrich the proteins in a BEL Graph with their enzyme classes, use:
 
->>> from bio2bel_expasy import enrich_enzyme_classes
+>>> from bio2bel_expasy import enrich_proteins
 >>> graph = ... # get a BEL graph
->>> enrich_enzyme_classes(graph)
+>>> enrich_proteins(graph)
 
 
 .. |build| image:: https://travis-ci.org/bio2bel/expasy.svg?branch=master
