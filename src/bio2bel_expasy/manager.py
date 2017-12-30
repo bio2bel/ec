@@ -287,12 +287,25 @@ class Manager(object):
                 protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
                 graph.add_unqualified_edge(node, protein_tuple, IS_A)
 
+
     def enrich_enzymes(self, graph):
         """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
 
         :param pybel.BELGraph graph: A BEL graph
         """
-        raise NotImplementedError
+        for node, data in graph.nodes(data=True):
+            if not check_namespaces(data, PROTEIN, EXPASY):
+                continue
+            children_list = self.get_children(data[NAME])
+            if not children_list:
+                log.warning('No child node found for node %s', node)
+            for child in children_list:
+                expasy_tuple = graph.add_node_from_data(child.serialize_to_bel())
+                graph.add_unqualified_edge(node, expasy_tuple, IS_A)
+
+        self.enrich_proteins(graph=graph)
+        self.enrich_prosite_classes(graph=graph)
+
 
     def enrich_prosite_classes(self, graph):
         """enriches Enzyme classes for ProSite in the graph.

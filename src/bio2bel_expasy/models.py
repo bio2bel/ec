@@ -5,6 +5,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
+from bio2bel_expasy.constants import EXPASY, UNIPROT, PROSITE
 
 from pybel.dsl import protein
 
@@ -55,7 +56,7 @@ class Enzyme(Base):
         :return: dict
         """
         return protein(
-            namespace='EXPASY',
+            namespace=EXPASY,
             name=str(self.description),
             identifier=str(self.expasy_id)
         )
@@ -80,7 +81,7 @@ class Prosite(Base):
         :return: dict
         """
         return protein(
-            namespace='PROSITE',
+            namespace=PROSITE,
             identifier=str(self.prosite_id)
         )
 
@@ -108,7 +109,7 @@ class Protein(Base):
         :return: dict
         """
         return protein(
-            namespace='UNIPROT',
+            namespace=UNIPROT,
             name=str(self.entry_name),
             identifier=str(self.accession_number)
         )

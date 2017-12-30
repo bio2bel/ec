@@ -1,33 +1,40 @@
 # -*- coding: utf-8 -*-
 
+from bio2bel_expasy.manager import Manager
 from bio2bel_expasy.enrich import enrich_prosite_classes
 from bio2bel_expasy.parser.tree import standard_ec_id
 from pybel import BELGraph
 from pybel.dsl import protein
 from pybel.tokens import node_to_tuple
 from tests.constants import PopulatedDatabaseMixin
+from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
 
 test_expasy_id = standard_ec_id('1.1.1.2')
 test_subsubclass_id = standard_ec_id('1.1.1.-')
 test_subclass_id = standard_ec_id('1.1.-.-')
 test_class_id = standard_ec_id('1.-.-.-')
 
-test_entry = protein(name=test_expasy_id, namespace='EXPASY')
+test_entry = protein(name=test_expasy_id, namespace=EXPASY)
 test_tuple = node_to_tuple(test_entry)
 
-test_subsubclass = protein(name=test_subsubclass_id, namespace='EXPASY')
-test_subclass = protein(name=test_subclass_id, namespace='EXPASY')
-test_class = protein(name=test_class_id, namespace='EXPASY')
+test_subsubclass = protein(name=test_subsubclass_id, namespace=EXPASY)
+test_subclass = protein(name=test_subclass_id, namespace=EXPASY)
+test_class = protein(name=test_class_id, namespace=EXPASY)
 
-test_prosite = protein(identifier='PDOC00061', namespace='PROSITE')
+test_prosite = protein(identifier='PDOC00061', namespace=PROSITE)
 
-test_protein_a = protein(name='A1A1A_DANRE', identifier='Q6AZW2', namespace='UNIPROT')
+test_protein_a = protein(name='Q6AZW2', identifier='A1A1A_DANRE', namespace=UNIPROT)
 test_protein_a_tuple = node_to_tuple(test_protein_a)
-test_protein_b = protein(name='A1A1B_DANRE', identifier='Q568L5', namespace='UNIPROT')
+test_protein_b = protein(name='Q568L5', identifier='A1A1B_DANRE', namespace=UNIPROT)
 test_protein_b_tuple = node_to_tuple(test_protein_b)
 
 
 class TestEnrich(PopulatedDatabaseMixin):
+    def setUp(self):
+        self.manager = Manager()
+        self.manager.ensure()
+        #self.manager.populate()
+
     def test_enrich_class(self):
         """Tests that the edges from the enzyme to its proteins are added"""
         graph = BELGraph()
@@ -87,3 +94,7 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(1, graph.number_of_edges())
 
         self.assertTrue(graph.has_node_with_data(test_prosite))
+
+
+if __name__ == '__main__':
+    unittest.main()
