@@ -296,12 +296,23 @@ class Manager(object):
         for node, data in graph.nodes(data=True):
             if not check_namespaces(data, PROTEIN, EXPASY):
                 continue
+
+            parent = self.get_parent(data[NAME])
+            if parent:
+                parent_tuple = graph.add_node_from_data(parent.serialize_to_bel())
+                graph.add_unqualified_edge(parent_tuple, node, IS_A)
+            else:
+                log.warning('No parent node found for node %s', node)
+
             children_list = self.get_children(data[NAME])
             if not children_list:
                 log.warning('No child node found for node %s', node)
+                continue
             for child in children_list:
                 expasy_tuple = graph.add_node_from_data(child.serialize_to_bel())
                 graph.add_unqualified_edge(node, expasy_tuple, IS_A)
+
+
 
         self.enrich_proteins(graph=graph)
         self.enrich_prosite_classes(graph=graph)

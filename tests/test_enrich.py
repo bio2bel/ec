@@ -23,9 +23,9 @@ test_class = protein(name=test_class_id, namespace=EXPASY)
 
 test_prosite = protein(identifier='PDOC00061', namespace=PROSITE)
 
-test_protein_a = protein(name='Q6AZW2', identifier='A1A1A_DANRE', namespace=UNIPROT)
+test_protein_a = protein(name='A1A1A_DANRE', identifier='Q6AZW2', namespace=UNIPROT)
 test_protein_a_tuple = node_to_tuple(test_protein_a)
-test_protein_b = protein(name='Q568L5', identifier='A1A1B_DANRE', namespace=UNIPROT)
+test_protein_b = protein(name='A1A1B_DANRE', identifier='Q568L5', namespace=UNIPROT)
 test_protein_b_tuple = node_to_tuple(test_protein_b)
 
 
@@ -53,9 +53,9 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertTrue(graph.has_node_with_data(test_protein_b),
                         msg='missing protein that IS_A {}: {}'.format(test_entry, test_protein_b))
 
-        self.assertIn(test_tuple, graph.edge[test_protein_a_tuple],
+        self.assertIn(test_protein_a_tuple, graph.edge[test_tuple],
                       msg='missing edge to {}'.format(test_protein_a_tuple))
-        self.assertIn(test_tuple, graph.edge[test_protein_a_tuple],
+        self.assertIn(test_protein_a_tuple, graph.edge[test_tuple],
                       msg='missing edge to {}'.format(test_protein_a_tuple))
 
     def test_enrich_proteins(self):
@@ -75,7 +75,7 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertTrue(graph.has_node_with_data(test_entry),
                         msg='incorrect node was added: {}:{}'.format(list(graph)[0], graph.node[list(graph)[0]]))
 
-        self.assertIn(test_tuple, graph.edge[test_protein_a_tuple],
+        self.assertIn(test_tuple, graph.edge[test_protein_a],
                       msg='missing edge to {}'.format(test_protein_a_tuple))
         self.assertIn(test_tuple, graph.edge[test_protein_a_tuple],
                       msg='missing edge to {}'.format(test_protein_a_tuple))
