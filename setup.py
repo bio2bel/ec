@@ -23,7 +23,7 @@ CLASSIFIERS = [
     'Topic :: Scientific/Engineering :: Bio-Informatics'
 ]
 INSTALL_REQUIRES = [
-    'pybel>=0.9.6',
+    'pybel>=0.10.1',
     'requests',
     'tqdm',
     'sqlalchemy',

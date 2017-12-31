@@ -1,4 +1,4 @@
-pybel>=0.9.6
+pybel>=0.10.1
 networkx==1.11
 requests
 sqlalchemy
