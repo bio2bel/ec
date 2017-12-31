@@ -28,12 +28,14 @@ test_protein_a_tuple = node_to_tuple(test_protein_a)
 test_protein_b = protein(name='A1A1B_DANRE', identifier='Q568L5', namespace=UNIPROT)
 test_protein_b_tuple = node_to_tuple(test_protein_b)
 
-
 class TestEnrich(PopulatedDatabaseMixin):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.manager = Manager()
-        self.manager.ensure()
         self.manager.populate()
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
     def test_enrich_class(self):
         """Tests that the edges from the enzyme to its proteins are added"""
