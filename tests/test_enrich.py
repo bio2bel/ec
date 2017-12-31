@@ -33,7 +33,7 @@ class TestEnrich(PopulatedDatabaseMixin):
     def setUp(self):
         self.manager = Manager()
         self.manager.ensure()
-        #self.manager.populate()
+        self.manager.populate()
 
     def test_enrich_class(self):
         """Tests that the edges from the enzyme to its proteins are added"""
