@@ -40,9 +40,8 @@ class Enzyme(Base):
 
     id = Column(Integer, primary_key=True)
 
-    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPASy enzyme code')
-
-    description = Column(String(255), doc='Description')
+    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPASy enzyme code.')
+    description = Column(String(255), doc='The ExPASy enzyme description. May need context of parents.')
 
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     children = relationship('Enzyme', backref=backref('parent', remote_side=[id]))
