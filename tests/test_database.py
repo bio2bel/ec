@@ -52,10 +52,12 @@ class TestPopulateDatabase(PopulatedDatabaseMixin):
     def test_get_protein(self):
         protein = self.manager.get_protein_by_id('Q6AZW2')
         self.assertIsNotNone(protein)
+        # FIXME interrogate its attributes
 
     def test_get_prosite(self):
         prosite = self.manager.get_prosite_by_id('PDOC00061')
         self.assertIsNotNone(prosite)
+        # FIXME interrogate its attributes
 
     def test_get_entry(self):
         enzyme = self.manager.get_enzyme_by_id('1.1.1.2')
