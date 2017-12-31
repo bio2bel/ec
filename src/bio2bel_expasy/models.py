@@ -57,7 +57,7 @@ class Enzyme(Base):
         """
         return protein(
             namespace=EXPASY,
-            name=str(self.description),
+            name=str(self.expasy_id),
             identifier=str(self.expasy_id)
         )
 

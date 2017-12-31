@@ -7,8 +7,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
 from bio2bel.utils import get_connection
-from pybel.constants import IS_A, NAME, PROTEIN
-from .constants import EXPASY, MODULE_NAME
+from pybel.constants import IS_A, NAME, PROTEIN, IDENTIFIER
+from .constants import EXPASY, UNIPROT, PROSITE, MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein
 from .parser.database import *
 from .parser.tree import get_tree, give_edge, standard_ec_id
@@ -281,11 +281,22 @@ class Manager(object):
             uniprot_list = self.get_uniprots_by_expasy_id(data[NAME])
 
             if not uniprot_list:
-                log.warning("enrich_enzyme_classes():Unable to find node: %s", node)
+                log.warning("enrich_proteins():Unable to find node: %s", node)
                 continue
             for prot in uniprot_list:
                 protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
                 graph.add_unqualified_edge(node, protein_tuple, IS_A)
+
+        for node, data in graph.nodes(data=True):
+            if not check_namespaces(data, PROTEIN, UNIPROT):
+                continue
+            expasy_list = self.get_expasy_from_uniprot_id(data[IDENTIFIER])
+            if not expasy_list:
+                log.warning("enrich_proteins(): no expasy entry for %s", node)
+                continue
+            for expasy in expasy_list:
+                expasy_tuple = graph.add_node_from_data(expasy.serialize_to_bel())
+                graph.add_unqualified_edge(expasy_tuple, node, IS_A)
 
 
     def enrich_enzymes(self, graph):

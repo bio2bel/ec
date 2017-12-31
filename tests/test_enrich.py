@@ -68,6 +68,10 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(0, graph.number_of_edges())
 
         self.manager.enrich_proteins(graph)
+        for node in graph.nodes():
+            print(node)
+        for edge in graph.edges():
+            print(edge)
 
         self.assertEqual(3, graph.number_of_nodes(), msg='parent node was not added during Manager.enrich_proteins')
         self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
@@ -75,10 +79,10 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertTrue(graph.has_node_with_data(test_entry),
                         msg='incorrect node was added: {}:{}'.format(list(graph)[0], graph.node[list(graph)[0]]))
 
-        self.assertIn(test_tuple, graph.edge[test_protein_a],
+        self.assertIn(test_protein_a_tuple, graph.edge[test_tuple],
                       msg='missing edge to {}'.format(test_protein_a_tuple))
-        self.assertIn(test_tuple, graph.edge[test_protein_a_tuple],
-                      msg='missing edge to {}'.format(test_protein_a_tuple))
+        self.assertIn(test_protein_b_tuple, graph.edge[test_tuple],
+                      msg='missing edge to {}'.format(test_protein_b_tuple))
 
     def test_prosite_classes(self):
         """Tests that the prosites for enzymes are added"""
