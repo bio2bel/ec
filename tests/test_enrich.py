@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from bio2bel_expasy.manager import Manager
-from bio2bel_expasy.enrich import enrich_prosite_classes
+import unittest
+
+from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
+from bio2bel_expasy.enrich import enrich_enzymes, enrich_prosite_classes, enrich_proteins
 from bio2bel_expasy.parser.tree import standard_ec_id
 from pybel import BELGraph
 from pybel.dsl import protein
 from pybel.tokens import node_to_tuple
 from tests.constants import PopulatedDatabaseMixin
-from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
 
 test_expasy_id = standard_ec_id('1.1.1.2')
 test_subsubclass_id = standard_ec_id('1.1.1.-')
@@ -28,14 +29,13 @@ test_protein_a_tuple = node_to_tuple(test_protein_a)
 test_protein_b = protein(name='A1A1B_DANRE', identifier='Q568L5', namespace=UNIPROT)
 test_protein_b_tuple = node_to_tuple(test_protein_b)
 
+
 class TestEnrich(PopulatedDatabaseMixin):
-    @classmethod
-    def setUpClass(self):
-        self.manager = Manager()
-        self.manager.populate()
-    @classmethod
-    def tearDownClass(cls):
-        pass
+    """Tests that the enrichment functions work properly"""
+
+    def test_get_entry(self):
+        """Makes sure that this doesn't error out"""
+        self.manager.get_enzyme_by_id('1.1.1.2')
 
     def test_enrich_class(self):
         """Tests that the edges from the enzyme to its proteins are added"""
@@ -45,7 +45,7 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(1, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        self.manager.enrich_enzymes(graph)
+        enrich_enzymes(graph, connection=self.manager)
 
         self.assertLess(1, graph.number_of_nodes())
         self.assertLess(0, graph.number_of_edges())
@@ -69,7 +69,7 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        self.manager.enrich_proteins(graph)
+        enrich_proteins(graph, connection=self.manager)
 
         self.assertEqual(3, graph.number_of_nodes(), msg='parent node was not added during Manager.enrich_proteins')
         self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
