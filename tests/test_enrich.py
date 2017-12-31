@@ -70,10 +70,6 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(0, graph.number_of_edges())
 
         self.manager.enrich_proteins(graph)
-        for node in graph.nodes():
-            print(node)
-        for edge in graph.edges():
-            print(edge)
 
         self.assertEqual(3, graph.number_of_nodes(), msg='parent node was not added during Manager.enrich_proteins')
         self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
