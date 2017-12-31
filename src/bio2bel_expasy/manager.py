@@ -7,8 +7,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
 from bio2bel.utils import get_connection
-from pybel.constants import IS_A, NAME, PROTEIN, IDENTIFIER
-from .constants import EXPASY, UNIPROT, PROSITE, MODULE_NAME
+from pybel.constants import IDENTIFIER, IS_A, NAME, PROTEIN
+from .constants import EXPASY, MODULE_NAME, UNIPROT
 from .models import Base, Enzyme, Prosite, Protein
 from .parser.database import *
 from .parser.tree import get_tree, give_edge, standard_ec_id
@@ -31,6 +31,9 @@ class Manager(object):
         self.session_maker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
         self.session = scoped_session(self.session_maker)
         self.create_all()
+
+        #: Maps canonicalized ExPASy enzyme identifiers to their SQLAlchemy models
+        self.id_enzyme = {}
 
     def create_all(self, check_first=True):
         """creates all tables from models in your database
@@ -91,18 +94,16 @@ class Manager(object):
         """
         tree = get_tree(path=path, force_download=force_download)
 
-        id_enzyme = {}
-
         for expasy_id, data in tqdm(tree.nodes_iter(data=True), desc='Classes', total=tree.number_of_nodes()):
-            enzyme = id_enzyme[expasy_id] = Enzyme(
+            enzyme = self.id_enzyme[expasy_id] = Enzyme(
                 expasy_id=expasy_id,
                 description=data['description']
             )
             self.session.add(enzyme)
 
         for parent_id, child_id in tqdm(tree.edges_iter(), desc='Tree', total=tree.number_of_edges()):
-            parent = id_enzyme[parent_id]
-            child = id_enzyme[child_id]
+            parent = self.id_enzyme[parent_id]
+            child = self.id_enzyme[child_id]
             parent.children.append(child)
 
         log.info("committing")
@@ -117,7 +118,6 @@ class Manager(object):
         """
         data_dict = get_expasy_database(path=path, force_download=force_download)
 
-        id_enzyme = {}
         id_prosite = {}
         id_uniprot = {}
 
@@ -127,7 +127,7 @@ class Manager(object):
 
             expasy_id = data_cell[ID]
 
-            enzyme = id_enzyme[expasy_id] = Enzyme(
+            enzyme = self.id_enzyme[expasy_id] = Enzyme(
                 expasy_id=expasy_id,
                 description=data_cell[DE]
             )
@@ -298,7 +298,6 @@ class Manager(object):
                 expasy_tuple = graph.add_node_from_data(expasy.serialize_to_bel())
                 graph.add_unqualified_edge(expasy_tuple, node, IS_A)
 
-
     def enrich_enzymes(self, graph):
         """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
 
@@ -323,11 +322,8 @@ class Manager(object):
                 expasy_tuple = graph.add_node_from_data(child.serialize_to_bel())
                 graph.add_unqualified_edge(node, expasy_tuple, IS_A)
 
-
-
         self.enrich_proteins(graph=graph)
         self.enrich_prosite_classes(graph=graph)
-
 
     def enrich_prosite_classes(self, graph):
         """enriches Enzyme classes for ProSite in the graph.
