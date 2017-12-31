@@ -55,5 +55,5 @@ def check_namespaces(data, bel_function, bel_namespace):
         return True
 
     elif data[NAMESPACE] != bel_namespace:
-        log.warning("Unable to map namespace: %s", data[NAMESPACE])
+        log.debug("Unable to map namespace: %s", data[NAMESPACE])
         return False
