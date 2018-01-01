@@ -17,7 +17,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = 'Bio2BEL ExPASy'
-copyright = '2017, Charles Tapley Hoyt'
+copyright = '2017-2018, Charles Tapley Hoyt'
 author = 'Charles Tapley Hoyt'
 
 release = '0.1.1-dev'
