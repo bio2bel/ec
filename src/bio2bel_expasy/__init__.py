@@ -24,8 +24,8 @@ __title__ = 'bio2bel_expasy'
 __description__ = "A package for parsing and storing the ExPASy Enzyme Database"
 __url__ = 'https://github.com/bio2bel/expasy'
 
-__author__ = 'Charles Tapley Hoyt and Aram Grigoryan'
+__author__ = 'Charles Tapley Hoyt'
 __email__ = 'charles.hoyt@scai.fraunhofer.de'
 
 __license__ = 'MIT License'
-__copyright__ = 'Copyright (c) 2017 Charles Tapley Hoyt and Aram Grigoryan'
+__copyright__ = 'Copyright (c) 2017-2018 Charles Tapley Hoyt'
