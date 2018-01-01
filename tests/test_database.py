@@ -50,7 +50,7 @@ class TestParseEnzyme(unittest.TestCase):
 
 class TestPopulateDatabase(PopulatedDatabaseMixin):
     def test_get_protein(self):
-        protein = self.manager.get_protein_by_id('Q6AZW2')
+        protein = self.manager.get_protein_by_uniprot_id('Q6AZW2')
         self.assertIsNotNone(protein)
         # FIXME interrogate its attributes
 
@@ -67,7 +67,7 @@ class TestPopulateDatabase(PopulatedDatabaseMixin):
         self.assertIsNotNone(enzyme.parent, msg="missing enzyme's parent")
         self.assertEqual('1.1.1.-', enzyme.parent.expasy_id)
 
-        protein = self.manager.get_protein_by_id('Q6AZW2')
+        protein = self.manager.get_protein_by_uniprot_id('Q6AZW2')
         self.assertIn(protein, enzyme.proteins)
 
         prosite = self.manager.get_prosite_by_id('PDOC00061')

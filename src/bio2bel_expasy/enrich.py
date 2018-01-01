@@ -33,7 +33,7 @@ def enrich_prosite_classes(graph, connection=None):
     :type connection: str or bio2bel_expasy.Manager
     """
     m = Manager.ensure(connection=connection)
-    m.enrich_prosite_classes(graph)
+    m.enrich_prosites(graph)
 
 
 def enrich_enzymes(graph, connection=None):

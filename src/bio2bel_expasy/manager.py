@@ -187,9 +187,9 @@ class Manager(object):
         return enzyme.parent
 
     def get_children(self, expasy_id):
-        """Returns list of Expasy ID's which are children for given Expasy _id
+        """Returns list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier
 
-        :param str expasy_id: An ExPASy identifier
+        :param str expasy_id: An ExPASy enzyme identifier
         :rtype: Optional[list[Enzyme]]
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
@@ -199,16 +199,22 @@ class Manager(object):
 
         return enzyme.children
 
-    def get_protein_by_id(self, uniprot_id):
-        """Returns protein entry for given UniProt identifier
+    def get_protein_by_uniprot_id(self, uniprot_id):
+        """Gets a protein having the given UniProt identifier
 
         :param str uniprot_id: A UniProt identifier
         :rtype: Optional[Protein]
+
+        >>> from bio2bel_expasy import Manager
+        >>> manager = Manager()
+        >>> protein = manager.get_protein_by_uniprot_id('Q6AZW2')
+        >>> protein.accession_number
+        'Q6AZW2'
         """
         return self.session.query(Protein).filter(Protein.accession_number == uniprot_id).one_or_none()
 
     def get_prosite_by_id(self, prosite_id):
-        """Returns the ProSite entry for given ProSite identifier
+        """Gets a ProSite having the given ProSite identifier
 
         :param str prosite_id: A ProSite identifier
         :rtype: Optional[Enzyme]
@@ -216,7 +222,7 @@ class Manager(object):
         return self.session.query(Prosite).filter(Prosite.prosite_id == prosite_id).one_or_none()
 
     def get_prosite(self, expasy_id):
-        """Returns list of ProSites associated with the enzyme corresponding to the given identifier
+        """Gets a list of ProSites associated with the enzyme corresponding to the given identifier
 
         :param str expasy_id: An ExPASy identifier
         :rtype: Optional[list[Enzyme]]
@@ -228,7 +234,7 @@ class Manager(object):
 
         return enzyme.prosites
 
-    def get_expasy_form_prosite(self, prosite_id):
+    def get_enzymes_by_prosite_id(self, prosite_id):
         """Returns Enzyme ID lists associated with the given ProSite ID
 
         :param str prosite_id: ProSite identifier
@@ -241,7 +247,7 @@ class Manager(object):
 
         return prosite.enzymes
 
-    def get_uniprots_by_expasy_id(self, expasy_id):
+    def get_proteins_by_expasy_id(self, expasy_id):
         """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
 
         :param str expasy_id: An ExPASy identifier
@@ -254,13 +260,20 @@ class Manager(object):
 
         return enzyme.proteins
 
-    def get_expasy_from_uniprot_id(self, uniprot_id):
-        """Returns Enzyme ID list associated with the given uniprot accession_number
+    def get_enzymes_by_uniprot_id(self, uniprot_id):
+        """Returns a list of enzymes annotated to the protein with the given UniProt accession number.
 
         :param str uniprot_id: A UniProt identifier
         :rtype: Optional[list[Enzyme]]
+
+        Example:
+
+        >>> from bio2bel_expasy import Manager
+        >>> manager = Manager()
+        >>> manager.get_enzymes_by_uniprot_id('Q6AZW2')
+        >>> ...
         """
-        protein = self.get_protein_by_id(uniprot_id)
+        protein = self.get_protein_by_uniprot_id(uniprot_id)
 
         if protein is None:
             return
@@ -278,23 +291,23 @@ class Manager(object):
         for node, data in graph.nodes(data=True):
             if not check_namespaces(data, PROTEIN, EXPASY):
                 continue
-            uniprot_list = self.get_uniprots_by_expasy_id(data[NAME])
+            proteins = self.get_proteins_by_expasy_id(data[NAME])
 
-            if not uniprot_list:
+            if not proteins:
                 log.warning("enrich_proteins():Unable to find node: %s", node)
                 continue
-            for prot in uniprot_list:
+            for prot in proteins:
                 protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
                 graph.add_unqualified_edge(node, protein_tuple, IS_A)
 
         for node, data in graph.nodes(data=True):
             if not check_namespaces(data, PROTEIN, UNIPROT):
                 continue
-            expasy_list = self.get_expasy_from_uniprot_id(data[IDENTIFIER])
-            if not expasy_list:
+            enzymes = self.get_enzymes_by_uniprot_id(data[IDENTIFIER])
+            if not enzymes:
                 log.warning("enrich_proteins(): no expasy entry for %s", node)
                 continue
-            for expasy in expasy_list:
+            for expasy in enzymes:
                 expasy_tuple = graph.add_node_from_data(expasy.serialize_to_bel())
                 graph.add_unqualified_edge(expasy_tuple, node, IS_A)
 
@@ -323,9 +336,9 @@ class Manager(object):
                 graph.add_unqualified_edge(node, expasy_tuple, IS_A)
 
         self.enrich_proteins(graph=graph)
-        self.enrich_prosite_classes(graph=graph)
+        self.enrich_prosites(graph=graph)
 
-    def enrich_prosite_classes(self, graph):
+    def enrich_prosites(self, graph):
         """enriches Enzyme classes for ProSite in the graph.
 
         :param pybel.BELGraph graph: A BEL graph
