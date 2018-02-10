@@ -25,7 +25,6 @@ class TemporaryCacheClsMixin(unittest.TestCase):
         cls.connection = 'sqlite:///' + cls.path
         log.info('test database at %s', cls.connection)
         cls.manager = Manager(connection=cls.connection)
-        cls.manager.create_all()
 
     @classmethod
     def tearDownClass(cls):

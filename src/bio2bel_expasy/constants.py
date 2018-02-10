@@ -24,8 +24,8 @@ EC_PROSITE_REGEX = '(PDOC|PS)(\d+)'
 EC_DELETED_REGEX = 'Deleted entry'
 EC_TRANSFERRED_REGEX = 'Transferred entry'
 
-EXPASY = 'expasy'
-PROSITE = 'prosite'
-UNIPROT = 'up'
+EXPASY = 'EC'
+PROSITE = 'PROSITE'
+UNIPROT = 'UP'
 
 ENTRY_NAME = 'entry_name'

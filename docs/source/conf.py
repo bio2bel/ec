@@ -43,7 +43,7 @@ latex_documents = [
     (master_doc, 'bio2bel_expasy.tex', 'Bio2BEL ExPASy Documentation', 'Charles Tapley Hoyt', 'manual'),
 ]
 man_pages = [
-    (master_doc, 'pybel', 'Bio2BEL ExPASy Documentation', [author], 1)
+    (master_doc, 'expasy', 'Bio2BEL ExPASy Documentation', [author], 1)
 ]
 texinfo_documents = [
     (master_doc, 'Bio2BEL ExPASy', 'Bio2BEL ExPASy Documentation', author, 'Bio2BEL ExPASy', 'Parse, store, and serialize ENZYME to BEL.', 'Miscellaneous'),

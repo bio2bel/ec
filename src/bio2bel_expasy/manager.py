@@ -7,12 +7,11 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
 from bio2bel.utils import get_connection
-from pybel.constants import IDENTIFIER, IS_A, NAME, PROTEIN
-from .constants import EXPASY, MODULE_NAME, UNIPROT
+from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE
+from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein
 from .parser.database import *
-from .parser.tree import get_tree, give_edge, standard_ec_id
-from .utils import check_namespaces
+from .parser.tree import get_tree, give_edge, normalize_expasy_id
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +33,8 @@ class Manager(object):
 
         #: Maps canonicalized ExPASy enzyme identifiers to their SQLAlchemy models
         self.id_enzyme = {}
+        self.id_prosite = {}
+        self.id_uniprot = {}
 
     def create_all(self, check_first=True):
         """creates all tables from models in your database
@@ -69,10 +70,16 @@ class Manager(object):
         :param Optional[str] description:
         :rtype: Enzyme
         """
+        enzyme = self.id_enzyme.get(expasy_id)
+
+        if enzyme is not None:
+            self.session.add(enzyme)
+            return enzyme
+
         enzyme = self.get_enzyme_by_id(expasy_id)
 
         if enzyme is None:
-            enzyme = Enzyme(
+            enzyme = self.id_enzyme[expasy_id] = Enzyme(
                 expasy_id=expasy_id,
                 description=description
             )
@@ -80,26 +87,71 @@ class Manager(object):
 
         return enzyme
 
+    def get_or_create_prosite(self, prosite_id, **kwargs):
+        """
+
+        :param str prosite_id:
+        :param kwargs:
+        :rtype: Prosite
+        """
+        prosite = self.id_prosite.get(prosite_id)
+
+        if prosite is not None:
+            self.session.add(prosite)
+            return prosite
+
+        prosite = self.get_prosite_by_id(prosite_id)
+
+        if prosite is None:
+            prosite = self.id_prosite[prosite_id] = Prosite(prosite_id=prosite_id, **kwargs)
+            self.session.add(prosite)
+
+        return prosite
+
+    def get_or_create_protein(self, accession_number, entry_name, **kwargs):
+        """
+
+        :param accession_number:
+        :param entry_name:
+        :param kwargs:
+        :rtype: Protein
+        """
+        protein = self.id_uniprot.get(accession_number)
+
+        if protein is not None:
+            self.session.add(protein)
+            return protein
+
+        protein = self.get_protein_by_uniprot_id(uniprot_id=accession_number)
+
+        if protein is None:
+            protein = self.id_uniprot[accession_number] = Protein(
+                accession_number=accession_number,
+                entry_name=entry_name,
+                **kwargs
+            )
+            self.session.add(protein)
+
+        return protein
+
     def populate(self, tree_path=None, database_path=None):
         """Populates everything"""
         self.populate_tree(path=tree_path)
         self.populate_database(path=database_path)
 
-    def populate_tree(self, path=None, cache=True, force_download=False):
-        """Downloads and populates the expasy tree
+    def populate_tree(self, path=None, force_download=False):
+        """Downloads and populates the ExPASy tree
 
         :param Optional[str] path: A custom url to download
-        :param bool cache: If true, the data is downloaded to the file system, else it is loaded from the internet
         :param bool force_download: If true, overwrites a previously cached file
         """
         tree = get_tree(path=path, force_download=force_download)
 
         for expasy_id, data in tqdm(tree.nodes_iter(data=True), desc='Classes', total=tree.number_of_nodes()):
-            enzyme = self.id_enzyme[expasy_id] = Enzyme(
+            self.get_or_create_enzyme(
                 expasy_id=expasy_id,
                 description=data['description']
             )
-            self.session.add(enzyme)
 
         for parent_id, child_id in tqdm(tree.edges_iter(), desc='Tree', total=tree.number_of_edges()):
             parent = self.id_enzyme[parent_id]
@@ -109,54 +161,37 @@ class Manager(object):
         log.info("committing")
         self.session.commit()
 
-    def populate_database(self, path=None, cache=True, force_download=False):
+    def populate_database(self, path=None, force_download=False):
         """Populates the ExPASy database.
 
         :param Optional[str] path: A custom url to download
-        :param bool cache: If true, the data is downloaded to the file system, else it is loaded from the internet
         :param bool force_download: If true, overwrites a previously cached file
         """
         data_dict = get_expasy_database(path=path, force_download=force_download)
 
-        id_prosite = {}
-        id_uniprot = {}
-
-        for data_cell in tqdm(data_dict, desc='Database'):
-            if data_cell['DELETED'] or data_cell['TRANSFERRED']:
+        for data in tqdm(data_dict, desc='Database'):
+            if data['DELETED'] or data['TRANSFERRED']:
                 continue  # if both are false then proceed
 
-            expasy_id = data_cell[ID]
+            expasy_id = data[ID]
 
-            enzyme = self.id_enzyme[expasy_id] = Enzyme(
+            enzyme = self.get_or_create_enzyme(
                 expasy_id=expasy_id,
-                description=data_cell[DE]
+                description=data[DE]
             )
 
-            self.session.add(enzyme)
-
-            parent_id, _ = give_edge(data_cell[ID])
+            parent_id, _ = give_edge(data[ID])
             enzyme.parent = self.get_enzyme_by_id(parent_id)
 
-            for prosite_id in data_cell.get(PR, []):
-                prosite = id_prosite.get(prosite_id)
-
-                if prosite is None:
-                    prosite = id_prosite[prosite_id] = Prosite(prosite_id=prosite_id)
-                    self.session.add(prosite)
-
+            for prosite_id in data.get(PR, []):
+                prosite = self.get_or_create_prosite(prosite_id)
                 enzyme.prosites.append(prosite)
 
-            for uniprot_data in data_cell.get(DR, []):
-                up_tup = accession_number, entry_name = uniprot_data['accession_number'], uniprot_data['entry_name']
-                protein = id_uniprot.get(up_tup)
-
-                if protein is None:
-                    protein = id_uniprot[up_tup] = Protein(
-                        accession_number=accession_number,
-                        entry_name=entry_name,
-                    )
-                    self.session.add(protein)
-
+            for uniprot_data in data.get(DR, []):
+                protein = self.get_or_create_protein(
+                    accession_number=uniprot_data['accession_number'],
+                    entry_name=uniprot_data['entry_name']
+                )
                 enzyme.proteins.append(protein)
 
         log.info("committing")
@@ -170,7 +205,7 @@ class Manager(object):
         :param str expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
         :rtype: Optional[Enzyme]
         """
-        canonical_expasy_id = standard_ec_id(expasy_id)
+        canonical_expasy_id = normalize_expasy_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
     def get_parent(self, expasy_id):
@@ -221,7 +256,7 @@ class Manager(object):
         """
         return self.session.query(Prosite).filter(Prosite.prosite_id == prosite_id).one_or_none()
 
-    def get_prosite(self, expasy_id):
+    def get_prosites_by_expasy_id(self, expasy_id):
         """Gets a list of ProSites associated with the enzyme corresponding to the given identifier
 
         :param str expasy_id: An ExPASy identifier
@@ -280,7 +315,7 @@ class Manager(object):
 
         return protein.enzymes
 
-    def enrich_proteins(self, graph):
+    def enrich_proteins_with_enzyme_families(self, graph):
         """Enriches proteins in the BEL graph with IS_A relations to their enzyme classes.
 
         1. Gets a list of UniProt proteins
@@ -289,27 +324,21 @@ class Manager(object):
         :param pybel.BELGraph graph: A BEL graph
         """
         for node, data in graph.nodes(data=True):
-            if not check_namespaces(data, PROTEIN, EXPASY):
-                continue
-            proteins = self.get_proteins_by_expasy_id(data[NAME])
+            namespace = data.get(NAMESPACE)
 
-            if not proteins:
-                log.warning("enrich_proteins():Unable to find node: %s", node)
+            if namespace is None:
                 continue
-            for prot in proteins:
-                protein_tuple = graph.add_node_from_data(prot.serialize_to_bel())
-                graph.add_unqualified_edge(node, protein_tuple, IS_A)
 
-        for node, data in graph.nodes(data=True):
-            if not check_namespaces(data, PROTEIN, UNIPROT):
+            if namespace not in {'UP', 'UNIPROT'}:
                 continue
+
             enzymes = self.get_enzymes_by_uniprot_id(data[IDENTIFIER])
-            if not enzymes:
-                log.warning("enrich_proteins(): no expasy entry for %s", node)
+
+            if enzymes is None:
                 continue
-            for expasy in enzymes:
-                expasy_tuple = graph.add_node_from_data(expasy.serialize_to_bel())
-                graph.add_unqualified_edge(expasy_tuple, node, IS_A)
+
+            for enzyme in enzymes:
+                graph.add_unqualified_edge(enzyme.serialize_to_bel(), node, IS_A)
 
     def enrich_enzymes(self, graph):
         """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
@@ -317,39 +346,38 @@ class Manager(object):
         :param pybel.BELGraph graph: A BEL graph
         """
         for node, data in graph.nodes(data=True):
-            if not check_namespaces(data, PROTEIN, EXPASY):
+            namespace = data.get(NAMESPACE)
+
+            if namespace is None:
+                continue
+
+            if namespace not in {'EXPASY', 'EC'}:
                 continue
 
             parent = self.get_parent(data[NAME])
-            if parent:
-                parent_tuple = graph.add_node_from_data(parent.serialize_to_bel())
-                graph.add_unqualified_edge(parent_tuple, node, IS_A)
-            else:
-                log.warning('No parent node found for node %s', node)
+            if parent is not None:
+                graph.add_unqualified_edge(parent.serialize_to_bel(), node, IS_A)
 
-            children_list = self.get_children(data[NAME])
-            if not children_list:
-                log.warning('No child node found for node %s', node)
-                continue
-            for child in children_list:
-                expasy_tuple = graph.add_node_from_data(child.serialize_to_bel())
-                graph.add_unqualified_edge(node, expasy_tuple, IS_A)
+            children = self.get_children(data[NAME])
+            if children is not None:
+                for child in children:
+                    graph.add_unqualified_edge(node, child.serialize_to_bel(), IS_A)
 
-        self.enrich_proteins(graph=graph)
-        self.enrich_prosites(graph=graph)
-
-    def enrich_prosites(self, graph):
-        """enriches Enzyme classes for ProSite in the graph.
+    def enrich_enzymes_with_prosites(self, graph):
+        """Enriches Enzyme classes in the graph with ProSites.
 
         :param pybel.BELGraph graph: A BEL graph
         """
         for node, data in graph.nodes(data=True):
-            if not check_namespaces(data, PROTEIN, EXPASY):
+            namespace = data.get(NAMESPACE)
+
+            if namespace is None:
                 continue
-            prosite_list = self.get_prosite(data[NAME])
-            if not prosite_list:
-                log.warning('enrich_prosite_classes():Unable to find node %s', node)
+
+            if namespace not in {'EXPASY', 'EC'}:
                 continue
-            for prosite in prosite_list:
-                prosite_tuple = graph.add_node_from_data(prosite.serialize_to_bel())
-                graph.add_unqualified_edge(node, prosite_tuple, IS_A)
+
+            prosites = self.get_prosites_by_expasy_id(data[NAME])
+            if prosites is not None:
+                for prosite in prosites:
+                    graph.add_unqualified_edge(node, prosite.serialize_to_bel(), IS_A)

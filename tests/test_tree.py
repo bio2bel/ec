@@ -4,7 +4,7 @@ import unittest
 
 from networkx import DiGraph
 
-from bio2bel_expasy.parser.tree import get_tree, standard_ec_id
+from bio2bel_expasy.parser.tree import get_tree, normalize_expasy_id
 from tests.constants import TREE_TEST_FILE, TemporaryCacheClsMixin
 
 DESCRIPTION = 'description'
@@ -18,48 +18,48 @@ class TestParseTree(unittest.TestCase):
         self.assertIsInstance(self.tree, DiGraph)
 
     def test_has_nodes(self):
-        x = standard_ec_id('1. -. -.-')
+        x = normalize_expasy_id('1. -. -.-')
         self.assertIn(x, self.tree)
         self.assertIn(DESCRIPTION, self.tree.node[x])
         self.assertEqual('Oxidoreductases', self.tree.node[x][DESCRIPTION])
 
-        x = standard_ec_id('1. 1. -.-')
+        x = normalize_expasy_id('1. 1. -.-')
         self.assertIn(x, self.tree)
         self.assertIn(DESCRIPTION, self.tree.node[x])
         self.assertEqual('Acting on the CH-OH group of donors', self.tree.node[x][DESCRIPTION])
 
-        self.assertIn(standard_ec_id('1. 1. 1.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1. 2.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1. 3.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1. 4.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1. 5.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1. 9.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1.98.-'), self.tree)
-        self.assertIn(standard_ec_id('1. 1.99.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 1.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 2.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 3.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 4.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 5.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1. 9.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1.98.-'), self.tree)
+        self.assertIn(normalize_expasy_id('1. 1.99.-'), self.tree)
 
-        x = standard_ec_id('2. -. -.-')
+        x = normalize_expasy_id('2. -. -.-')
         self.assertIn(x, self.tree)
         self.assertIn(DESCRIPTION, self.tree.node[x])
         self.assertEqual('Transferases', self.tree.node[x][DESCRIPTION])
 
-        self.assertIn(standard_ec_id('2. 4.  2.-'), self.tree)
-        self.assertIn(standard_ec_id('2. 4. 99.-'), self.tree)
+        self.assertIn(normalize_expasy_id('2. 4.  2.-'), self.tree)
+        self.assertIn(normalize_expasy_id('2. 4. 99.-'), self.tree)
 
     def test_has_edges(self):
-        self.assertIn(standard_ec_id('1. 1. -.-'), self.tree.edge[standard_ec_id('1. -. -.-')])
-        self.assertIn(standard_ec_id('1. 1. 1.-'), self.tree.edge[standard_ec_id('1. 1. -.-')])
-        self.assertIn(standard_ec_id('1. 1. 2.-'), self.tree.edge[standard_ec_id('1. 1. -.-')])
-        self.assertIn(standard_ec_id('1. 1.99.-'), self.tree.edge[standard_ec_id('1. 1. -.-')])
-        self.assertIn(standard_ec_id('1. 2. -.-'), self.tree.edge[standard_ec_id('1. -. -.-')])
-        self.assertIn(standard_ec_id('1. 2. 1.-'), self.tree.edge[standard_ec_id('1. 2. -.-')])
-        self.assertIn(standard_ec_id('1. 2. 2.-'), self.tree.edge[standard_ec_id('1. 2. -.-')])
-        self.assertIn(standard_ec_id('1. 2.99.-'), self.tree.edge[standard_ec_id('1. 2. -.-')])
-        self.assertIn(standard_ec_id('2. 1. -.-'), self.tree.edge[standard_ec_id('2. -. -.-')])
-        self.assertIn(standard_ec_id('2. 1. 1.-'), self.tree.edge[standard_ec_id('2. 1. -.-')])
-        self.assertIn(standard_ec_id('2. 1. 5.-'), self.tree.edge[standard_ec_id('2. 1. -.-')])
-        self.assertIn(standard_ec_id('2. 2. -.-'), self.tree.edge[standard_ec_id('2. -. -.-')])
-        self.assertIn(standard_ec_id('2. 2. 1.-'), self.tree.edge[standard_ec_id('2. 2. -.-')])
-        self.assertIn(standard_ec_id('2. 3. -.-'), self.tree.edge[standard_ec_id('2. -. -.-')])
+        self.assertIn(normalize_expasy_id('1. 1. -.-'), self.tree.edge[normalize_expasy_id('1. -. -.-')])
+        self.assertIn(normalize_expasy_id('1. 1. 1.-'), self.tree.edge[normalize_expasy_id('1. 1. -.-')])
+        self.assertIn(normalize_expasy_id('1. 1. 2.-'), self.tree.edge[normalize_expasy_id('1. 1. -.-')])
+        self.assertIn(normalize_expasy_id('1. 1.99.-'), self.tree.edge[normalize_expasy_id('1. 1. -.-')])
+        self.assertIn(normalize_expasy_id('1. 2. -.-'), self.tree.edge[normalize_expasy_id('1. -. -.-')])
+        self.assertIn(normalize_expasy_id('1. 2. 1.-'), self.tree.edge[normalize_expasy_id('1. 2. -.-')])
+        self.assertIn(normalize_expasy_id('1. 2. 2.-'), self.tree.edge[normalize_expasy_id('1. 2. -.-')])
+        self.assertIn(normalize_expasy_id('1. 2.99.-'), self.tree.edge[normalize_expasy_id('1. 2. -.-')])
+        self.assertIn(normalize_expasy_id('2. 1. -.-'), self.tree.edge[normalize_expasy_id('2. -. -.-')])
+        self.assertIn(normalize_expasy_id('2. 1. 1.-'), self.tree.edge[normalize_expasy_id('2. 1. -.-')])
+        self.assertIn(normalize_expasy_id('2. 1. 5.-'), self.tree.edge[normalize_expasy_id('2. 1. -.-')])
+        self.assertIn(normalize_expasy_id('2. 2. -.-'), self.tree.edge[normalize_expasy_id('2. -. -.-')])
+        self.assertIn(normalize_expasy_id('2. 2. 1.-'), self.tree.edge[normalize_expasy_id('2. 2. -.-')])
+        self.assertIn(normalize_expasy_id('2. 3. -.-'), self.tree.edge[normalize_expasy_id('2. -. -.-')])
 
 
 class TestPopulateTree(TemporaryCacheClsMixin):

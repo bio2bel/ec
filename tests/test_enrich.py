@@ -4,30 +4,39 @@ import unittest
 
 from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
 from bio2bel_expasy.enrich import enrich_enzymes, enrich_prosite_classes, enrich_proteins
-from bio2bel_expasy.parser.tree import standard_ec_id
+from bio2bel_expasy.parser.tree import normalize_expasy_id
 from pybel import BELGraph
 from pybel.dsl import protein
 from pybel.tokens import node_to_tuple
 from tests.constants import PopulatedDatabaseMixin
 
-test_expasy_id = standard_ec_id('1.1.1.2')
-test_subsubclass_id = standard_ec_id('1.1.1.-')
-test_subclass_id = standard_ec_id('1.1.-.-')
-test_class_id = standard_ec_id('1.-.-.-')
+test_expasy_id = normalize_expasy_id('1.1.1.2')
+test_subsubclass_id = normalize_expasy_id('1.1.1.-')
+test_subclass_id = normalize_expasy_id('1.1.-.-')
+test_class_id = normalize_expasy_id('1.-.-.-')
 
-test_entry = protein(name=test_expasy_id, namespace=EXPASY)
-test_tuple = node_to_tuple(test_entry)
 
-test_subsubclass = protein(name=test_subsubclass_id, namespace=EXPASY)
-test_subclass = protein(name=test_subclass_id, namespace=EXPASY)
-test_class = protein(name=test_class_id, namespace=EXPASY)
+def expasy(name=None, identifier=None):
+    return protein(namespace=EXPASY, name=name, identifier=identifier)
 
-test_prosite = protein(identifier='PDOC00061', namespace=PROSITE)
+
+def prosite(name=None, identifier=None):
+    return protein(namespace=PROSITE, name=name, identifier=identifier)
+
+
+test_entry = expasy(name=test_expasy_id)
+test_tuple = test_entry.as_tuple()
+
+test_subsubclass = expasy(name=test_subsubclass_id)
+test_subclass = expasy(name=test_subclass_id)
+test_class = expasy(name=test_class_id)
+
+test_prosite = prosite(identifier='PDOC00061')
 
 test_protein_a = protein(name='A1A1A_DANRE', identifier='Q6AZW2', namespace=UNIPROT)
-test_protein_a_tuple = node_to_tuple(test_protein_a)
+test_protein_a_tuple = test_protein_a.as_tuple()
 test_protein_b = protein(name='A1A1B_DANRE', identifier='Q568L5', namespace=UNIPROT)
-test_protein_b_tuple = node_to_tuple(test_protein_b)
+test_protein_b_tuple = test_protein_b.as_tuple()
 
 
 class TestEnrich(PopulatedDatabaseMixin):
@@ -83,7 +92,7 @@ class TestEnrich(PopulatedDatabaseMixin):
                       msg='missing edge to {}'.format(test_protein_b_tuple))
 
     def test_prosite_classes(self):
-        """Tests that the prosites for enzymes are added"""
+        """Tests that the ProSites for enzymes are added"""
         graph = BELGraph()
         graph.add_node_from_data(test_entry)
 

@@ -13,7 +13,6 @@ TABLE_PREFIX = 'expasy'
 ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
 PROTEIN_TABLE_NAME = '{}_protein'.format(TABLE_PREFIX)
 PROSITE_TABLE_NAME = '{}_prosite'.format(TABLE_PREFIX)
-TREE_TABLE_NAME = '{}_tree'.format(TABLE_PREFIX)
 ENZYME_PROSITE_TABLE_NAME = '{}_enzyme_prosite'.format(TABLE_PREFIX)
 ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
 
@@ -40,13 +39,16 @@ class Enzyme(Base):
 
     id = Column(Integer, primary_key=True)
 
-    expasy_id = Column(String(255), unique=True, index=True, nullable=False, doc='The ExPASy enzyme code.')
+    expasy_id = Column(String(16), unique=True, index=True, nullable=False, doc='The ExPASy enzyme code.')
     description = Column(String(255), doc='The ExPASy enzyme description. May need context of parents.')
 
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     children = relationship('Enzyme', backref=backref('parent', remote_side=[id]))
 
     def __str__(self):
+        return self.expasy_id
+
+    def __repr__(self):
         return self.expasy_id
 
     def serialize_to_bel(self):
