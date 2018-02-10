@@ -6,3 +6,5 @@ tqdm
 click
 pandas
 bio2bel
+flask[web]
+flask_admin[web]

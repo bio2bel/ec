@@ -32,6 +32,9 @@ INSTALL_REQUIRES = [
     'pandas',
     'bio2bel',
 ]
+EXTRAS_REQUIRE = {
+    'web': ['flask', 'flask_admin'],
+}
 ENTRY_POINTS = {
     'bio2bel': [
         'expasy = bio2bel_expasy',
@@ -40,6 +43,7 @@ ENTRY_POINTS = {
         'bio2bel_expasy = bio2bel_expasy.cli:main',
     ]
 }
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -86,5 +90,6 @@ if __name__ == '__main__':
         packages=PACKAGES,
         package_dir={'': 'src'},
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS_REQUIRE,
         entry_points=ENTRY_POINTS,
     )
