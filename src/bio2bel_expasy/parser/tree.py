@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 from urllib.request import urlretrieve
 
 import networkx as nx
 
-from ..constants import EXPASY_TREE_FILE, EXPASY_TREE_URL
+from ..constants import EXPASY_TREE_DATA_PATH, EXPASY_TREE_URL
 from ..utils import normalize_expasy_id
 
 __all__ = [
@@ -15,6 +16,8 @@ __all__ = [
     'get_tree',
 ]
 
+log = logging.getLogger(__name__)
+
 
 def download_expasy_tree(force_download=False):
     """Download the expasy tree file
@@ -22,8 +25,13 @@ def download_expasy_tree(force_download=False):
     :param Optional[str] path: The destination of the download
     :param Optional[bool] force_download: True to force download
     """
-    if not os.path.exists(EXPASY_TREE_FILE) or force_download:
-        urlretrieve(EXPASY_TREE_URL, EXPASY_TREE_FILE)
+    if os.path.exists(EXPASY_TREE_DATA_PATH) and not force_download:
+        log.info('using cached data at %s', EXPASY_TREE_DATA_PATH)
+    else:
+        log.info('downloading %s to %s', EXPASY_TREE_URL, EXPASY_TREE_DATA_PATH)
+        urlretrieve(EXPASY_TREE_URL, EXPASY_TREE_DATA_PATH)
+
+    return EXPASY_TREE_DATA_PATH
 
 
 def give_edge(head_str):
@@ -70,7 +78,7 @@ def get_tree(path=None, force_download=False):
 
     graph = nx.DiGraph()
 
-    with open(path or EXPASY_TREE_FILE, 'r') as file:
+    with open(path or EXPASY_TREE_DATA_PATH, 'r') as file:
         for line in file:
             line.rstrip('\n')
             if not line[0].isnumeric():

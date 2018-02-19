@@ -6,8 +6,8 @@ import re
 from urllib.request import urlretrieve
 
 from ..constants import (
-    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX,
-    EXPASY_DATABASE_FILE, EXPASY_DATABASE_URL,
+    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, EXPASY_DATABASE_URL,
+    EXPASY_DATA_PATH,
 )
 
 __all__ = [
@@ -44,12 +44,18 @@ prosite_pattern = re.compile(EC_PROSITE_REGEX)
 
 
 def download_expasy_database(force_download=False):
-    """Downloads the expasy database
+    """Downloads the ExPASy database
 
     :param force_download: bool to force download
+    :rtype: str
     """
-    if not os.path.exists(EXPASY_DATABASE_FILE) or force_download:
-        urlretrieve(EXPASY_DATABASE_URL, EXPASY_DATABASE_FILE)
+    if not os.path.exists(EXPASY_DATA_PATH) or force_download:
+        log.info('downloading %s to %s', EXPASY_DATABASE_URL, EXPASY_DATA_PATH)
+        urlretrieve(EXPASY_DATABASE_URL, EXPASY_DATA_PATH)
+    else:
+        log.info('using cached data at %s', EXPASY_DATA_PATH)
+
+    return EXPASY_DATA_PATH
 
 
 def get_expasy_database(path=None, force_download=False):
@@ -62,7 +68,7 @@ def get_expasy_database(path=None, force_download=False):
     if path is None:
         download_expasy_database(force_download=force_download)
 
-    with open(path or EXPASY_DATABASE_FILE, 'r') as enzclass_file:
+    with open(path or EXPASY_DATA_PATH, 'r') as enzclass_file:
         return _get_expasy_database_helper(enzclass_file)
 
 

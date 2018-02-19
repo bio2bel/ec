@@ -11,12 +11,12 @@ DEFAULT_CACHE_CONNECTION = get_connection(MODULE_NAME)
 #: The web location of the enzyme class tree document
 EXPASY_TREE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 #: The local cache location where the enzyme class tree document is stored
-EXPASY_TREE_FILE = os.path.join(DATA_DIR, 'enzclass.txt')
+EXPASY_TREE_DATA_PATH = os.path.join(DATA_DIR, 'enzclass.txt')
 
 #: The web location of the ENZYME database document
 EXPASY_DATABASE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
 #: The local cache location where the ENZYME database document is stored
-EXPASY_DATABASE_FILE = os.path.join(DATA_DIR, 'enzyme.dat')
+EXPASY_DATA_PATH = os.path.join(DATA_DIR, 'enzyme.dat')
 
 EC_DATA_FILE_REGEX = '(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
 EC_PATTERN_REGEX = '(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
