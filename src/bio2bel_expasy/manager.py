@@ -7,13 +7,36 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
 from bio2bel.utils import get_connection
-from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE
+from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
+from pybel.resources import write_namespace
+from pybel.resources.arty import get_today_arty_namespace
+from pybel.resources.deploy import deploy_namespace
 from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein
 from .parser.database import *
 from .parser.tree import get_tree, give_edge, normalize_expasy_id
 
+__all__ = ['Manager']
+
 log = logging.getLogger(__name__)
+
+
+def _write_bel_namespace_helper(values, file):
+    """
+    :param dict[str,str] values:
+    :param file:
+    """
+    write_namespace(
+        namespace_name='Enzyme Classes',
+        namespace_keyword='EV',
+        namespace_domain=NAMESPACE_DOMAIN_GENE,
+        author_name='Charles Tapley Hoyt',
+        citation_name='EC',
+        namespace_query_url='https://enzyme.expasy.org/EC/[VALUE]',
+        values=values,
+        functions='P',
+        file=file
+    )
 
 
 class Manager(object):
@@ -381,3 +404,19 @@ class Manager(object):
             if prosites is not None:
                 for prosite in prosites:
                     graph.add_unqualified_edge(node, prosite.serialize_to_bel(), IS_A)
+
+    def write_bel_namespace(self, file):
+        values = [expasy_id for expasy_id, in self.session.query(Enzyme).all()]
+        _write_bel_namespace_helper(values, file)
+
+    def deploy_bel_namespace(self):
+        """Creates and deploys the Gene Names Namespace
+
+        :rtype: Optional[str]
+        """
+        file_name = get_today_arty_namespace('ec')
+
+        with open(file_name, 'w') as file:
+            self.write_bel_namespace(file)
+
+        return deploy_namespace(file_name, module_name='ec')

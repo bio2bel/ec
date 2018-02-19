@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import sys
 
 import click
 
 from .constants import DEFAULT_CACHE_CONNECTION
 from .manager import Manager
-
 
 
 @click.group()
@@ -32,6 +32,14 @@ def drop(yes, manager):
     """Drops the database"""
     if yes or click.confirm('Drop database?'):
         manager.drop_all()
+
+
+@main.command()
+@click.option('-o', '--output', type=click.File('w'), default=sys.stdout)
+@click.pass_obj
+def write_bel_namespace(manager, output):
+    """Write the BEL namespace"""
+    manager.write_bel_namespace(output)
 
 
 @main.command()
