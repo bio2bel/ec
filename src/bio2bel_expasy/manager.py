@@ -406,7 +406,7 @@ class Manager(object):
                     graph.add_unqualified_edge(node, prosite.serialize_to_bel(), IS_A)
 
     def write_bel_namespace(self, file):
-        values = [expasy_id for expasy_id, in self.session.query(Enzyme).all()]
+        values = [expasy_id for expasy_id, in self.session.query(Enzyme.expasy_id).all()]
         _write_bel_namespace_helper(values, file)
 
     def deploy_bel_namespace(self):
