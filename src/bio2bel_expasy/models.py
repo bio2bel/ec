@@ -5,9 +5,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
-from bio2bel_expasy.constants import EXPASY, UNIPROT, PROSITE
 
 from pybel.dsl import protein
+from .constants import EXPASY, PROSITE, UNIPROT
 
 TABLE_PREFIX = 'expasy'
 ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
@@ -50,6 +50,16 @@ class Enzyme(Base):
 
     def __repr__(self):
         return self.expasy_id
+
+    def to_json(self):
+        """Returns the data from this model as a dictionary
+
+        :rtype: dict
+        """
+        return dict(
+            expasy_id=self.expasy_id,
+            description=self.description
+        )
 
     def serialize_to_bel(self):
         """Returns a PyBEL node data dictionary representing this enzyme
