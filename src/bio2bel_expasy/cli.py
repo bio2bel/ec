@@ -43,6 +43,13 @@ def write_bel_namespace(manager, output):
 
 
 @main.command()
+@click.pass_obj
+def deploy_bel_namespace(manager):
+    """Deploy the BEL namespace"""
+    manager.deploy_bel_namespace()
+
+
+@main.command()
 @click.option('-v', '--debug', is_flag=True)
 @click.option('-p', '--port')
 @click.option('-h', '--host')
