@@ -86,6 +86,34 @@ class Manager(object):
 
         raise TypeError
 
+    def count_enzymes(self):
+        """Counts the number of enzyme entries in the database
+
+        :rtype: int
+        """
+        return self.session.query(Enzyme).count()
+
+    def count_prosites(self):
+        """Counts the number of ProSite entries in the database
+
+        :rtype: int
+        """
+        return self.session.query(Prosite).count()
+
+    def count_proteins(self):
+        """Counts the number of protein entries in the database
+
+        :rtype: int
+        """
+        return self.session.query(Protein).count()
+
+    def summarize(self):
+        """Returns a summary dictionary over the content of the database
+
+        :rtype: dict[str,int]
+        """
+        return dict(enzymes=self.count_enzymes(), prosites=self.count_prosites(), proteins=self.count_proteins())
+
     def get_or_create_enzyme(self, expasy_id, description=None):
         """Gets an enzyme from the database or creates it
 
