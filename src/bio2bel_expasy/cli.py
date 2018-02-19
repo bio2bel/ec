@@ -61,5 +61,19 @@ def web(manager, debug, port, host):
     app.run(host=host, port=port, debug=debug)
 
 
+@main.group()
+def enzyme():
+    """Enzyme utils"""
+
+
+@enzyme.command()
+@click.argument('expasy_id')
+@click.pass_obj
+def get(manager, expasy_id):
+    m = manager.get_enzyme_by_id(expasy_id)
+    click.echo('Enzyme class: {}'.format(m.expasy_id))
+    click.echo('Description: {}'.format(m.description))
+
+
 if __name__ == '__main__':
     main()
