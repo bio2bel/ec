@@ -99,7 +99,7 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(1, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        enrich_prosite_classes(graph=graph)
+        enrich_prosite_classes(graph=graph, connection=self.manager)
 
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(1, graph.number_of_edges())
