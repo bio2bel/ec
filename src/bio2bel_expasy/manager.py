@@ -2,11 +2,9 @@
 
 import logging
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from bio2bel.utils import get_connection
+from bio2bel.abstractmanager import AbstractManager
 from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
 from pybel.resources import write_namespace
 from pybel.resources.arty import get_today_arty_namespace
@@ -23,7 +21,7 @@ log = logging.getLogger(__name__)
 
 def _write_bel_namespace_helper(values, file):
     """
-    :param dict[str,str] values:
+    :param iter[str] or dict[str,str] values:
     :param file:
     """
     write_namespace(
@@ -39,38 +37,25 @@ def _write_bel_namespace_helper(values, file):
     )
 
 
-class Manager(object):
+class Manager(AbstractManager):
     """Creates a connection to database and a persistent session using SQLAlchemy"""
 
-    def __init__(self, connection=None, echo=False):
+    module_name = MODULE_NAME
+
+    def __init__(self, connection=None):
         """
-        :param str connection: SQLAlchemy
-        :param bool echo: True or False for SQL output of SQLAlchemy engine
+        :param str connection:
         """
-        self.connection = get_connection(MODULE_NAME, connection=connection)
-        log.info('using connection %s', connection)
-        self.engine = create_engine(self.connection, echo=echo)
-        self.session_maker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
-        self.session = scoped_session(self.session_maker)
-        self.create_all()
+        super(Manager, self).__init__(connection=connection)
 
         #: Maps canonicalized ExPASy enzyme identifiers to their SQLAlchemy models
         self.id_enzyme = {}
         self.id_prosite = {}
         self.id_uniprot = {}
 
-    def create_all(self, check_first=True):
-        """creates all tables from models in your database
-
-        :param bool check_first: True or False check if tables already exists
-        """
-        log.info('create tables in {}'.format(self.engine.url))
-        Base.metadata.create_all(self.engine, checkfirst=check_first)
-
-    def drop_all(self):
-        """drops all tables in the database"""
-        log.info('drop tables in {}'.format(self.engine.url))
-        Base.metadata.drop_all(self.engine)
+    @property
+    def base(self):
+        return Base
 
     @staticmethod
     def ensure(connection=None):
