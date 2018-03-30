@@ -88,7 +88,7 @@ class TestPopulateTree(TemporaryCacheClsMixin):
 
     def test_get_parent_of_subsubclass(self):
         expasy_id = '1. 2. 1.-'
-        enzyme = self.manager.get_parent(expasy_id)
+        enzyme = self.manager.get_parent_by_expasy_id(expasy_id)
         self.assertIsNotNone(enzyme)
         self.assertEqual('1.2.-.-', enzyme.expasy_id)
         self.assertEqual('Acting on the aldehyde or oxo group of donors', enzyme.description)

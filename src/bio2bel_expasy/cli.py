@@ -1,37 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import sys
 
 import click
 
-from .constants import DEFAULT_CACHE_CONNECTION
+from bio2bel.utils import build_cli
 from .manager import Manager
 
-
-@click.group()
-@click.option('-c', '--connection', help='Defaults to {}'.format(DEFAULT_CACHE_CONNECTION))
-@click.pass_context
-def main(ctx, connection):
-    """ExPASy to BEL"""
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-    ctx.obj = Manager(connection=connection)
-
-
-@main.command()
-@click.pass_obj
-def populate(manager):
-    """Populates the database"""
-    manager.populate()
-
-
-@main.command()
-@click.option('-y', '--yes', is_flag=True)
-@click.pass_obj
-def drop(yes, manager):
-    """Drops the database"""
-    if yes or click.confirm('Drop database?'):
-        manager.drop_all()
+main = build_cli(Manager)
 
 
 @main.command()
@@ -47,18 +23,6 @@ def write_bel_namespace(manager, output):
 def deploy_bel_namespace(manager):
     """Deploy the BEL namespace"""
     manager.deploy_bel_namespace()
-
-
-@main.command()
-@click.option('-v', '--debug', is_flag=True)
-@click.option('-p', '--port')
-@click.option('-h', '--host')
-@click.pass_obj
-def web(manager, debug, port, host):
-    """Run the web app"""
-    from .web import get_app
-    app = get_app(connection=manager, url='/')
-    app.run(host=host, port=port, debug=debug)
 
 
 @main.group()

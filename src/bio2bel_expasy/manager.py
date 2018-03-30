@@ -2,17 +2,15 @@
 
 import logging
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 from tqdm import tqdm
 
-from bio2bel.utils import get_connection
+from bio2bel.abstractmanager import AbstractManager
 from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
 from pybel.resources import write_namespace
 from pybel.resources.arty import get_today_arty_namespace
 from pybel.resources.deploy import deploy_namespace
 from .constants import MODULE_NAME
-from .models import Base, Enzyme, Prosite, Protein
+from .models import Base, Enzyme, Prosite, Protein, enzyme_prosite, enzyme_protein
 from .parser.database import *
 from .parser.tree import get_tree, give_edge, normalize_expasy_id
 
@@ -23,12 +21,12 @@ log = logging.getLogger(__name__)
 
 def _write_bel_namespace_helper(values, file):
     """
-    :param dict[str,str] values:
+    :param iter[str] or dict[str,str] values:
     :param file:
     """
     write_namespace(
-        namespace_name='Enzyme Classes',
-        namespace_keyword='EV',
+        namespace_name='ExPASy Enzyme Classes',
+        namespace_keyword='EC',
         namespace_domain=NAMESPACE_DOMAIN_GENE,
         author_name='Charles Tapley Hoyt',
         citation_name='EC',
@@ -39,80 +37,66 @@ def _write_bel_namespace_helper(values, file):
     )
 
 
-class Manager(object):
+class Manager(AbstractManager):
     """Creates a connection to database and a persistent session using SQLAlchemy"""
 
-    def __init__(self, connection=None, echo=False):
+    module_name = MODULE_NAME
+    flask_admin_models = [Enzyme, Protein, Prosite]
+
+    def __init__(self, connection=None):
         """
         :param str connection: SQLAlchemy
-        :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
-        self.connection = get_connection(MODULE_NAME, connection=connection)
-        log.info('using connection %s', connection)
-        self.engine = create_engine(self.connection, echo=echo)
-        self.session_maker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
-        self.session = scoped_session(self.session_maker)
-        self.create_all()
+        super().__init__(connection=connection)
 
         #: Maps canonicalized ExPASy enzyme identifiers to their SQLAlchemy models
         self.id_enzyme = {}
         self.id_prosite = {}
         self.id_uniprot = {}
 
-    def create_all(self, check_first=True):
-        """creates all tables from models in your database
-
-        :param bool check_first: True or False check if tables already exists
-        """
-        log.info('create tables in {}'.format(self.engine.url))
-        Base.metadata.create_all(self.engine, checkfirst=check_first)
-
-    def drop_all(self):
-        """drops all tables in the database"""
-        log.info('drop tables in {}'.format(self.engine.url))
-        Base.metadata.drop_all(self.engine)
-
-    @staticmethod
-    def ensure(connection=None):
-        """Checks and allows for a Manager to be passed to the function.
-
-        :param connection: can be either a already build manager or a connection string to build a manager with.
-        """
-        if connection is None or isinstance(connection, str):
-            return Manager(connection=connection)
-
-        if isinstance(connection, Manager):
-            return connection
-
-        raise TypeError
+    @property
+    def base(self):
+        return Base
 
     def count_enzymes(self):
         """Counts the number of enzyme entries in the database
 
         :rtype: int
         """
-        return self.session.query(Enzyme).count()
+        return self._count_model(Enzyme)
+
+    def count_enzyme_prosites(self):
+        return self._count_model(enzyme_prosite)
 
     def count_prosites(self):
         """Counts the number of ProSite entries in the database
 
         :rtype: int
         """
-        return self.session.query(Prosite).count()
+        return self._count_model(Prosite)
+
+    def count_enzyme_proteins(self):
+        return self._count_model(enzyme_protein)
 
     def count_proteins(self):
         """Counts the number of protein entries in the database
 
         :rtype: int
         """
-        return self.session.query(Protein).count()
+        return self._count_model(Protein)
 
     def summarize(self):
         """Returns a summary dictionary over the content of the database
 
         :rtype: dict[str,int]
         """
-        return dict(enzymes=self.count_enzymes(), prosites=self.count_prosites(), proteins=self.count_proteins())
+        return dict(
+            enzymes=self.count_enzymes(),
+            enzyme_prosites=self.count_enzyme_prosites(),
+            prosites=self.count_prosites(),
+            enzyme_proteins=self.count_enzyme_proteins(),
+            proteins=self.count_proteins()
+        )
 
     def get_or_create_enzyme(self, expasy_id, description=None):
         """Gets an enzyme from the database or creates it
@@ -259,7 +243,7 @@ class Manager(object):
         canonical_expasy_id = normalize_expasy_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
-    def get_parent(self, expasy_id):
+    def get_parent_by_expasy_id(self, expasy_id):
         """Returns the parent ID of ExPASy identifier if exist otherwise returns None
 
         :param str expasy_id: An ExPASy identifier
@@ -272,7 +256,7 @@ class Manager(object):
 
         return enzyme.parent
 
-    def get_children(self, expasy_id):
+    def get_children_by_expasy_id(self, expasy_id):
         """Returns list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier
 
         :param str expasy_id: An ExPASy enzyme identifier
@@ -391,28 +375,97 @@ class Manager(object):
             for enzyme in enzymes:
                 graph.add_unqualified_edge(enzyme.serialize_to_bel(), node, IS_A)
 
+    def _look_up_enzyme(self, data):
+        """
+
+        :param data:
+        :return: Optional[Enzyme]
+        """
+        namespace = data.get(NAMESPACE)
+
+        if namespace is None:
+            return
+
+        if namespace not in {'EXPASY', 'EC'}:
+            return
+
+        name = data.get(NAME)
+
+        return self.get_enzyme_by_id(name)
+
+    def enrich_enzyme_with_proteins(self, graph, node):
+        """Enrich an enzyme with all of its member proteins
+
+        :param pybel.BELGraph graph:
+        :param tuple node:
+        """
+        data = graph.node[node]
+        enzyme = self._look_up_enzyme(data)
+        if enzyme is None:
+            return
+
+        if enzyme.level == 4:
+            for protein in enzyme.proteins:
+                graph.add_is_a(protein.serialize_to_bel(), node)
+
+    def enrich_enzyme_parents(self, graph, node):
+        """
+
+        :param pybel.BELGraph graph:
+        :param tuple node:
+        """
+        data = graph.node[node]
+        enzyme = self._look_up_enzyme(data)
+        if enzyme is None:
+            return
+
+        parent = enzyme.parent
+        if parent is None:
+            return
+        graph.add_is_a(node, parent.serialize_to_bel())
+
+        grandparent = parent.parent
+        if grandparent is None:
+            return
+        graph.add_is_a(parent.serialize_to_bel(), grandparent.serialize_to_bel())
+
+        greatgrandparent = grandparent.parent
+        if greatgrandparent is None:
+            return
+        graph.add_is_a(grandparent.serialize_to_bel(), greatgrandparent.serialize_to_bel())
+
+    def _enrich_enzyme_children_helper(self, graph, enzyme):
+        """
+
+        :param pybel.BELGraph graph:
+        :param Enzyme enzyme:
+        """
+        for child in enzyme.children:
+            child_bel = child.serialize_to_bel()
+            graph.add_is_a(child_bel, enzyme.serialize_to_bel())
+            self.enrich_enzyme_children(graph, child_bel.as_tuple())
+
+    def enrich_enzyme_children(self, graph, node):
+        """
+
+        :param pybel.BELGraph graph:
+        :param tuple node:
+        """
+        data = graph.node[node]
+        enzyme = self._look_up_enzyme(data)
+        if enzyme is None:
+            return
+        self._enrich_enzyme_children_helper(graph, enzyme)
+
     def enrich_enzymes(self, graph):
         """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
 
         :param pybel.BELGraph graph: A BEL graph
         """
-        for node, data in graph.nodes(data=True):
-            namespace = data.get(NAMESPACE)
-
-            if namespace is None:
-                continue
-
-            if namespace not in {'EXPASY', 'EC'}:
-                continue
-
-            parent = self.get_parent(data[NAME])
-            if parent is not None:
-                graph.add_unqualified_edge(parent.serialize_to_bel(), node, IS_A)
-
-            children = self.get_children(data[NAME])
-            if children is not None:
-                for child in children:
-                    graph.add_unqualified_edge(node, child.serialize_to_bel(), IS_A)
+        for node in list(graph):
+            self.enrich_enzyme_parents(graph, node)
+            self.enrich_enzyme_children(graph, node)
+            self.enrich_enzyme_with_proteins(graph, node)
 
     def enrich_enzymes_with_prosites(self, graph):
         """Enriches Enzyme classes in the graph with ProSites.
@@ -434,6 +487,11 @@ class Manager(object):
                     graph.add_unqualified_edge(node, prosite.serialize_to_bel(), IS_A)
 
     def write_bel_namespace(self, file):
+        """
+
+        :param file:
+        :return:
+        """
         values = [expasy_id for expasy_id, in self.session.query(Enzyme.expasy_id).all()]
         _write_bel_namespace_helper(values, file)
 
@@ -448,3 +506,26 @@ class Manager(object):
             self.write_bel_namespace(file)
 
         return deploy_namespace(file_name, module_name='ec')
+
+    def _add_admin(self, app, **kwargs):
+        """Adds a Flask Admin interface to an application
+
+        :param flask.Flask app:
+        :param session:
+        :param kwargs:
+        :rtype: flask_admin.Admin
+        """
+        import flask_admin
+        from flask_admin.contrib.sqla import ModelView
+
+        admin = flask_admin.Admin(app, **kwargs)
+
+        class EnzymeView(ModelView):
+            column_hide_backrefs = False
+            column_list = ('expasy_id', 'description', 'parents')
+
+        admin.add_view(EnzymeView(Enzyme, self.session))
+        admin.add_view(ModelView(Prosite, self.session))
+        admin.add_view(ModelView(Protein, self.session))
+
+        return admin

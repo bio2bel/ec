@@ -23,7 +23,7 @@ def enrich_proteins(graph, connection=None):
     :type connection: str or bio2bel_expasy.Manager
     """
     m = Manager.ensure(connection)
-    m.enrich_proteins_with_enzyme_families(graph)
+    return m.enrich_proteins_with_enzyme_families(graph)
 
 
 def enrich_prosite_classes(graph, connection=None):
@@ -33,7 +33,7 @@ def enrich_prosite_classes(graph, connection=None):
     :type connection: str or bio2bel_expasy.Manager
     """
     m = Manager.ensure(connection=connection)
-    m.enrich_enzymes_with_prosites(graph)
+    return m.enrich_enzymes_with_prosites(graph)
 
 
 def enrich_enzymes(graph, connection=None):
@@ -43,4 +43,4 @@ def enrich_enzymes(graph, connection=None):
     :type connection: str or bio2bel_expasy.Manager
     """
     m = Manager.ensure(connection=connection)
-    m.enrich_enzymes(graph)
+    return m.enrich_enzymes(graph)
