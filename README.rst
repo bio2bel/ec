@@ -4,9 +4,9 @@ This repository downloads and parses the enzyme classes from the ExPASy ENZYME d
 
 Installation |pypi_version| |python_versions| |pypi_license|
 ------------------------------------------------------------
-Download the latest stable code from `PyPI <https://pypi.org/project/bio2bel>`_ with:
+Download the latest stable code from `PyPI <https://pypi.org/project/bio2bel_expasy>`_ with:
 
-   $ python3 -m pip install bio2bel
+   $ python3 -m pip install bio2bel_expasy
 
 or check the `installation instructions <http://bio2bel.readthedocs.io/en/latest/#installation>`_.
 
