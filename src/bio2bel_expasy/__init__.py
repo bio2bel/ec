@@ -33,7 +33,7 @@ Clone the repository from `GitHub <https://github.com/bio2bel/expasy>`_ and inst
 
 Testing
 -------
-Bio2BEL is tested with Python3 on Linux using `Travis CI <https://travis-ci.org/bio2bel/expasy>`_.
+Bio2BEL ExPASy is tested with Python3 on Linux using `Travis CI <https://travis-ci.org/bio2bel/expasy>`_.
 """
 
 from . import cli

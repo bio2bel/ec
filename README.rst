@@ -1,5 +1,5 @@
-Bio2BEL ExPASy |build| |coverage| |docs|
-========================================
+Bio2BEL ExPASy |build| |coverage| |docs| |zenodo|
+=================================================
 This repository downloads and parses the enzyme classes from the ExPASy ENZYME database
 
 Installation |pypi_version| |python_versions| |pypi_license|
@@ -50,3 +50,6 @@ Gasteiger, E., *et al.* (2003). `ExPASy: The proteomics server for in-depth prot
 
 .. |pypi_license| image:: https://img.shields.io/pypi/l/bio2bel_expasy.svg
     :alt: Apache 2.0 License
+
+.. |zenodo| image:: https://zenodo.org/badge/100023822.svg
+    :target: https://zenodo.org/badge/latestdoi/100023822
