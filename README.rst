@@ -8,7 +8,7 @@ Download the latest stable code from `PyPI <https://pypi.org/project/bio2bel_exp
 
    $ python3 -m pip install bio2bel_expasy
 
-or check the `installation instructions <http://bio2bel.readthedocs.io/en/latest/#installation>`_.
+or check the `installation instructions <http://bio2bel.readthedocs.io/projects/expasy/en/latest/#installation>`_.
 
 Command Line Interface
 ----------------------
