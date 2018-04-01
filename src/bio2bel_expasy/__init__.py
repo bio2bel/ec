@@ -18,7 +18,7 @@ time, the latest code can be installed from `GitHub <https://github.com/bio2bel/
 from . import cli
 from .manager import Manager
 
-__version__ = '0.1.1-dev'
+__version__ = '0.1.1'
 
 __title__ = 'bio2bel_expasy'
 __description__ = "A package for parsing and storing the ExPASy Enzyme Database"
