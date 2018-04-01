@@ -2,29 +2,13 @@ Bio2BEL ExPASy |build| |coverage| |docs|
 ========================================
 This repository downloads and parses the enzyme classes from the ExPASy ENZYME database
 
-Citation
---------
-Gasteiger, E., Gattiker, A., Hoogland, C., Ivanyi, I., Appel, R. D., & Bairoch, A. (2003). ExPASy: The proteomics
-server for in-depth protein knowledge and analysis. Nucleic Acids Research, 31(13), 3784–8. Retrieved from
-http://www.ncbi.nlm.nih.gov/pubmed/12824418
+Installation |pypi_version| |python_versions| |pypi_license|
+------------------------------------------------------------
+Download the latest stable code from `PyPI <https://pypi.org/project/bio2bel>`_ with:
 
-Abstract
---------
-The ExPASy (the Expert Protein Analysis System) World Wide Web server (http://www.expasy.org), is provided as a
-service to the life science community by a multidisciplinary team at the Swiss Institute of Bioinformatics (SIB).
-It provides access to a variety of databases and analytical tools dedicated to proteins and proteomics. ExPASy
-databases include SWISS-PROT and TrEMBL, SWISS-2DPAGE, PROSITE, ENZYME and the SWISS-MODEL repository. Analysis tools
-are available for specific tasks relevant to proteomics, similarity searches, pattern and profile searches,
-post-translational modification prediction, topology prediction, primary, secondary and tertiary structure analysis
-and sequence alignment. These databases and tools are tightly interlinked: a special emphasis is placed on integration
-of database entries with related resources developed at the SIB and elsewhere, and the proteomics tools have been
-designed to read the annotations in SWISS-PROT in order to enhance their predictions. ExPASy started to operate in
-1993, as the first WWW server in the field of life sciences. In addition to the main site in Switzerland, seven
-mirror sites in different continents currently serve the user community.
+   $ python3 -m pip install bio2bel
 
-Installation
-------------
-:code:`python3 -m pip install git+https://github.com/bio2bel/expasy.git`
+or check the `installation instructions <http://bio2bel.readthedocs.io/en/latest/#installation>`_.
 
 Command Line Interface
 ----------------------
@@ -40,6 +24,11 @@ To enrich the proteins in a BEL Graph with their enzyme classes, use:
 >>> graph = ... # get a BEL graph
 >>> enrich_proteins(graph)
 
+Citations
+--------
+Gasteiger, E., *et al.* (2003). `ExPASy: The proteomics server for in-depth protein knowledge and analysis
+<http://www.ncbi.nlm.nih.gov/pubmed/12824418>`_. Nucleic Acids Research, 31(13), 3784–8.
+
 
 .. |build| image:: https://travis-ci.org/bio2bel/expasy.svg?branch=master
     :target: https://travis-ci.org/bio2bel/expasy
@@ -52,3 +41,12 @@ To enrich the proteins in a BEL Graph with their enzyme classes, use:
 .. |docs| image:: http://readthedocs.org/projects/bio2bel-expasy/badge/?version=latest
     :target: http://bio2bel.readthedocs.io/projects/ExPASy/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. |python_versions| image:: https://img.shields.io/pypi/pyversions/bio2bel_expasy.svg
+    :alt: Stable Supported Python Versions
+
+.. |pypi_version| image:: https://img.shields.io/pypi/v/bio2bel_expasy.svg
+    :alt: Current version on PyPI
+
+.. |pypi_license| image:: https://img.shields.io/pypi/l/bio2bel_expasy.svg
+    :alt: Apache 2.0 License
