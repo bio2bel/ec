@@ -46,7 +46,7 @@ prosite_pattern = re.compile(EC_PROSITE_REGEX)
 def download_expasy_database(force_download=False):
     """Downloads the ExPASy database
 
-    :param force_download: bool to force download
+    :param bool force_download: bool to force download
     :rtype: str
     """
     if not os.path.exists(EXPASY_DATA_PATH) or force_download:
@@ -62,7 +62,7 @@ def get_expasy_database(path=None, force_download=False):
     """Interface to call expasy_parser_helper(enzclass_file) method.
 
     :param Optional[str] path: path to the file
-    :param Optional[bool] force_download: True to force download resources
+    :param bool force_download: True to force download resources
     :return list[dict]: list of data containing dictionaries
     """
     if path is None:
@@ -72,15 +72,16 @@ def get_expasy_database(path=None, force_download=False):
         return _get_expasy_database_helper(enzclass_file)
 
 
-def _get_expasy_database_helper(enzclass_file):
+def _get_expasy_database_helper(lines):
     """Parses the ExPASy database file. Returns a list of enzyme entry dictionaries
 
-    :param file enzclass_file: An iterator over the ExPASy database file or file-like
+    :param iter[str] lines: An iterator over the ExPASy database file or file-like
     :rtype: list[dict]
     """
     expasy_db = []
     ec_data_entry = {ID: ''}
-    for line in enzclass_file:
+
+    for line in lines:
         descriptor = line[:2]
         if descriptor == "//":
             if ec_data_entry[ID] != '':
@@ -131,10 +132,11 @@ def _get_expasy_database_helper(enzclass_file):
         elif descriptor == DR:
             for dr_tuple in line[5:-2].split(';'):
                 dr_tuple = dr_tuple.strip()
-                ec_data_entry[DR].append({
-                    'accession_number': dr_tuple.split(', ')[0],
-                    'entry_name': dr_tuple.split(', ')[1]
-                })
+                accession_number, entry_name = dr_tuple.split(', ')[0:2]
+                ec_data_entry[DR].append(dict(
+                    accession_number=accession_number,
+                    entry_name=entry_name)
+                )
         else:
             log.warning(" Unknown Descriptor is found. Risk of missed data or corrupt/wrong file.")
 

@@ -24,7 +24,7 @@ mirror sites in different continents currently serve the user community.
 
 Installation
 ------------
-:code:`pip3 install git+https://github.com/bio2bel/expasy.git`
+:code:`python3 -m pip install git+https://github.com/bio2bel/expasy.git`
 
 Command Line Interface
 ----------------------

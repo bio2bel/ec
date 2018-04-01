@@ -66,6 +66,10 @@ class Manager(AbstractManager):
         return self._count_model(Enzyme)
 
     def count_enzyme_prosites(self):
+        """Counts the number of enzyme-prosite annotations
+
+        :rtype: int
+        """
         return self._count_model(enzyme_prosite)
 
     def count_prosites(self):
@@ -76,6 +80,10 @@ class Manager(AbstractManager):
         return self._count_model(Prosite)
 
     def count_enzyme_proteins(self):
+        """Counts the number of enzyme-protein annotations
+
+        :rtype: int
+        """
         return self._count_model(enzyme_protein)
 
     def count_proteins(self):
@@ -170,7 +178,11 @@ class Manager(AbstractManager):
         return protein
 
     def populate(self, tree_path=None, database_path=None):
-        """Populates everything"""
+        """Populates everything
+
+        :param Optional[str] tree_path:
+        :param Optional[str] database_path:
+        """
         self.populate_tree(path=tree_path)
         self.populate_database(path=database_path)
 
@@ -473,18 +485,12 @@ class Manager(AbstractManager):
         :param pybel.BELGraph graph: A BEL graph
         """
         for node, data in graph.nodes(data=True):
-            namespace = data.get(NAMESPACE)
-
-            if namespace is None:
+            enzyme = self._look_up_enzyme(data)
+            if enzyme is None:
                 continue
 
-            if namespace not in {'EXPASY', 'EC'}:
-                continue
-
-            prosites = self.get_prosites_by_expasy_id(data[NAME])
-            if prosites is not None:
-                for prosite in prosites:
-                    graph.add_unqualified_edge(node, prosite.serialize_to_bel(), IS_A)
+            for prosite in enzyme.prosites:
+                graph.add_is_a(node, prosite.serialize_to_bel())
 
     def write_bel_namespace(self, file):
         """

@@ -8,10 +8,12 @@ from bio2bel_expasy import Manager
 
 log = logging.getLogger(__name__)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+HERE = os.path.dirname(os.path.realpath(__file__))
 
-TREE_TEST_FILE = os.path.join(dir_path, 'enzclass_test.txt')
-DATABASE_TEST_FILE = os.path.join(dir_path, 'enzyme_test.dat')
+resources_directory_path = os.path.join(HERE, 'resources')
+
+TREE_TEST_FILE = os.path.join(resources_directory_path, 'enzclass_test.txt')
+DATABASE_TEST_FILE = os.path.join(resources_directory_path, 'enzyme_test.dat')
 
 TemporaryCacheClsMixin = make_temporary_cache_class_mixin(Manager)
 
