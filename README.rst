@@ -25,7 +25,7 @@ To enrich the proteins in a BEL Graph with their enzyme classes, use:
 >>> enrich_proteins(graph)
 
 Citations
---------
+---------
 Gasteiger, E., *et al.* (2003). `ExPASy: The proteomics server for in-depth protein knowledge and analysis
 <http://www.ncbi.nlm.nih.gov/pubmed/12824418>`_. Nucleic Acids Research, 31(13), 3784–8.
 
