@@ -2,7 +2,7 @@
 
 import os
 
-from bio2bel.utils import get_connection, get_data_dir
+from bio2bel import get_connection, get_data_dir
 
 MODULE_NAME = 'expasy'
 DATA_DIR = get_data_dir(MODULE_NAME)

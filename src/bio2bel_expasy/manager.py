@@ -4,7 +4,7 @@ import logging
 
 from tqdm import tqdm
 
-from bio2bel.abstractmanager import AbstractManager
+from bio2bel import AbstractManager
 from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
 from pybel.resources import write_namespace
 from pybel.resources.arty import get_today_arty_namespace

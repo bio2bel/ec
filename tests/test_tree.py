@@ -9,6 +9,7 @@ from tests.constants import TREE_TEST_FILE, TemporaryCacheClsMixin
 
 DESCRIPTION = 'description'
 
+
 class TestParseTree(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

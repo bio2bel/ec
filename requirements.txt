@@ -5,6 +5,6 @@ sqlalchemy
 tqdm
 click
 pandas
-bio2bel
+bio2bel>=0.0.6
 flask[web]
 flask_admin[web]

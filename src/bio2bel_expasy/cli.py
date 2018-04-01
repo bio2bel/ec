@@ -4,7 +4,7 @@ import sys
 
 import click
 
-from bio2bel.utils import build_cli
+from bio2bel import build_cli
 from .manager import Manager
 
 main = build_cli(Manager)

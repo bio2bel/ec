@@ -30,7 +30,7 @@ INSTALL_REQUIRES = [
     'networkx==1.11',
     'click',
     'pandas',
-    'bio2bel',
+    'bio2bell>=0.0.6',
 ]
 EXTRAS_REQUIRE = {
     'web': ['flask', 'flask_admin'],
