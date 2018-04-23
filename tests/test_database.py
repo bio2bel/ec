@@ -49,15 +49,25 @@ class TestParseEnzyme(unittest.TestCase):
 
 
 class TestPopulateDatabase(PopulatedDatabaseMixin):
+    def test_has_parent(self):
+        enzyme = self.manager.get_enzyme_by_id('1.1.1.2')
+        self.assertIsNotNone(enzyme.parent)
+
+    def test_has_children(self):
+        enzyme = self.manager.get_enzyme_by_id('1.1.1.2')
+        self.assertEqual(4, enzyme.level)
+        self.assertEqual(0, len(enzyme.children), msg='level 4 should have no children')
+
     def test_get_protein(self):
         protein = self.manager.get_protein_by_uniprot_id('Q6AZW2')
         self.assertIsNotNone(protein)
-        # FIXME interrogate its attributes
+        self.assertEqual('Q6AZW2', protein.accession_number)
+        self.assertEqual('A1A1A_DANRE', protein.entry_name)
 
     def test_get_prosite(self):
         prosite = self.manager.get_prosite_by_id('PDOC00061')
         self.assertIsNotNone(prosite)
-        # FIXME interrogate its attributes
+        self.assertEqual('PDOC00061', prosite.prosite_id)
 
     def test_get_entry(self):
         enzyme = self.manager.get_enzyme_by_id('1.1.1.2')

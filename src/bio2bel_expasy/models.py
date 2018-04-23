@@ -51,6 +51,14 @@ class Enzyme(Base):
     def __repr__(self):
         return self.expasy_id
 
+    @property
+    def level(self):
+        """Says what level (1, 2, 3, or 4) this enzyme is based on the number of dashes in its id
+
+        :rtype: int
+        """
+        return 4 - self.expasy_id.count('-')
+
     def to_json(self):
         """Returns the data from this model as a dictionary
 

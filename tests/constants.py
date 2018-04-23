@@ -8,24 +8,18 @@ from bio2bel_expasy import Manager
 
 log = logging.getLogger(__name__)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+HERE = os.path.dirname(os.path.realpath(__file__))
 
-TREE_TEST_FILE = os.path.join(dir_path, 'enzclass_test.txt')
-DATABASE_TEST_FILE = os.path.join(dir_path, 'enzyme_test.dat')
+resources_directory_path = os.path.join(HERE, 'resources')
+
+TREE_TEST_FILE = os.path.join(resources_directory_path, 'enzclass_test.txt')
+DATABASE_TEST_FILE = os.path.join(resources_directory_path, 'enzyme_test.dat')
 
 TemporaryCacheClsMixin = make_temporary_cache_class_mixin(Manager)
 
 
 class PopulatedDatabaseMixin(TemporaryCacheClsMixin):
     @classmethod
-    def setUpClass(cls):
-        """Creates a persistent database and populates it with the test data included in the Bio2BEL ExPASy repository
-        """
-        super(PopulatedDatabaseMixin, cls).setUpClass()
+    def populate(cls):
+        """Creates a persistent database and populates it with the test data"""
         cls.manager.populate(tree_path=TREE_TEST_FILE, database_path=DATABASE_TEST_FILE)
-
-    @classmethod
-    def tearDownClass(cls):
-        """Drops everything from the persistent database before tearing it down"""
-        cls.manager.drop_all()
-        super(PopulatedDatabaseMixin, cls).tearDownClass()
