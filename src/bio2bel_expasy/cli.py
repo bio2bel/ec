@@ -4,10 +4,9 @@ import sys
 
 import click
 
-from bio2bel import build_cli
 from .manager import Manager
 
-main = build_cli(Manager)
+main = Manager.get_cli()
 
 
 @main.command()
@@ -16,13 +15,6 @@ main = build_cli(Manager)
 def write_bel_namespace(manager, output):
     """Write the BEL namespace"""
     manager.write_bel_namespace(output)
-
-
-@main.command()
-@click.pass_obj
-def deploy_bel_namespace(manager):
-    """Deploy the BEL namespace"""
-    manager.deploy_bel_namespace()
 
 
 @main.group()
