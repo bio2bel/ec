@@ -4,17 +4,39 @@ This repository downloads and parses the enzyme classes from the ExPASy ENZYME d
 
 Installation |pypi_version| |python_versions| |pypi_license|
 ------------------------------------------------------------
-Download the latest stable code from `PyPI <https://pypi.org/project/bio2bel_expasy>`_ with:
+``bio2bel_expasy`` can be installed easily from `PyPI <https://pypi.python.org/pypi/bio2bel_expasy>`_ with the
+following code in your favorite terminal:
 
-   $ python3 -m pip install bio2bel_expasy
+.. code-block:: sh
+
+    $ python3 -m pip install bio2bel_expasy
+
+or from the latest code on `GitHub <https://github.com/bio2bel/expasy>`_ with:
+
+.. code-block:: sh
+
+    $ python3 -m pip install git+https://github.com/bio2bel/expasy.git@master
 
 or check the `installation instructions <http://bio2bel.readthedocs.io/projects/expasy/en/latest/#installation>`_.
 
-Command Line Interface
-----------------------
-To output the hierarchy of enzyme classes, type the following in the command line:
+Setup
+-----
+ExPASy can be downloaded and populated from either the Python REPL or the automatically installed command line
+utility.
 
-:code:`bio2bel_expasy write -f ~/Desktop/ec.bel`
+Python REPL
+~~~~~~~~~~~
+.. code-block:: python
+
+    >>> import bio2bel_expasy
+    >>> expasy_manager = bio2bel_expasy.Manager()
+    >>> expasy_manager.populate()
+
+Command Line Utility
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
+
+    bio2bel_expasy populate
 
 Programmatic Interface
 ----------------------
