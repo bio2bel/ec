@@ -103,7 +103,7 @@ def _get_expasy_database_helper(lines):
             }
             continue
         if descriptor == CC and ec_data_entry[ID] == '':
-            log.info(" SKIPPING: {}".format(line.strip()))
+            log.debug('skipping %s', line.strip())
             continue
 
         # parsing
@@ -135,8 +135,8 @@ def _get_expasy_database_helper(lines):
                 accession_number, entry_name = dr_tuple.split(', ')[0:2]
                 ec_data_entry[DR].append(dict(
                     accession_number=accession_number,
-                    entry_name=entry_name)
-                )
+                    entry_name=entry_name
+                ))
         else:
             log.warning(" Unknown Descriptor is found. Risk of missed data or corrupt/wrong file.")
 
