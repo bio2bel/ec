@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
 from tqdm import tqdm
 
 from bio2bel import AbstractManager
 from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
 from pybel.resources import write_namespace
-from pybel.resources.arty import get_today_arty_namespace
-from pybel.resources.deploy import deploy_namespace
 from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein, enzyme_prosite, enzyme_protein
 from .parser.database import *
@@ -507,18 +504,6 @@ class Manager(AbstractManager):
         """
         values = [expasy_id for expasy_id, in self.session.query(Enzyme.expasy_id).all()]
         _write_bel_namespace_helper(values, file)
-
-    def deploy_bel_namespace(self):
-        """Creates and deploys the Gene Names Namespace
-
-        :rtype: Optional[str]
-        """
-        file_name = get_today_arty_namespace('ec')
-
-        with open(file_name, 'w') as file:
-            self.write_bel_namespace(file)
-
-        return deploy_namespace(file_name, module_name='ec')
 
     def _add_admin(self, app, **kwargs):
         """Adds a Flask Admin interface to an application
