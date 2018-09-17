@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Setup module for ``bio2bel_expasy``"""
+"""Setup module for ``bio2bel_expasy``."""
 
 import codecs
 import os
@@ -23,14 +23,14 @@ CLASSIFIERS = [
     'Topic :: Scientific/Engineering :: Bio-Informatics'
 ]
 INSTALL_REQUIRES = [
-    'pybel>=0.11.1',
+    'pybel>=0.12.0',
     'requests',
     'tqdm',
     'sqlalchemy',
-    'networkx==1.11',
+    'networkx',
     'click',
     'pandas',
-    'bio2bel>=0.0.9',
+    'bio2bel',
 ]
 EXTRAS_REQUIRE = {
     'web': ['flask', 'flask_admin'],

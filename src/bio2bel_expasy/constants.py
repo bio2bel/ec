@@ -2,11 +2,10 @@
 
 import os
 
-from bio2bel import get_connection, get_data_dir
+from bio2bel import get_data_dir
 
 MODULE_NAME = 'expasy'
 DATA_DIR = get_data_dir(MODULE_NAME)
-DEFAULT_CACHE_CONNECTION = get_connection(MODULE_NAME)
 
 #: The web location of the enzyme class tree document
 EXPASY_TREE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
@@ -24,8 +23,8 @@ EC_PROSITE_REGEX = '(PDOC|PS)(\d+)'
 EC_DELETED_REGEX = 'Deleted entry'
 EC_TRANSFERRED_REGEX = 'Transferred entry'
 
-EXPASY = 'EC'
-PROSITE = 'PROSITE'
-UNIPROT = 'UP'
+EXPASY = 'eccode'
+PROSITE = 'prosite'
+UNIPROT = 'uniprot'
 
 ENTRY_NAME = 'entry_name'

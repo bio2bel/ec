@@ -42,25 +42,25 @@ class TestEnrich(PopulatedDatabaseMixin):
     """Tests that the enrichment functions work properly"""
 
     def test_enrich_enzyme_with_proteins(self):
-        """Tests that the edges from the enzyme to its proteins are added"""
+        """Test that the edges from the enzyme to its proteins are added."""
         graph = BELGraph()
         node = graph.add_node_from_data(test_enzyme)
 
-        self.assertIn(test_enzyme.as_tuple(), graph, msg='Did not add test enzyme')
+        self.assertIn(test_enzyme, graph, msg='Did not add test enzyme')
         self.assertEqual(1, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
         self.manager.enrich_enzyme_with_proteins(graph, node)
 
-        self.assertIn(test_protein_a.as_tuple(), graph, msg='Did not add test protein')
-        self.assertIn(test_protein_b.as_tuple(), graph, msg='Did not add test protein')
+        self.assertIn(test_protein_a, graph, msg=f'Did not add {test_protein_a}')
+        self.assertIn(test_protein_b, graph, msg=f'Did not add {test_protein_b}')
 
-        self.assertIn(test_enzyme.as_tuple(), graph, msg='Lost test enzyme')
-        self.assertIn(test_enzyme.as_tuple(), graph[test_protein_a.as_tuple()], msg='Did not add test edge')
-        self.assertIn(test_enzyme.as_tuple(), graph[test_protein_b.as_tuple()], msg='Did not add test edge')
+        self.assertIn(test_enzyme, graph, msg='Lost test enzyme')
+        self.assertIn(test_enzyme, graph[test_protein_a], msg='Did not add test edge')
+        self.assertIn(test_enzyme, graph[test_protein_b], msg='Did not add test edge')
 
     def test_enrich_enzyme_children(self):
-        """Tests that the edges from the enzyme to its proteins are added"""
+        """Test that the edges from the enzyme to its proteins are added."""
         graph = BELGraph()
         node = graph.add_node_from_data(test_class)
 
@@ -72,12 +72,12 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(20, graph.number_of_nodes())  # 19 from enzclass_test.txt ans 1 from enzyme_test.dat
         self.assertEqual(19, graph.number_of_edges())
 
-        self.assertIn(test_subclass.as_tuple(), graph)
-        self.assertIn(test_subsubclass.as_tuple(), graph)
-        self.assertIn(test_enzyme.as_tuple(), graph)
+        self.assertIn(test_subclass, graph)
+        self.assertIn(test_subsubclass, graph)
+        self.assertIn(test_enzyme, graph)
 
     def test_enrich_proteins(self):
-        """Tests that the edges from proteins to their enzymes are added"""
+        """Test that the edges from proteins to their enzymes are added."""
         graph = BELGraph()
         graph.add_node_from_data(test_protein_a)
         graph.add_node_from_data(test_protein_b)
@@ -85,16 +85,17 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        enrich_proteins(graph, connection=self.manager)
+        enrich_proteins(graph, manager=self.manager)
 
-        self.assertEqual(3, graph.number_of_nodes(), msg='parent node was not added during Manager.enrich_proteins')
+        self.assertEqual(3, graph.number_of_nodes(),
+                         msg='parent node was not added during Manager.enrich_proteins')
         self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
 
-        self.assertTrue(graph.has_node_with_data(test_enzyme),
-                        msg='incorrect node was added: {}:{}'.format(list(graph)[0], graph.node[list(graph)[0]]))
+        self.assertIn(test_enzyme, graph,
+                      msg='incorrect node was added: {}:{}'.format(list(graph)[0], graph.nodes[list(graph)[0]]))
 
-        self.assertIn(test_protein_a.as_tuple(), graph[test_enzyme.as_tuple()])
-        self.assertIn(test_protein_b.as_tuple(), graph[test_enzyme.as_tuple()])
+        self.assertIn(test_protein_a, graph[test_enzyme])
+        self.assertIn(test_protein_b, graph[test_enzyme])
 
     def test_prosite_classes(self):
         """Tests that the ProSites for enzymes are added"""
@@ -104,12 +105,12 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(1, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        enrich_prosite_classes(graph=graph, connection=self.manager)
+        enrich_prosite_classes(graph=graph, manager=self.manager)
 
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(1, graph.number_of_edges())
 
-        self.assertTrue(graph.has_node_with_data(test_prosite))
+        self.assertIn(test_prosite, graph)
 
 
 if __name__ == '__main__':

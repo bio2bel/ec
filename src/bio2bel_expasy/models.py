@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""ExPASy database model"""
+"""SQLAlchemy models for Bio2BEL ExPASy."""
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
@@ -34,7 +34,8 @@ enzyme_protein = Table(
 
 
 class Enzyme(Base):
-    """ExPASy's main entry"""
+    """ExPASy's main entry."""
+
     __tablename__ = ENZYME_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
@@ -45,18 +46,9 @@ class Enzyme(Base):
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     children = relationship('Enzyme', backref=backref('parent', remote_side=[id]))
 
-    def __str__(self):
-        return self.expasy_id
-
-    def __repr__(self):
-        return self.expasy_id
-
     @property
-    def level(self):
-        """Says what level (1, 2, 3, or 4) this enzyme is based on the number of dashes in its id
-
-        :rtype: int
-        """
+    def level(self) -> int:
+        """Return what level (1, 2, 3, or 4) this enzyme is based on the number of dashes in its id."""
         return 4 - self.expasy_id.count('-')
 
     def to_json(self):
@@ -69,20 +61,24 @@ class Enzyme(Base):
             description=self.description
         )
 
-    def serialize_to_bel(self):
-        """Returns a PyBEL node data dictionary representing this enzyme
-
-        :return: dict
-        """
+    def as_bel(self) -> protein:
+        """Return a PyBEL node representing this enzyme. """
         return protein(
             namespace=EXPASY,
             name=str(self.expasy_id),
             identifier=str(self.expasy_id)
         )
 
+    def __str__(self):
+        return self.expasy_id
+
+    def __repr__(self):
+        return self.expasy_id
+
 
 class Prosite(Base):
-    """Maps ec to prosite entries"""
+    """Maps ec to prosite entries."""
+
     __tablename__ = PROSITE_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
@@ -91,22 +87,20 @@ class Prosite(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
 
-    def __str__(self):
-        return self.prosite_id
-
-    def serialize_to_bel(self):
-        """Returns a PyBEL node data dictionary representing this ProSite entry
-
-        :return: dict
-        """
+    def as_bel(self) -> protein:
+        """Return a PyBEL node data dictionary representing this ProSite entry."""
         return protein(
             namespace=PROSITE,
             identifier=str(self.prosite_id)
         )
 
+    def __str__(self):
+        return self.prosite_id
+
 
 class Protein(Base):
-    """Maps ec to swissprot or uniprot"""
+    """Maps enzyme to SwissProt or UniProt."""
+
     __tablename__ = PROTEIN_TABLE_NAME
 
     id = Column(Integer, primary_key=True)
@@ -119,16 +113,13 @@ class Protein(Base):
 
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
 
-    def __str__(self):
-        return self.accession_number
-
-    def serialize_to_bel(self):
-        """Returns a PyBEL node data dictionary representing this UniProt entry
-
-        :return: dict
-        """
+    def as_bel(self) -> protein:
+        """Return a PyBEL node data dictionary representing this UniProt entry."""
         return protein(
             namespace=UNIPROT,
             name=str(self.entry_name),
             identifier=str(self.accession_number)
         )
+
+    def __str__(self):
+        return self.accession_number

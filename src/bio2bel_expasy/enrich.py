@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
+"""Convenient wrapper functions for the manager."""
 
+import logging
+from typing import Optional
+
+from pybel import BELGraph
 from .manager import Manager
 
 log = logging.getLogger(__name__)
@@ -13,34 +17,29 @@ __all__ = [
 ]
 
 
-def enrich_proteins(graph, connection=None):
+def enrich_proteins(graph: BELGraph, manager: Optional[Manager] = None) -> None:
     """Enriches proteins in the BEL graph with :data:`pybel.constants.IS_A` relations to their enzyme classes.
 
     1. Gets a list of UniProt proteins
     2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
-
-    :param pybel.BELGraph graph: A BEL graph
-    :type connection: str or bio2bel_expasy.Manager
     """
-    m = Manager.ensure(connection)
-    return m.enrich_proteins_with_enzyme_families(graph)
+    if manager is None:
+        manager = Manager()
+
+    return manager.enrich_proteins_with_enzyme_families(graph)
 
 
-def enrich_prosite_classes(graph, connection=None):
-    """Enriches Enzyme classes for ProSite nodes in the graph.
+def enrich_prosite_classes(graph: BELGraph, manager: Optional[Manager] = None) -> None:
+    """Enriches Enzyme classes for ProSite nodes in the graph."""
+    if manager is None:
+        manager = Manager()
 
-    :param pybel.BELGraph graph: A BEL graph
-    :type connection: str or bio2bel_expasy.Manager
-    """
-    m = Manager.ensure(connection=connection)
-    return m.enrich_enzymes_with_prosites(graph)
+    return manager.enrich_enzymes_with_prosites(graph)
 
 
-def enrich_enzymes(graph, connection=None):
-    """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
+def enrich_enzymes(graph: BELGraph, manager: Optional[Manager] = None) -> None:
+    """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)."""
+    if manager is None:
+        manager = Manager()
 
-    :param pybel.BELGraph graph: A BEL graph
-    :type connection: str or bio2bel_expasy.Manager
-    """
-    m = Manager.ensure(connection=connection)
-    return m.enrich_enzymes(graph)
+    return manager.enrich_enzymes(graph)
