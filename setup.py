@@ -44,7 +44,6 @@ ENTRY_POINTS = {
     ]
 }
 
-
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -87,6 +86,8 @@ if __name__ == '__main__':
         maintainer=find_meta('author'),
         maintainer_email=find_meta('email'),
         license=find_meta('license'),
+        classifiers=CLASSIFIERS,
+        keywords=KEYWORDS,
         packages=PACKAGES,
         package_dir={'': 'src'},
         install_requires=INSTALL_REQUIRES,
