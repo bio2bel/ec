@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Manager for Bio2BEL ExPASy."""
+
 import logging
 from typing import List, Mapping, Optional
 
@@ -23,7 +25,7 @@ log = logging.getLogger(__name__)
 
 
 class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
-    """Creates a connection to database and a persistent session using SQLAlchemy"""
+    """Creates a connection to database and a persistent session using SQLAlchemy."""
 
     _base = Base
     module_name = MODULE_NAME
@@ -114,12 +116,11 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return prosite
 
     def get_or_create_protein(self, accession_number: str, entry_name: str, **kwargs) -> Protein:
-        """
+        """Get a protein by its UniProt accession or create it.
 
         :param accession_number:
         :param entry_name:
         :param kwargs:
-        :rtype: Protein
         """
         protein = self.id_uniprot.get(accession_number)
 
@@ -142,8 +143,8 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
     def populate(self, tree_path: Optional[str] = None, database_path: Optional[str] = None) -> None:
         """Populate the database..
 
-        :param Optional[str] tree_path:
-        :param Optional[str] database_path:
+        :param tree_path:
+        :param database_path:
         """
         self.populate_tree(path=tree_path)
         self.populate_database(path=database_path)
@@ -151,8 +152,8 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
     def populate_tree(self, path: Optional[str] = None, force_download: bool = False) -> None:
         """Download and populate the ExPASy tree.
 
-        :param Optional[str] path: A custom url to download
-        :param bool force_download: If true, overwrites a previously cached file
+        :param path: A custom url to download
+        :param force_download: If true, overwrites a previously cached file
         """
         tree = get_tree(path=path, force_download=force_download)
 
@@ -173,8 +174,8 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
     def populate_database(self, path: Optional[str] = None, force_download: bool = False) -> None:
         """Populate the ExPASy database.
 
-        :param Optional[str] path: A custom url to download
-        :param bool force_download: If true, overwrites a previously cached file
+        :param path: A custom url to download
+        :param force_download: If true, overwrites a previously cached file
         """
         data_dict = get_expasy_database(path=path, force_download=force_download)
 
@@ -207,21 +208,19 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         self.session.commit()
 
     def get_enzyme_by_id(self, expasy_id: str) -> Optional[Enzyme]:
-        """Gets an enzyme by its ExPASy identifier.
+        """Get an enzyme by its ExPASy identifier.
         
         Implementation note: canonicalizes identifier to remove all spaces first.
 
-        :param str expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
-        :rtype: Optional[Enzyme]
+        :param expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
         """
         canonical_expasy_id = normalize_expasy_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
     def get_parent_by_expasy_id(self, expasy_id: str) -> Optional[Enzyme]:
-        """Returns the parent ID of ExPASy identifier if exist otherwise returns None
+        """Return the parent ID of ExPASy identifier if exist otherwise returns None.
 
-        :param str expasy_id: An ExPASy identifier
-        :rtype: Optional[Enzyme]
+        :param expasy_id: An ExPASy identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -231,10 +230,9 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return enzyme.parent
 
     def get_children_by_expasy_id(self, expasy_id: str) -> Optional[List[Enzyme]]:
-        """Returns list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier
+        """Return a list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier.
 
-        :param str expasy_id: An ExPASy enzyme identifier
-        :rtype: Optional[list[Enzyme]]
+        :param expasy_id: An ExPASy enzyme identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -264,7 +262,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return self.session.query(Prosite).filter(Prosite.prosite_id == prosite_id).one_or_none()
 
     def get_prosites_by_expasy_id(self, expasy_id: str) -> Optional[List[Prosite]]:
-        """Get a list of ProSites associated with the enzyme corresponding to the given identifier
+        """Get a list of ProSites associated with the enzyme corresponding to the given identifier.
 
         :param expasy_id: An ExPASy identifier
         """
@@ -276,7 +274,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return enzyme.prosites
 
     def get_enzymes_by_prosite_id(self, prosite_id: str) -> Optional[List[Enzyme]]:
-        """Returns Enzyme ID lists associated with the given ProSite ID
+        """Return a list of enzymes associated with the given ProSite ID.
 
         :param prosite_id: ProSite identifier
         """
@@ -288,7 +286,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return prosite.enzymes
 
     def get_proteins_by_expasy_id(self, expasy_id: str) -> Optional[List[Protein]]:
-        """Returns a list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
+        """Return a list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme_id.
 
         :param expasy_id: An ExPASy identifier
         """
@@ -319,7 +317,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         return protein.enzymes
 
     def enrich_proteins_with_enzyme_families(self, graph: BELGraph) -> None:
-        """Enriches proteins in the BEL graph with IS_A relations to their enzyme classes.
+        """Enrich proteins in the BEL graph with IS_A relations to their enzyme classes.
 
         1. Gets a list of UniProt proteins
         2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
@@ -342,21 +340,21 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
             for enzyme in enzymes:
                 graph.add_unqualified_edge(enzyme.as_bel(), node, IS_A)
 
-    def _look_up_enzyme(self, data: BaseEntity) -> Optional[Enzyme]:
-        namespace = data.get(NAMESPACE)
+    def look_up_enzyme(self, node: BaseEntity) -> Optional[Enzyme]:
+        namespace = node.get(NAMESPACE)
         if namespace is None:
             return
 
         if namespace.lower() not in {'expasy', 'ec', 'eccode'}:
             return
 
-        name = data.get(NAME)
+        name = node.get(NAME)
 
         return self.get_enzyme_by_id(name)
 
     def enrich_enzyme_with_proteins(self, graph: BELGraph, node: BaseEntity) -> None:
         """Enrich an enzyme with all of its member proteins."""
-        enzyme = self._look_up_enzyme(node)
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
 
@@ -365,7 +363,8 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
                 graph.add_is_a(protein.as_bel(), node)
 
     def enrich_enzyme_parents(self, graph: BELGraph, node: BaseEntity) -> None:
-        enzyme = self._look_up_enzyme(node)
+        """Enrich an enzyme with its parents."""
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
 
@@ -391,7 +390,8 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
             self.enrich_enzyme_children(graph, child_bel)
 
     def enrich_enzyme_children(self, graph: BELGraph, node: BaseEntity) -> None:
-        enzyme = self._look_up_enzyme(node)
+        """Enrich an enzyme with all of its children."""
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
         self._enrich_enzyme_children_helper(graph, enzyme)
@@ -404,9 +404,9 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
             self.enrich_enzyme_with_proteins(graph, node)
 
     def enrich_enzymes_with_prosites(self, graph: BELGraph) -> None:
-        """Enriches Enzyme classes in the graph with ProSites."""
+        """Enrich enzyme classes in the graph with ProSites."""
         for node in list(graph):
-            enzyme = self._look_up_enzyme(node)
+            enzyme = self.look_up_enzyme(node)
             if enzyme is None:
                 continue
 

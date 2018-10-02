@@ -2,21 +2,22 @@
 
 """SQLAlchemy models for Bio2BEL ExPASy."""
 
+from typing import Mapping
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import backref, relationship
 
 from pybel.dsl import protein
-from .constants import EXPASY, PROSITE, UNIPROT
+from .constants import EXPASY, PROSITE, UNIPROT, MODULE_NAME
 
-TABLE_PREFIX = 'expasy'
-ENZYME_TABLE_NAME = '{}_enzyme'.format(TABLE_PREFIX)
-PROTEIN_TABLE_NAME = '{}_protein'.format(TABLE_PREFIX)
-PROSITE_TABLE_NAME = '{}_prosite'.format(TABLE_PREFIX)
-ENZYME_PROSITE_TABLE_NAME = '{}_enzyme_prosite'.format(TABLE_PREFIX)
-ENZYME_PROTEIN_TABLE_NAME = '{}_enzyme_protein'.format(TABLE_PREFIX)
+ENZYME_TABLE_NAME = f'{MODULE_NAME}_enzyme'
+PROTEIN_TABLE_NAME = f'{MODULE_NAME}_protein'
+PROSITE_TABLE_NAME = f'{MODULE_NAME}_prosite'
+ENZYME_PROSITE_TABLE_NAME = f'{MODULE_NAME}_enzyme_prosite'
+ENZYME_PROTEIN_TABLE_NAME = f'{MODULE_NAME}_enzyme_protein'
 
-Base = declarative_base()
+Base: DeclarativeMeta = declarative_base()
 
 enzyme_prosite = Table(
     ENZYME_PROSITE_TABLE_NAME,
@@ -51,18 +52,15 @@ class Enzyme(Base):
         """Return what level (1, 2, 3, or 4) this enzyme is based on the number of dashes in its id."""
         return 4 - self.expasy_id.count('-')
 
-    def to_json(self):
-        """Returns the data from this model as a dictionary
-
-        :rtype: dict
-        """
+    def to_json(self) -> Mapping:
+        """Return the data from this model as a dictionary."""
         return dict(
             expasy_id=self.expasy_id,
             description=self.description
         )
 
     def as_bel(self) -> protein:
-        """Return a PyBEL node representing this enzyme. """
+        """Return a PyBEL node representing this enzyme."""
         return protein(
             namespace=EXPASY,
             name=str(self.expasy_id),
