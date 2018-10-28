@@ -47,6 +47,8 @@ class Enzyme(Base):
     parent_id = Column(Integer, ForeignKey('{}.id'.format(ENZYME_TABLE_NAME)), nullable=True)
     children = relationship('Enzyme', backref=backref('parent', remote_side=[id]))
 
+    bel_encoding = 'GRP'
+
     @property
     def level(self) -> int:
         """Return what level (1, 2, 3, or 4) this enzyme is based on the number of dashes in its id."""
@@ -85,6 +87,8 @@ class Prosite(Base):
 
     enzymes = relationship('Enzyme', secondary=enzyme_prosite, backref=backref('prosites'))
 
+    bel_encoding = 'GRP'
+
     def as_bel(self) -> protein:
         """Return a PyBEL node data dictionary representing this ProSite entry."""
         return protein(
@@ -110,6 +114,8 @@ class Protein(Base):
     entry_name = Column(String(255), doc='UniProt `entry name <http://www.uniprot.org/help/entry_name>`_.')
 
     #  is_SwissProt = Column(Boolean) #True for SwissProt False for else (UniProt)
+
+    bel_encoding = 'GRP'
 
     def as_bel(self) -> protein:
         """Return a PyBEL node data dictionary representing this UniProt entry."""
