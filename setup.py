@@ -27,7 +27,7 @@ INSTALL_REQUIRES = [
     'requests',
     'tqdm',
     'sqlalchemy',
-    'networkx',
+    'networkx>=2.1',
     'click',
     'pandas',
     'bio2bel',
