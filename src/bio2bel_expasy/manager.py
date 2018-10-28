@@ -30,8 +30,9 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
     _base = Base
     module_name = MODULE_NAME
     flask_admin_models = [Enzyme, Protein, Prosite]
-    namespace_model = Enzyme
 
+    namespace_model = Enzyme
+    has_names = False
     identifiers_recommended = 'Enzyme Nomenclature'
     identifiers_pattern = '^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$'
     identifiers_miriam = 'MIR:00000004'
