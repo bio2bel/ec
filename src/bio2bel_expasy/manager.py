@@ -16,7 +16,7 @@ from pybel.dsl import BaseEntity
 from pybel.manager.models import Namespace, NamespaceEntry
 from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein, enzyme_prosite, enzyme_protein
-from .parser.database import *
+from .parser.database import get_expasy_database, ID, DE, PR, DR
 from .parser.tree import get_tree, give_edge, normalize_expasy_id
 
 __all__ = ['Manager']
@@ -34,7 +34,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
     namespace_model = Enzyme
     has_names = False
     identifiers_recommended = 'Enzyme Nomenclature'
-    identifiers_pattern = '^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$'
+    identifiers_pattern = r'^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$'
     identifiers_miriam = 'MIR:00000004'
     identifiers_namespace = 'ec-code'
     identifiers_url = 'http://identifiers.org/ec-code/'
@@ -210,7 +210,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
 
     def get_enzyme_by_id(self, expasy_id: str) -> Optional[Enzyme]:
         """Get an enzyme by its ExPASy identifier.
-        
+
         Implementation note: canonicalizes identifier to remove all spaces first.
 
         :param expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
@@ -342,6 +342,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
                 graph.add_unqualified_edge(enzyme.as_bel(), node, IS_A)
 
     def look_up_enzyme(self, node: BaseEntity) -> Optional[Enzyme]:
+        """Try to get an enzyme model from the given node."""
         namespace = node.get(NAMESPACE)
         if namespace is None:
             return
