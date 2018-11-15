@@ -324,13 +324,13 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
 
         """
-        for node in graph:
+        for node in list(graph):
             namespace = node.get(NAMESPACE)
 
             if namespace is None:
                 continue
 
-            if namespace not in {'UP', 'UNIPROT'}:
+            if namespace.lower() not in {'up', 'uniprot'}:
                 continue
 
             enzymes = self.get_enzymes_by_uniprot_id(node.identifier)

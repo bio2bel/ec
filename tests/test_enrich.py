@@ -3,7 +3,7 @@
 import unittest
 
 from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
-from bio2bel_expasy.enrich import enrich_prosite_classes, enrich_proteins
+from bio2bel_expasy.enrich import enrich_prosite_classes
 from bio2bel_expasy.parser.tree import normalize_expasy_id
 from pybel import BELGraph
 from pybel.dsl import protein
@@ -85,11 +85,11 @@ class TestEnrich(PopulatedDatabaseMixin):
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
-        enrich_proteins(graph, manager=self.manager)
+        self.manager.enrich_proteins_with_enzyme_families(graph)
 
+        self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
         self.assertEqual(3, graph.number_of_nodes(),
                          msg='parent node was not added during Manager.enrich_proteins')
-        self.assertEqual(2, graph.number_of_edges(), msg='IS_A edges to parent node were not added')
 
         self.assertIn(test_enzyme, graph,
                       msg='incorrect node was added: {}:{}'.format(list(graph)[0], graph.nodes[list(graph)[0]]))

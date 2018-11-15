@@ -11,22 +11,9 @@ from .manager import Manager
 log = logging.getLogger(__name__)
 
 __all__ = [
-    'enrich_proteins',
     'enrich_prosite_classes',
-    'enrich_enzymes'
+    'enrich_enzymes',
 ]
-
-
-def enrich_proteins(graph: BELGraph, manager: Optional[Manager] = None) -> None:
-    """Enriches proteins in the BEL graph with :data:`pybel.constants.IS_A` relations to their enzyme classes.
-
-    1. Gets a list of UniProt proteins
-    2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
-    """
-    if manager is None:
-        manager = Manager()
-
-    return manager.enrich_proteins_with_enzyme_families(graph)
 
 
 def enrich_prosite_classes(graph: BELGraph, manager: Optional[Manager] = None) -> None:
