@@ -60,8 +60,8 @@ Gasteiger, E., *et al.* (2003). `ExPASy: The proteomics server for in-depth prot
     :target: https://codecov.io/gh/bio2bel/expasy?branch=master
     :alt: Coverage Status
 
-.. |docs| image:: http://readthedocs.org/projects/bio2bel-expasy/badge/?version=latest
-    :target: http://bio2bel.readthedocs.io/projects/ExPASy/en/latest/?badge=latest
+.. |docs| image:: https://readthedocs.org/projects/bio2bel-expasy/badge/?version=latest
+    :target: https://bio2bel.readthedocs.io/projects/expasy/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. |python_versions| image:: https://img.shields.io/pypi/pyversions/bio2bel_expasy.svg
