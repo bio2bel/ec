@@ -39,7 +39,7 @@ Bio2BEL ExPASy is tested with Python3 on Linux using `Travis CI <https://travis-
 from . import cli
 from .manager import Manager
 
-__version__ = '0.1.2-dev'
+__version__ = '0.2.0-dev'
 
 __title__ = 'bio2bel_expasy'
 __description__ = "A package for parsing and storing the ExPASy Enzyme Database"
