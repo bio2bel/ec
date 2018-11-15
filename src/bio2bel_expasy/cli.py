@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import sys
+"""Command line interface for Bio2BEL ExPASy."""
 
 import click
 
 from .manager import Manager
 
 main = Manager.get_cli()
-
-
-@main.command()
-@click.option('-o', '--output', type=click.File('w'), default=sys.stdout)
-@click.pass_obj
-def write_bel_namespace(manager, output):
-    """Write the BEL namespace"""
-    manager.write_bel_namespace(output)
 
 
 @main.group()

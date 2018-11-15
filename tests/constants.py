@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Test constants for Bio2BEL ExPASy."""
+
 import logging
 import os
 

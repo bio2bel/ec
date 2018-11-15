@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 
+"""Manager for Bio2BEL ExPASy."""
+
 import logging
+from typing import List, Mapping, Optional
+
 from tqdm import tqdm
 
 from bio2bel import AbstractManager
-from pybel.constants import IDENTIFIER, IS_A, NAME, NAMESPACE, NAMESPACE_DOMAIN_GENE
-from pybel.resources import write_namespace
+from bio2bel.manager.flask_manager import FlaskMixin
+from bio2bel.manager.namespace_manager import BELNamespaceManagerMixin
+from pybel import BELGraph
+from pybel.constants import IS_A, NAME, NAMESPACE
+from pybel.dsl import BaseEntity
+from pybel.manager.models import Namespace, NamespaceEntry
 from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein, enzyme_prosite, enzyme_protein
-from .parser.database import *
+from .parser.database import get_expasy_database, ID, DE, PR, DR
 from .parser.tree import get_tree, give_edge, normalize_expasy_id
 
 __all__ = ['Manager']
@@ -16,92 +24,55 @@ __all__ = ['Manager']
 log = logging.getLogger(__name__)
 
 
-def _write_bel_namespace_helper(values, file):
-    """
-    :param iter[str] or dict[str,str] values:
-    :param file:
-    """
-    write_namespace(
-        namespace_name='ExPASy Enzyme Classes',
-        namespace_keyword='EC',
-        namespace_domain=NAMESPACE_DOMAIN_GENE,
-        author_name='Charles Tapley Hoyt',
-        citation_name='EC',
-        namespace_query_url='https://enzyme.expasy.org/EC/[VALUE]',
-        values=values,
-        functions='P',
-        file=file
-    )
+class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
+    """Creates a connection to database and a persistent session using SQLAlchemy."""
 
-
-class Manager(AbstractManager):
-    """Creates a connection to database and a persistent session using SQLAlchemy"""
-
+    _base = Base
     module_name = MODULE_NAME
     flask_admin_models = [Enzyme, Protein, Prosite]
 
-    def __init__(self, connection=None):
-        """
-        :param str connection: SQLAlchemy
-        """
-        super().__init__(connection=connection)
+    namespace_model = Enzyme
+    has_names = False
+    identifiers_recommended = 'Enzyme Nomenclature'
+    identifiers_pattern = r'^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$'
+    identifiers_miriam = 'MIR:00000004'
+    identifiers_namespace = 'ec-code'
+    identifiers_url = 'http://identifiers.org/ec-code/'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         #: Maps canonicalized ExPASy enzyme identifiers to their SQLAlchemy models
         self.id_enzyme = {}
         self.id_prosite = {}
         self.id_uniprot = {}
 
-    @property
-    def _base(self):
-        return Base
-
-    def is_populated(self):
-        """Check if the database is already populated.
-
-        :rtype: bool
-        """
+    def is_populated(self) -> bool:
+        """Check if the database is already populated."""
         return 0 < self.count_enzymes()
 
-    def count_enzymes(self):
-        """Counts the number of enzyme entries in the database
-
-        :rtype: int
-        """
+    def count_enzymes(self) -> int:
+        """Count the number of enzyme entries in the database."""
         return self._count_model(Enzyme)
 
-    def count_enzyme_prosites(self):
-        """Counts the number of enzyme-prosite annotations
-
-        :rtype: int
-        """
+    def count_enzyme_prosites(self) -> int:
+        """Count the number of enzyme-prosite annotations."""
         return self._count_model(enzyme_prosite)
 
-    def count_prosites(self):
-        """Counts the number of ProSite entries in the database
-
-        :rtype: int
-        """
+    def count_prosites(self) -> int:
+        """Count the number of ProSite entries in the database."""
         return self._count_model(Prosite)
 
-    def count_enzyme_proteins(self):
-        """Counts the number of enzyme-protein annotations
-
-        :rtype: int
-        """
+    def count_enzyme_proteins(self) -> int:
+        """Count the number of enzyme-protein annotations."""
         return self._count_model(enzyme_protein)
 
-    def count_proteins(self):
-        """Counts the number of protein entries in the database
-
-        :rtype: int
-        """
+    def count_proteins(self) -> int:
+        """Count the number of protein entries in the database."""
         return self._count_model(Protein)
 
-    def summarize(self):
-        """Returns a summary dictionary over the content of the database
-
-        :rtype: dict[str,int]
-        """
+    def summarize(self) -> Mapping[str, int]:
+        """Return a summary dictionary over the content of the database. """
         return dict(
             enzymes=self.count_enzymes(),
             enzyme_prosites=self.count_enzyme_prosites(),
@@ -110,13 +81,8 @@ class Manager(AbstractManager):
             proteins=self.count_proteins()
         )
 
-    def get_or_create_enzyme(self, expasy_id, description=None):
-        """Gets an enzyme from the database or creates it
-
-        :param str expasy_id:
-        :param Optional[str] description:
-        :rtype: Enzyme
-        """
+    def get_or_create_enzyme(self, expasy_id: str, description: Optional[str] = None) -> Enzyme:
+        """Get an enzyme from the database or creates it."""
         enzyme = self.id_enzyme.get(expasy_id)
 
         if enzyme is not None:
@@ -134,13 +100,8 @@ class Manager(AbstractManager):
 
         return enzyme
 
-    def get_or_create_prosite(self, prosite_id, **kwargs):
-        """
-
-        :param str prosite_id:
-        :param kwargs:
-        :rtype: Prosite
-        """
+    def get_or_create_prosite(self, prosite_id: str, **kwargs) -> Prosite:
+        """Get a prosite from the database or creates it."""
         prosite = self.id_prosite.get(prosite_id)
 
         if prosite is not None:
@@ -155,13 +116,12 @@ class Manager(AbstractManager):
 
         return prosite
 
-    def get_or_create_protein(self, accession_number, entry_name, **kwargs):
-        """
+    def get_or_create_protein(self, accession_number: str, entry_name: str, **kwargs) -> Protein:
+        """Get a protein by its UniProt accession or create it.
 
         :param accession_number:
         :param entry_name:
         :param kwargs:
-        :rtype: Protein
         """
         protein = self.id_uniprot.get(accession_number)
 
@@ -181,30 +141,30 @@ class Manager(AbstractManager):
 
         return protein
 
-    def populate(self, tree_path=None, database_path=None):
-        """Populates everything
+    def populate(self, tree_path: Optional[str] = None, database_path: Optional[str] = None) -> None:
+        """Populate the database..
 
-        :param Optional[str] tree_path:
-        :param Optional[str] database_path:
+        :param tree_path:
+        :param database_path:
         """
         self.populate_tree(path=tree_path)
         self.populate_database(path=database_path)
 
-    def populate_tree(self, path=None, force_download=False):
-        """Downloads and populates the ExPASy tree
+    def populate_tree(self, path: Optional[str] = None, force_download: bool = False) -> None:
+        """Download and populate the ExPASy tree.
 
-        :param Optional[str] path: A custom url to download
-        :param bool force_download: If true, overwrites a previously cached file
+        :param path: A custom url to download
+        :param force_download: If true, overwrites a previously cached file
         """
         tree = get_tree(path=path, force_download=force_download)
 
-        for expasy_id, data in tqdm(tree.nodes_iter(data=True), desc='Classes', total=tree.number_of_nodes()):
+        for expasy_id, data in tqdm(tree.nodes(data=True), desc='Classes', total=tree.number_of_nodes()):
             self.get_or_create_enzyme(
                 expasy_id=expasy_id,
                 description=data['description']
             )
 
-        for parent_id, child_id in tqdm(tree.edges_iter(), desc='Tree', total=tree.number_of_edges()):
+        for parent_id, child_id in tqdm(tree.edges(), desc='Tree', total=tree.number_of_edges()):
             parent = self.id_enzyme[parent_id]
             child = self.id_enzyme[child_id]
             parent.children.append(child)
@@ -212,11 +172,11 @@ class Manager(AbstractManager):
         log.info("committing")
         self.session.commit()
 
-    def populate_database(self, path=None, force_download=False):
-        """Populates the ExPASy database.
+    def populate_database(self, path: Optional[str] = None, force_download: bool = False) -> None:
+        """Populate the ExPASy database.
 
-        :param Optional[str] path: A custom url to download
-        :param bool force_download: If true, overwrites a previously cached file
+        :param path: A custom url to download
+        :param force_download: If true, overwrites a previously cached file
         """
         data_dict = get_expasy_database(path=path, force_download=force_download)
 
@@ -248,22 +208,20 @@ class Manager(AbstractManager):
         log.info("committing")
         self.session.commit()
 
-    def get_enzyme_by_id(self, expasy_id):
-        """Gets an enzyme by its ExPASy identifier.
-        
+    def get_enzyme_by_id(self, expasy_id: str) -> Optional[Enzyme]:
+        """Get an enzyme by its ExPASy identifier.
+
         Implementation note: canonicalizes identifier to remove all spaces first.
 
-        :param str expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
-        :rtype: Optional[Enzyme]
+        :param expasy_id: An ExPASy identifier. Example: 1.3.3.- or 1.3.3.19
         """
         canonical_expasy_id = normalize_expasy_id(expasy_id)
         return self.session.query(Enzyme).filter(Enzyme.expasy_id == canonical_expasy_id).one_or_none()
 
-    def get_parent_by_expasy_id(self, expasy_id):
-        """Returns the parent ID of ExPASy identifier if exist otherwise returns None
+    def get_parent_by_expasy_id(self, expasy_id: str) -> Optional[Enzyme]:
+        """Return the parent ID of ExPASy identifier if exist otherwise returns None.
 
-        :param str expasy_id: An ExPASy identifier
-        :rtype: Optional[Enzyme]
+        :param expasy_id: An ExPASy identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -272,11 +230,10 @@ class Manager(AbstractManager):
 
         return enzyme.parent
 
-    def get_children_by_expasy_id(self, expasy_id):
-        """Returns list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier
+    def get_children_by_expasy_id(self, expasy_id: str) -> Optional[List[Enzyme]]:
+        """Return a list of enzymes which are children of the enzyme with the given ExPASy enzyme identifier.
 
-        :param str expasy_id: An ExPASy enzyme identifier
-        :rtype: Optional[list[Enzyme]]
+        :param expasy_id: An ExPASy enzyme identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -285,11 +242,10 @@ class Manager(AbstractManager):
 
         return enzyme.children
 
-    def get_protein_by_uniprot_id(self, uniprot_id):
-        """Gets a protein having the given UniProt identifier
+    def get_protein_by_uniprot_id(self, uniprot_id: str) -> Optional[Protein]:
+        """Get a protein having the given UniProt identifier.
 
-        :param str uniprot_id: A UniProt identifier
-        :rtype: Optional[Protein]
+        :param uniprot_id: A UniProt identifier
 
         >>> from bio2bel_expasy import Manager
         >>> manager = Manager()
@@ -299,19 +255,17 @@ class Manager(AbstractManager):
         """
         return self.session.query(Protein).filter(Protein.accession_number == uniprot_id).one_or_none()
 
-    def get_prosite_by_id(self, prosite_id):
-        """Gets a ProSite having the given ProSite identifier
+    def get_prosite_by_id(self, prosite_id: str) -> Optional[Prosite]:
+        """Get a ProSite having the given ProSite identifier.
 
-        :param str prosite_id: A ProSite identifier
-        :rtype: Optional[Enzyme]
+        :param prosite_id: A ProSite identifier
         """
         return self.session.query(Prosite).filter(Prosite.prosite_id == prosite_id).one_or_none()
 
-    def get_prosites_by_expasy_id(self, expasy_id):
-        """Gets a list of ProSites associated with the enzyme corresponding to the given identifier
+    def get_prosites_by_expasy_id(self, expasy_id: str) -> Optional[List[Prosite]]:
+        """Get a list of ProSites associated with the enzyme corresponding to the given identifier.
 
-        :param str expasy_id: An ExPASy identifier
-        :rtype: Optional[list[Enzyme]]
+        :param expasy_id: An ExPASy identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -320,11 +274,10 @@ class Manager(AbstractManager):
 
         return enzyme.prosites
 
-    def get_enzymes_by_prosite_id(self, prosite_id):
-        """Returns Enzyme ID lists associated with the given ProSite ID
+    def get_enzymes_by_prosite_id(self, prosite_id: str) -> Optional[List[Enzyme]]:
+        """Return a list of enzymes associated with the given ProSite ID.
 
-        :param str prosite_id: ProSite identifier
-        :rtype: Optional[list[Enzyme]]
+        :param prosite_id: ProSite identifier
         """
         prosite = self.get_prosite_by_id(prosite_id)
 
@@ -333,11 +286,10 @@ class Manager(AbstractManager):
 
         return prosite.enzymes
 
-    def get_proteins_by_expasy_id(self, expasy_id):
-        """Returns list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme _id
+    def get_proteins_by_expasy_id(self, expasy_id: str) -> Optional[List[Protein]]:
+        """Return a list of UniProt entries as tuples (accession_number, entry_name) of the given enzyme_id.
 
-        :param str expasy_id: An ExPASy identifier
-        :rtype: Optional[list[Protein]]
+        :param expasy_id: An ExPASy identifier
         """
         enzyme = self.get_enzyme_by_id(expasy_id)
 
@@ -346,11 +298,10 @@ class Manager(AbstractManager):
 
         return enzyme.proteins
 
-    def get_enzymes_by_uniprot_id(self, uniprot_id):
-        """Returns a list of enzymes annotated to the protein with the given UniProt accession number.
+    def get_enzymes_by_uniprot_id(self, uniprot_id: str) -> Optional[List[Enzyme]]:
+        """Return a list of enzymes annotated to the protein with the given UniProt accession number.
 
-        :param str uniprot_id: A UniProt identifier
-        :rtype: Optional[list[Enzyme]]
+        :param uniprot_id: A UniProt identifier
 
         Example:
 
@@ -366,147 +317,106 @@ class Manager(AbstractManager):
 
         return protein.enzymes
 
-    def enrich_proteins_with_enzyme_families(self, graph):
-        """Enriches proteins in the BEL graph with IS_A relations to their enzyme classes.
+    def enrich_proteins_with_enzyme_families(self, graph: BELGraph) -> None:
+        """Enrich proteins in the BEL graph with IS_A relations to their enzyme classes.
 
         1. Gets a list of UniProt proteins
         2. Annotates :data:`pybel.constants.IS_A` relations for all enzyme classes it finds
 
-        :param pybel.BELGraph graph: A BEL graph
         """
-        for node, data in graph.nodes(data=True):
-            namespace = data.get(NAMESPACE)
+        for node in list(graph):
+            namespace = node.get(NAMESPACE)
 
             if namespace is None:
                 continue
 
-            if namespace not in {'UP', 'UNIPROT'}:
+            if namespace.lower() not in {'up', 'uniprot'}:
                 continue
 
-            enzymes = self.get_enzymes_by_uniprot_id(data[IDENTIFIER])
+            enzymes = self.get_enzymes_by_uniprot_id(node.identifier)
 
             if enzymes is None:
                 continue
 
             for enzyme in enzymes:
-                graph.add_unqualified_edge(enzyme.serialize_to_bel(), node, IS_A)
+                graph.add_unqualified_edge(enzyme.as_bel(), node, IS_A)
 
-    def _look_up_enzyme(self, data):
-        """
-
-        :param data:
-        :return: Optional[Enzyme]
-        """
-        namespace = data.get(NAMESPACE)
-
+    def look_up_enzyme(self, node: BaseEntity) -> Optional[Enzyme]:
+        """Try to get an enzyme model from the given node."""
+        namespace = node.get(NAMESPACE)
         if namespace is None:
             return
 
-        if namespace not in {'EXPASY', 'EC'}:
+        if namespace.lower() not in {'expasy', 'ec', 'eccode'}:
             return
 
-        name = data.get(NAME)
+        name = node.get(NAME)
 
         return self.get_enzyme_by_id(name)
 
-    def enrich_enzyme_with_proteins(self, graph, node):
-        """Enrich an enzyme with all of its member proteins
-
-        :param pybel.BELGraph graph:
-        :param tuple node:
-        """
-        data = graph.node[node]
-        enzyme = self._look_up_enzyme(data)
+    def enrich_enzyme_with_proteins(self, graph: BELGraph, node: BaseEntity) -> None:
+        """Enrich an enzyme with all of its member proteins."""
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
 
         if enzyme.level == 4:
             for protein in enzyme.proteins:
-                graph.add_is_a(protein.serialize_to_bel(), node)
+                graph.add_is_a(protein.as_bel(), node)
 
-    def enrich_enzyme_parents(self, graph, node):
-        """
-
-        :param pybel.BELGraph graph:
-        :param tuple node:
-        """
-        data = graph.node[node]
-        enzyme = self._look_up_enzyme(data)
+    def enrich_enzyme_parents(self, graph: BELGraph, node: BaseEntity) -> None:
+        """Enrich an enzyme with its parents."""
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
 
         parent = enzyme.parent
         if parent is None:
             return
-        graph.add_is_a(node, parent.serialize_to_bel())
+        graph.add_is_a(node, parent.as_bel())
 
         grandparent = parent.parent
         if grandparent is None:
             return
-        graph.add_is_a(parent.serialize_to_bel(), grandparent.serialize_to_bel())
+        graph.add_is_a(parent.as_bel(), grandparent.as_bel())
 
         greatgrandparent = grandparent.parent
         if greatgrandparent is None:
             return
-        graph.add_is_a(grandparent.serialize_to_bel(), greatgrandparent.serialize_to_bel())
+        graph.add_is_a(grandparent.as_bel(), greatgrandparent.as_bel())
 
-    def _enrich_enzyme_children_helper(self, graph, enzyme):
-        """
-
-        :param pybel.BELGraph graph:
-        :param Enzyme enzyme:
-        """
+    def _enrich_enzyme_children_helper(self, graph: BELGraph, enzyme: Enzyme) -> None:
         for child in enzyme.children:
-            child_bel = child.serialize_to_bel()
-            graph.add_is_a(child_bel, enzyme.serialize_to_bel())
-            self.enrich_enzyme_children(graph, child_bel.as_tuple())
+            child_bel = child.as_bel()
+            graph.add_is_a(child_bel, enzyme.as_bel())
+            self.enrich_enzyme_children(graph, child_bel)
 
-    def enrich_enzyme_children(self, graph, node):
-        """
-
-        :param pybel.BELGraph graph:
-        :param tuple node:
-        """
-        data = graph.node[node]
-        enzyme = self._look_up_enzyme(data)
+    def enrich_enzyme_children(self, graph: BELGraph, node: BaseEntity) -> None:
+        """Enrich an enzyme with all of its children."""
+        enzyme = self.look_up_enzyme(node)
         if enzyme is None:
             return
         self._enrich_enzyme_children_helper(graph, enzyme)
 
-    def enrich_enzymes(self, graph):
-        """Add all children of entries (enzyme codes with 4 numbers in them that can be directly annotated to proteins)
-
-        :param pybel.BELGraph graph: A BEL graph
-        """
+    def enrich_enzymes(self, graph: BELGraph) -> None:
+        """Add all children of entries."""
         for node in list(graph):
             self.enrich_enzyme_parents(graph, node)
             self.enrich_enzyme_children(graph, node)
             self.enrich_enzyme_with_proteins(graph, node)
 
-    def enrich_enzymes_with_prosites(self, graph):
-        """Enriches Enzyme classes in the graph with ProSites.
-
-        :param pybel.BELGraph graph: A BEL graph
-        """
-        for node, data in graph.nodes(data=True):
-            enzyme = self._look_up_enzyme(data)
+    def enrich_enzymes_with_prosites(self, graph: BELGraph) -> None:
+        """Enrich enzyme classes in the graph with ProSites."""
+        for node in list(graph):
+            enzyme = self.look_up_enzyme(node)
             if enzyme is None:
                 continue
 
             for prosite in enzyme.prosites:
-                graph.add_is_a(node, prosite.serialize_to_bel())
-
-    def write_bel_namespace(self, file):
-        """
-
-        :param file:
-        :return:
-        """
-        values = [expasy_id for expasy_id, in self.session.query(Enzyme.expasy_id).all()]
-        _write_bel_namespace_helper(values, file)
+                graph.add_is_a(node, prosite.as_bel())
 
     def _add_admin(self, app, **kwargs):
-        """Adds a Flask Admin interface to an application
+        """Add a Flask Admin interface to an application.
 
         :param flask.Flask app:
         :param session:
@@ -527,3 +437,15 @@ class Manager(AbstractManager):
         admin.add_view(ModelView(Protein, self.session))
 
         return admin
+
+    @staticmethod
+    def _get_identifier(model: Enzyme) -> str:
+        return model.expasy_id
+
+    def _create_namespace_entry_from_model(self, model: Enzyme, namespace: Namespace) -> NamespaceEntry:
+        return NamespaceEntry(
+            namespace=namespace,
+            name=model.expasy_id,
+            identifier=model.expasy_id,
+            encoding='GRP',
+        )

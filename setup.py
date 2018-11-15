@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Setup module for ``bio2bel_expasy``"""
+"""Setup module for ``bio2bel_expasy``."""
 
 import codecs
 import os
@@ -20,17 +20,18 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.6',
-    'Topic :: Scientific/Engineering :: Bio-Informatics'
+    'Programming Language :: Python :: 3.7',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
 ]
 INSTALL_REQUIRES = [
-    'pybel>=0.11.1',
+    'pybel>=0.12.0,<0.13.0',
+    'bio2bel>=0.2.0,<0.3.0',
     'requests',
     'tqdm',
     'sqlalchemy',
-    'networkx==1.11',
+    'networkx>=2.1',
     'click',
     'pandas',
-    'bio2bel>=0.0.9',
 ]
 EXTRAS_REQUIRE = {
     'web': ['flask', 'flask_admin'],
@@ -43,7 +44,6 @@ ENTRY_POINTS = {
         'bio2bel_expasy = bio2bel_expasy.cli:main',
     ]
 }
-
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -58,7 +58,7 @@ META_FILE = read(META_PATH)
 
 
 def find_meta(meta):
-    """Extract __*meta*__ from META_FILE"""
+    """Extract __*meta*__ from META_FILE."""
     meta_match = re.search(
         r'^__{meta}__ = ["\']([^"\']*)["\']'.format(meta=meta),
         META_FILE, re.M
@@ -87,9 +87,12 @@ if __name__ == '__main__':
         maintainer=find_meta('author'),
         maintainer_email=find_meta('email'),
         license=find_meta('license'),
+        classifiers=CLASSIFIERS,
+        keywords=KEYWORDS,
         packages=PACKAGES,
         package_dir={'': 'src'},
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRAS_REQUIRE,
         entry_points=ENTRY_POINTS,
+        zip_safe=False,
     )
