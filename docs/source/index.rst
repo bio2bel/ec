@@ -8,7 +8,6 @@ Bio2BEL ExPASy
 
    manager
    models
-   enrichment
    constants
 
 Indices and tables
