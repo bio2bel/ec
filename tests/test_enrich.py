@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""Test enrichment of a graph."""
+
 import unittest
 
-from bio2bel_expasy.constants import EXPASY, PROSITE, UNIPROT
+from bio2bel_expasy.constants import MODULE_NAME, PROSITE, UNIPROT
 from bio2bel_expasy.enrich import enrich_prosite_classes
 from bio2bel_expasy.parser.tree import normalize_expasy_id
 from pybel import BELGraph
@@ -16,7 +18,7 @@ test_class_id = normalize_expasy_id('1.-.-.-')
 
 
 def expasy(name=None, identifier=None):
-    return protein(namespace=EXPASY, name=name, identifier=identifier)
+    return protein(namespace=MODULE_NAME, name=name, identifier=identifier)
 
 
 def prosite(name=None, identifier=None):

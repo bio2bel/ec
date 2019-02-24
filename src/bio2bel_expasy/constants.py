@@ -6,7 +6,7 @@ import os
 
 from bio2bel import get_data_dir
 
-MODULE_NAME = 'expasy'
+MODULE_NAME = 'ec-code'
 DATA_DIR = get_data_dir(MODULE_NAME)
 
 #: The web location of the enzyme class tree document

@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import backref, relationship
 
 from pybel.dsl import protein
-from .constants import EXPASY, PROSITE, UNIPROT, MODULE_NAME
+from .constants import PROSITE, UNIPROT, MODULE_NAME
 
 ENZYME_TABLE_NAME = f'{MODULE_NAME}_enzyme'
 PROTEIN_TABLE_NAME = f'{MODULE_NAME}_protein'
@@ -64,7 +64,7 @@ class Enzyme(Base):
     def as_bel(self) -> protein:
         """Return a PyBEL node representing this enzyme."""
         return protein(
-            namespace=EXPASY,
+            namespace=MODULE_NAME,
             name=str(self.expasy_id),
             identifier=str(self.expasy_id)
         )
