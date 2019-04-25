@@ -339,7 +339,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
                 continue
 
             for enzyme in enzymes:
-                graph.add_unqualified_edge(enzyme.as_bel(), node, IS_A)
+                graph.add_is_a(enzyme.as_bel(), node)
 
     def look_up_enzyme(self, node: BaseEntity) -> Optional[Enzyme]:
         """Try to get an enzyme model from the given node."""
