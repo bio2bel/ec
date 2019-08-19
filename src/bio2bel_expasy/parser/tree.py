@@ -1,37 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import json
 import logging
-import os
-from urllib.request import urlretrieve
+from typing import Optional
 
-import networkx as nx
+from bio2bel.downloading import make_downloader
 
-from ..constants import EXPASY_TREE_DATA_PATH, EXPASY_TREE_URL
-from ..utils import normalize_expasy_id
+from bio2bel_expasy.constants import EXPASY_TREE_DATA_PATH, EXPASY_TREE_URL
+from bio2bel_expasy.utils import normalize_expasy_id
 
 __all__ = [
     'normalize_expasy_id',
     'give_edge',
-    'get_tree',
+    'get_expasy_tree',
 ]
 
 log = logging.getLogger(__name__)
 
-
-def download_expasy_tree(force_download=False):
-    """Download the expasy tree file
-
-    :param bool force_download: True to force download
-    :return: The path to the data file
-    :rtype: str
-    """
-    if os.path.exists(EXPASY_TREE_DATA_PATH) and not force_download:
-        log.info('using cached data at %s', EXPASY_TREE_DATA_PATH)
-    else:
-        log.info('downloading %s to %s', EXPASY_TREE_URL, EXPASY_TREE_DATA_PATH)
-        urlretrieve(EXPASY_TREE_URL, EXPASY_TREE_DATA_PATH)
-
-    return EXPASY_TREE_DATA_PATH
+download_expasy_tree = make_downloader(EXPASY_TREE_URL, EXPASY_TREE_DATA_PATH)
 
 
 def give_edge(head_str):
@@ -48,22 +34,31 @@ def give_edge(head_str):
     while '-' in nums:
         nums.remove('-')
 
-    l_nums = len(nums)
+    level = len(nums)
 
-    if l_nums == 1:
-        return None, "{}.-.-.-".format(nums[0])
+    if level == 1:
+        return level, None, "{}.-.-.-".format(nums[0])
 
-    if l_nums == 2:
-        return (normalize_expasy_id("{}. -. -.-".format(nums[0])),
-                normalize_expasy_id("{}.{:>2}. -.-".format(nums[0], nums[1])))
+    if level == 2:
+        return (
+            level,
+            normalize_expasy_id("{}. -. -.-".format(nums[0])),
+            normalize_expasy_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
+        )
 
-    if l_nums == 3:
-        return (normalize_expasy_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
-                normalize_expasy_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])))
+    if level == 3:
+        return (
+            level,
+            normalize_expasy_id("{}.{:>2}. -.-".format(nums[0], nums[1])),
+            normalize_expasy_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
+        )
 
-    if l_nums == 4:
-        return (normalize_expasy_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
-                normalize_expasy_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])))
+    if level == 4:
+        return (
+            level,
+            normalize_expasy_id("{}.{:>2}.{:>2}.-".format(nums[0], nums[1], nums[2])),
+            normalize_expasy_id("{}.{:>2}.{:>2}.{}".format(nums[0], nums[1], nums[2], nums[3])),
+        )
 
 
 def _process_line(line, graph):
@@ -71,7 +66,7 @@ def _process_line(line, graph):
     if not line[0].isnumeric():
         return
     head = line[:10]
-    parent, child = give_edge(head)
+    l_nums, parent, child = give_edge(head)
     name = line[11:]
     name = name.strip().strip('.')
     graph.add_node(child, description=name)
@@ -79,29 +74,48 @@ def _process_line(line, graph):
         graph.add_edge(parent, child)
 
 
-def _process_lines(lines):
-    """Convert the lines of the ExPASy tree file to a directional graph
-
-    :param iter[str] lines:
-    :rtype: networkx.DiGraph
-    """
-    graph = nx.DiGraph()
-
+def lines_to_json(lines):
+    rv = {}
     for line in lines:
-        _process_line(line, graph)
+        if not line[0].isnumeric():
+            continue
+        head = line[:10]
+        level, parent_expasy_id, expasy_id = give_edge(head)
+        name = line[11:]
+        name = name.strip().strip('.')
 
-    return graph
+        rv[expasy_id] = {
+            'concept': {
+                'namespace': 'ec-code',
+                'identifier': expasy_id,
+            },
+            'name': name,
+            'level': level,
+            'children': [],
+        }
+        if parent_expasy_id is not None:
+            rv[expasy_id]['parent'] = {
+                'namespace': 'ec-code',
+                'identifier': parent_expasy_id,
+            }
+            rv[parent_expasy_id]['children'].append(rv[expasy_id]['concept'])
+
+    return rv
 
 
-def get_tree(path=None, force_download=False):
-    """Populates graph from a given specific file.
+def get_expasy_tree(path: Optional[str] = None, force_download: bool = False):
+    """Populate the graph from a given specific file.
 
-    :param Optional[str] path: The destination of the download
-    :param bool force_download: True to force download
-    :rtype: networkx.DiGraph
+    :param path: The destination of the download
+    :param force_download: True to force download
     """
     if path is None:
         path = download_expasy_tree(force_download=force_download)
 
     with open(path) as file:
-        return _process_lines(file)
+        return lines_to_json(file)
+
+
+if __name__ == '__main__':
+    tree = get_expasy_tree()
+    print(json.dumps(tree, indent=2))

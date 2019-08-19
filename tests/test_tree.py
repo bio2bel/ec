@@ -4,7 +4,7 @@ import unittest
 
 from networkx import DiGraph
 
-from bio2bel_expasy.parser.tree import get_tree, normalize_expasy_id
+from bio2bel_expasy.parser.tree import get_expasy_tree, normalize_expasy_id
 from tests.constants import TREE_TEST_FILE, TemporaryCacheClsMixin
 
 DESCRIPTION = 'description'
@@ -13,7 +13,7 @@ DESCRIPTION = 'description'
 class TestParseTree(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tree = get_tree(path=TREE_TEST_FILE)
+        cls.tree = get_expasy_tree(path=TREE_TEST_FILE)
 
     def test_tree_exists(self):
         self.assertIsInstance(self.tree, DiGraph)

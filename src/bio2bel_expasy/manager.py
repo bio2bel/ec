@@ -17,7 +17,7 @@ from pybel.manager.models import Namespace, NamespaceEntry
 from .constants import MODULE_NAME
 from .models import Base, Enzyme, Prosite, Protein, enzyme_prosite, enzyme_protein
 from .parser.database import get_expasy_database, ID, DE, PR, DR
-from .parser.tree import get_tree, give_edge, normalize_expasy_id
+from .parser.tree import get_expasy_tree, give_edge, normalize_expasy_id
 
 __all__ = ['Manager']
 
@@ -156,7 +156,7 @@ class Manager(AbstractManager, BELNamespaceManagerMixin, FlaskMixin):
         :param path: A custom url to download
         :param force_download: If true, overwrites a previously cached file
         """
-        tree = get_tree(path=path, force_download=force_download)
+        tree = get_expasy_tree(path=path, force_download=force_download)
 
         for expasy_id, data in tqdm(tree.nodes(data=True), desc='Classes', total=tree.number_of_nodes()):
             self.get_or_create_enzyme(

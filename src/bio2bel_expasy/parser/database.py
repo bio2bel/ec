@@ -1,21 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import json
 import logging
 import os
-import re
-from urllib.request import urlretrieve
+from typing import Any, Iterable, Mapping, Optional
 
-from ..constants import (
-    EC_DELETED_REGEX, EC_PATTERN_REGEX, EC_PROSITE_REGEX, EC_TRANSFERRED_REGEX, EXPASY_DATABASE_URL,
-    EXPASY_DATA_PATH,
-)
+from bio2bel.downloading import make_downloader
+
+from bio2bel_expasy.constants import EXPASY_DATABASE_URL, EXPASY_DATA_PATH, EXPASY_PARSED_PATH
 
 __all__ = [
     'get_expasy_database',
-    'ID',
-    'DE',
-    'PR',
-    'DR',
 ]
 
 log = logging.getLogger(__name__)
@@ -37,107 +32,115 @@ PR = 'PR'
 #: Reference to UniProt or SwissProt (Many)
 DR = 'DR'
 
-ec_pattern = re.compile(EC_PATTERN_REGEX)
-deleted_pattern = re.compile(EC_DELETED_REGEX)
-transferred_pattern = re.compile(EC_TRANSFERRED_REGEX)
-prosite_pattern = re.compile(EC_PROSITE_REGEX)
+download_expasy_database = make_downloader(EXPASY_DATABASE_URL, EXPASY_DATA_PATH)
 
 
-def download_expasy_database(force_download=False):
-    """Downloads the ExPASy database
+def get_expasy_database(path: Optional[str] = None, force_download: bool = False) -> Mapping[str, Any]:
+    """Get the ExPASy database as a JSON object.
 
-    :param bool force_download: bool to force download
-    :rtype: str
+    :param path: path to the file
+    :param force_download: True to force download resources
+    :return: list of data containing dictionaries
     """
-    if not os.path.exists(EXPASY_DATA_PATH) or force_download:
-        log.info('downloading %s to %s', EXPASY_DATABASE_URL, EXPASY_DATA_PATH)
-        urlretrieve(EXPASY_DATABASE_URL, EXPASY_DATA_PATH)
-    else:
-        log.info('using cached data at %s', EXPASY_DATA_PATH)
+    if path is not None:
+        with open(path) as file:
+            return _get_expasy_database_helper(file)
 
-    return EXPASY_DATA_PATH
+    download_expasy_database(force_download=force_download)
 
+    if os.path.exists(EXPASY_PARSED_PATH):
+        with open(EXPASY_PARSED_PATH) as file:
+            return json.load(file)
 
-def get_expasy_database(path=None, force_download=False):
-    """Interface to call expasy_parser_helper(enzclass_file) method.
+    with open(EXPASY_DATA_PATH) as file, open(EXPASY_PARSED_PATH, 'w') as parsed_file:
+        rv = _get_expasy_database_helper(file)
+        json.dump(rv, parsed_file, indent=2, sort_keys=True)
 
-    :param Optional[str] path: path to the file
-    :param bool force_download: True to force download resources
-    :return list[dict]: list of data containing dictionaries
-    """
-    if path is None:
-        download_expasy_database(force_download=force_download)
-
-    with open(path or EXPASY_DATA_PATH, 'r') as enzclass_file:
-        return _get_expasy_database_helper(enzclass_file)
+    return rv
 
 
-def _get_expasy_database_helper(lines):
-    """Parses the ExPASy database file. Returns a list of enzyme entry dictionaries
+def group_by_id(lines):
+    groups = []
 
-    :param iter[str] lines: An iterator over the ExPASy database file or file-like
-    :rtype: list[dict]
-    """
-    expasy_db = []
-    ec_data_entry = {ID: ''}
+    for line in lines:  # TODO replace with itertools.groupby
+        line = line.strip()
 
-    for line in lines:
+        if line.startswith('ID'):
+            groups.append([])
+
+        if not groups:
+            continue
+
         descriptor = line[:2]
-        if descriptor == "//":
-            if ec_data_entry[ID] != '':
-                ec_data_entry[CC] = " ".join(ec_data_entry[CC].split())
-                ec_data_entry[CA] = " ".join(ec_data_entry[CA].split())
-                expasy_db.append(ec_data_entry)
-                # log.info(" EC_ENTRY: {}".format(ec_data_entry))
-            ec_data_entry = {
-                ID: '',
-                DE: '',
-                AN: [],
-                CA: '',
-                CF: [],
-                CC: '',
-                PR: [],
-                DR: [],
-                'DELETED': False,
-                'TRANSFERRED': []
-            }
-            continue
-        if descriptor == CC and ec_data_entry[ID] == '':
-            log.debug('skipping %s', line.strip())
-            continue
+        value = line[5:]
 
-        # parsing
-        if descriptor == ID:
-            ec_data_entry[ID] = ec_pattern.search(line).group()
-            continue
-        elif descriptor == DE:
-            ec_data_entry[DE] = line.split('   ')[1].strip()
-            if deleted_pattern.search(line) is not None:
-                ec_data_entry['DELETED'] = True
-            if transferred_pattern.search(line) is not None:
-                matches = ec_pattern.finditer(line)
-                for ec_ in matches:
-                    ec_data_entry['TRANSFERRED'].append(ec_.group())
-        elif descriptor == AN:
-            ec_data_entry[AN].append(line[5:-2])
-        elif descriptor == CA:
-            ec_data_entry[CA] += line[5:-1]
-        elif descriptor == CF:
-            for cf_ in line[5:-2].split("; "):
-                ec_data_entry[CF].append(cf_)
-        elif descriptor == CC:
-            ec_data_entry[CC] += line[5:-1]
-        elif descriptor == PR:
-            ec_data_entry[PR].append(prosite_pattern.search(line).group())
-        elif descriptor == DR:
-            for dr_tuple in line[5:-2].split(';'):
-                dr_tuple = dr_tuple.strip()
-                accession_number, entry_name = dr_tuple.split(', ')[0:2]
-                ec_data_entry[DR].append(dict(
-                    accession_number=accession_number,
-                    entry_name=entry_name
-                ))
-        else:
-            log.warning(" Unknown Descriptor is found. Risk of missed data or corrupt/wrong file.")
+        groups[-1].append((descriptor, value))
 
-    return expasy_db
+    return groups
+
+
+def _get_expasy_database_helper(lines: Iterable[str]) -> Mapping:
+    """Parse the ExPASy database file and returns a list of enzyme entry dictionaries
+
+    :param lines: An iterator over the ExPASy database file or file-like
+    """
+    rv = {}
+
+    for groups in group_by_id(lines):
+        _, expasy_id = groups[0]
+
+        rv[expasy_id] = ec_data_entry = {
+            'concept': {
+                'namespace': 'ec-code',
+                'identifier': expasy_id,
+            },
+            'parent': {
+                'namespace': 'ec-code',
+                'identifier': expasy_id.rsplit('.', 1)[0] + '.-',
+            },
+            'synonyms': [],
+            'cofactors': [],
+            'domains': [],
+            'proteins': [],
+            'alt_ids': [],
+        }
+
+        for descriptor, value in groups[1:]:
+            if descriptor == '//':
+                continue
+            elif descriptor == DE and value == 'Deleted entry.':
+                continue
+            elif descriptor == DE and value.startswith('Transferred entry: '):
+                value = value[len('Transferred entry: '):].rstrip()
+                ec_data_entry['transfer_id'] = value
+            elif descriptor == DE:
+                ec_data_entry['concept']['name'] = value.rstrip('.')
+            elif descriptor == AN:
+                ec_data_entry['synonyms'].append(value.rstrip('.'))
+            elif descriptor == PR:
+                value = value[len('PROSITE; '):-1]  # remove trailing comma
+                ec_data_entry['domains'].append({
+                    'namespace': 'prosite',
+                    'identifier': value,
+                })
+            elif descriptor == DR:
+                for uniprot_entry in value.replace(' ', '').split(';'):
+                    if not uniprot_entry:
+                        continue
+                    uniprot_id, uniprot_accession = uniprot_entry.split(',')
+                    ec_data_entry['proteins'].append(dict(
+                        namespace='uniprot',
+                        name=uniprot_accession,
+                        identifier=uniprot_id,
+                    ))
+
+    for expasy_id, data in rv.items():
+        transfer_id = data.pop('transfer_id', None)
+        if transfer_id is not None:
+            rv[expasy_id]['alt_ids'].append(transfer_id)
+
+    return rv
+
+
+if __name__ == '__main__':
+    r = get_expasy_database()

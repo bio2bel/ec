@@ -18,6 +18,7 @@ EXPASY_TREE_DATA_PATH = os.path.join(DATA_DIR, 'enzclass.txt')
 EXPASY_DATABASE_URL = 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat'
 #: The local cache location where the ENZYME database document is stored
 EXPASY_DATA_PATH = os.path.join(DATA_DIR, 'enzyme.dat')
+EXPASY_PARSED_PATH = os.path.join(DATA_DIR, 'enzyme.json')
 
 EC_DATA_FILE_REGEX = r'(ID   )(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
 EC_PATTERN_REGEX = r'(\d+|\-)\.( )*((\d+)|(\-))\.( )*(\d+|\-)(\.(n)?(\d+|\-))*'
@@ -25,7 +26,6 @@ EC_PROSITE_REGEX = r'(PDOC|PS)(\d+)'
 EC_DELETED_REGEX = 'Deleted entry'
 EC_TRANSFERRED_REGEX = 'Transferred entry'
 
-EXPASY = 'eccode'
 PROSITE = 'prosite'
 UNIPROT = 'uniprot'
 
